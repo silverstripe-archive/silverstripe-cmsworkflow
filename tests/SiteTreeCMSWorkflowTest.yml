@@ -1,0 +1,23 @@
+Permission:
+   accesscmsmain:
+      Code: CMS_ACCESS_CMSMain
+Group:
+   custompublishergroup:
+      Title: custompublishergroup
+      Permissions: =>Permission.accesscmsmain
+Member:
+   randomuser:
+      Email: randomuser@test.com
+   defaultpublisher:
+      Email: defaultpublisher@test.com
+   custompublisher:
+      Email: publisher@test.com
+      Groups: =>Group.custompublishergroup
+SiteTree:
+   defaultpublisherspage:
+      Title: defaultpublisherspage
+      CanPublishType: OnlyTheseUsers
+   custompublisherpage:
+      Title: custompublisherpage
+      CanPublishType: OnlyTheseUsers
+      PublisherGroups: =>Group.custompublishergroup
