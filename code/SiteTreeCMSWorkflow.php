@@ -1,7 +1,10 @@
 <?php
-
 /**
- * Extension to SiteTree for CMS Workflow support
+ * Extension to SiteTree for CMS Workflow support.
+ * 
+ * Creates
+ *
+ * @package cmsworkflow
  */
 class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	function extraDBFields() {
@@ -126,23 +129,56 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	 *
 	 * @return boolean True if the current user can view this page.
 	 */
-	public function alternateCanPublish($member = null) {
-		if(!isset($member)) $member = Member::currentUser();
+	public function canPublish($member = null) {
+		if(!$member && $member !== FALSE) $member = Member::currentUser();
 
+		// check for admin permission
 		if(Permission::checkMember($member, 'ADMIN')) return true;
-		if(!Permission::checkMember($member, 'CMS_ACCESS_CMSMain')) return false;
 		
-		if(((!$this->owner->CanPublishType) || ($this->owner->CanPublishType == 'Anyone') ||
-						($this->owner->CanPublishType == 'LoggedInUsers' && $member) ||
-						($this->owner->CanPublishType == 'OnlyTheseUsers' && $member &&
-						 $member->inGroups($this->owner->PublisherGroups()))) == false)
-					return false;
+		// check for missing cmsmain permission
+		if(!Permission::checkMember($member, 'CMS_ACCESS_CMSMain')) return false;
+
+		// check for empty spec
+		if(!$this->owner->CanPublishType || $this->owner->CanPublishType == 'Anyone') return true;
+
+		// check for any logged-in users
+		if($this->owner->CanPublishType == 'LoggedInUsers' && !Permission::checkMember($member, 'CMS_ACCESS_CMSMain')) return false;
+
+		// check for specific groups
+		if(
+			$this->owner->CanPublishType == 'OnlyTheseUsers' 
+			&& (
+				!$member
+				|| !$member->inGroups($this->owner->PublisherGroups())
+			)
+		) {
+			return false;
+		}
 
 		return true;
 	}
 	
-	function augmentPopulateDefaults() {
-		$this->owner->PublisherGroups()->add(Permission::get_groups_by_permission('ADMIN')->first()->ID);
+	/**
+	 * Adds mappings of the default groups created 
+	 */
+	function onAfterWrite() {
+		if(!$this->owner->EditorGroups()->Count()) {
+			$SQL_group = Convert::raw2sql('site-content-authors');
+	        $groupCheckObj = DataObject::get_one('Group', "Code = '{$SQL_group}'");
+			//Debug::show(DataObject::get('Group'));
+	        $this->owner->EditorGroups()->add($groupCheckObj);
+			
+			$SQL_group = Convert::raw2sql('site-content-publishers');
+			$groupCheckObj = DataObject::get_one('Group', "Code = '{$SQL_group}'");
+			$this->owner->EditorGroups()->add($groupCheckObj);
+		}
+		
+		if(!$this->owner->PublisherGroups()->Count()) {
+			$SQL_group = Convert::raw2sql('site-content-publishers');
+			$groupCheckObj = DataObject::get_one('Group', "Code = '{$SQL_group}'");
+			$this->owner->PublisherGroups()->add($groupCheckObj);
+		}
+
 	}
 
 	function augmentDefaultRecords() {
@@ -152,9 +188,18 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			$authorGroup->Code = "site-content-authors";
 			$authorGroup->write();
 			Permission::grant($authorGroup->ID, "CMS_ACCESS_CMSMain");
-
 			Permission::grant($authorGroup->ID, "CMS_ACCESS_AssetAdmin");
 			Database::alteration_message("Added site content author group","created");
+		}
+
+		if(!DB::query("SELECT * FROM `Group` WHERE `Group`.`Code` = 'site-content-publishers'")->value()){
+			$publishersGroup = Object::create('Group');
+			$publishersGroup->Title = 'Site Content Publishers';
+			$publishersGroup->Code = "site-content-publishers";
+			$publishersGroup->write();
+			Permission::grant($publishersGroup->ID, "CMS_ACCESS_CMSMain");
+			Permission::grant($publishersGroup->ID, "CMS_ACCESS_AssetAdmin");
+			Database::alteration_message("Added site content publisher group","created");
 		}
 	}
 	
@@ -163,9 +208,8 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	 */
 	function onAfterPublish() {
 		$this->owner->NeedsPublication = false;
-		$this->owner->write();
+		$this->owner->writeWithoutVersion();
 	}
 	
 }
-
 ?>
