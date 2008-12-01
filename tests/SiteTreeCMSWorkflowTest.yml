@@ -1,10 +1,15 @@
 Permission:
-   accesscmsmain:
+   accesscmsmain1:
+      Code: CMS_ACCESS_CMSMain
+   accesscmsmain2:
       Code: CMS_ACCESS_CMSMain
 Group:
    custompublishergroup:
       Title: custompublishergroup
-      Permissions: =>Permission.accesscmsmain
+      Permissions: =>Permission.accesscmsmain1
+   customauthorsgroup:
+      Title: customauthorsgroup
+      Permissions: =>Permission.accesscmsmain2
 Member:
    randomuser:
       Email: randomuser@test.com
@@ -13,6 +18,9 @@ Member:
    custompublisher:
       Email: publisher@test.com
       Groups: =>Group.custompublishergroup
+   customauthor:
+      Email: customauthor@test.com
+      Groups: =>Group.customauthorsgroup
 SiteTree:
    defaultpublisherspage:
       Title: defaultpublisherspage

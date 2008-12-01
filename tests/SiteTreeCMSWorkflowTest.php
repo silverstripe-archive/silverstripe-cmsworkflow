@@ -3,7 +3,7 @@
  * @package cmsworkflow
  * @subpackage tests
  */
-class SiteTreeCMSWorkflowTest extends SapphireTest {
+class SiteTreeCMSWorkflowTest extends FunctionalTest {
 	
 	/**
 	 * Created in setUp() to ensure defaults are created *before* inserting new fixtures,
@@ -53,6 +53,52 @@ class SiteTreeCMSWorkflowTest extends SapphireTest {
 			'Default publisher groups are assigned to new records'
 		);
 	}
+	
+	// doesn't work because Member::currentUser() doesn't respect test session data in SiteTree->canEdit()
+	/*
+	function testCmsActionsLimited() {
+		$custompublisherspage = $this->objFromFixture('SiteTree', 'custompublisherpage');
+		
+		$custompublishersgroup = $this->objFromFixture('Group', 'custompublishergroup');
+		$custompublisher = $this->objFromFixture('Member', 'custompublisher');
+		$custompublisher->Groups()->add($custompublishersgroup);
+		
+		$customauthorsgroup = $this->objFromFixture('Group', 'customauthorsgroup');
+		$customauthor = $this->objFromFixture('Member', 'customauthor');
+		$customauthor->Groups()->add($customauthorsgroup);
+		
+		$unpublishedRecord = new Page();
+		$unpublishedRecord->write();
+		
+		$publishedRecord = new Page();
+		$publishedRecord->write();
+		$publishedRecord->publish('Stage', 'Live');
+		
+		$deletedFromLiveRecord = new Page();
+		$deletedFromLiveRecord->write();
+		$deletedFromLiveRecord->publish('Stage', 'Live');
+		$deletedFromLiveRecord->deleteFromStage('Live');
+		
+		$changedOnStageRecord = new Page();
+		$changedOnStageRecord->write();
+		$changedOnStageRecord->publish('Stage', 'Live');
+		$changedOnStageRecord->Content = 'Changed on Stage';
+		$changedOnStageRecord->write();
+		
+		// test for author
+		var_dump($customauthor->Email);
+		$this->session()->inst_set('loggedInAs', $customauthor->ID);
+		$c = Member::currentUser();
+		var_dump($c);
+		return;
+		$actions = $unpublishedRecord->getCMSActions();
+		$this->assertNotContains(
+			'action_publish',
+			$unpublishedRecord->getCMSActions(),
+			'Author cant trigger publish button'
+		);
+	}
+	*/
 	
 }
 ?>

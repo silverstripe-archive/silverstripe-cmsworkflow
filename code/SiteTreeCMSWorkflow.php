@@ -10,7 +10,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	function extraDBFields() {
 		return array(
 			'db' => array(
-				"NeedsPublication" => "Boolean",
+				"NeedsReview" => "Boolean",
 				"CanPublishType" =>"Enum('LoggedInUsers, OnlyTheseUsers', 'OnlyTheseUsers')", 
 			),
 			'many_many' => array(
@@ -43,31 +43,39 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		}
 	}
 	
+	/**
+	 * Normal authors (without publication permission) can perform the following actions on a page:
+	 * - save
+	 * - cancel draft changes
+	 * - 
+	 */
 	public function updateCMSActions(&$actions) {
+		// if user doesn't have publish rights, exchange the behavior from
+		// "publish" to "request publish" etc.
 		if(!$this->owner->canPublish()) {
-			foreach($actions as $i => $action) if($action->Name() == 'publish') unset($actions[$i]);
+
+			// "request publication"
+			$actions->removeByName('action_publish');
 			if($this->owner->canEdit() && $this->owner->stagesDiffer('Stage', 'Live')) { 
-				$actions[] = new FormAction('callPageMethod', _t('SiteTreeCMSWorkflow.BUTTONREQUESTPUBLICATION', 'Request Publication'), null, 'cms_requestpublication');
+				$actions->push(
+					new FormAction(
+						'cms_requestpublication', 
+						_t('SiteTreeCMSWorkflow.BUTTONREQUESTPUBLICATION', 'Request Publication')
+					)
+				);
+			}
+			
+			// "request removal"
+			$actions->removeByName('action_deletefromlive');
+			if($this->owner->canEdit() && $this->owner->stagesDiffer('Stage', 'Live')) { 
+				$actions->push(
+					new FormAction(
+						'cms_requestdeletefromlive', 
+						_t('SiteTreeCMSWorkflow.BUTTONREQUESTREMOVAL', 'Request Removal')
+					)
+				);
 			}
 		}
-	}
-	
-	/**
-	 * Handler for the CMS button
-	 */
-	public function cms_requestpublication() {
-		$this->doRequestPublication();
-		
-		$members = $this->owner->PublisherMembers();
-		foreach($members as $member) {
-			$emails[] = $member->Email;
-		}
-		$strEmails = implode(", ", $emails);
-		
-		FormResponse::status_message(
-			sprintf(_t('SiteTreeCMSWorkflow.REQUEST_PUBLICATION_SUCCESS_MESSAGE','Emailed %s requesting publication'), 
-			$strEmails), 'good');
-		return FormResponse::respond();	
 	}
 	
 	/**
@@ -85,39 +93,6 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			$group = Permission::get_groups_by_permission('ADMIN')->first();
 			return $group->Members();
 		}
-	}
-
-	public function doRequestPublication(){
-		$this->owner->NeedsPublication = true;
-		$this->owner->writeWithoutVersion();
-		$currentUser = Member::CurrentUser();
-		global $project;
-
-		$members = $this->PublisherMembers();
-		if($members->count()){
-			foreach($members as $member){
-				$notify = new PublishRequestEmail();
-				$notify -> setTo($member->Email);
-				if($currentUser->Email) {
-					$notify -> setFrom($currentUser->Email);
-				}else{
-					$notify -> setFrom(Email::getAdminEmail());
-				}
-				$notify -> setSubject(_t("SiteTreeCMSWorkflow.REQUEST_PUBLICATION_EMAIL_SUBJECT", "Please review and publish the \"{$this->owner->Title}\" page on your site."));
-				$emailData = array(
-					"ProjectTitle" => strtoupper($project),
-					"PageCMSLink" => "admin/show/".$this->owner->ID,
-					"Receiver" => $member,
-					"Sender" => $currentUser,
-					"Page" => $this,
-					"StageSiteLink"	=> $this->owner->Link()."?stage=stage",
-					"LiveSiteLink"	=> $this->owner->Link()."?stage=live",
-				);
-				$notify->populateTemplate($emailData);
-				$notify->send();
-			}
-		}
-		return $this;
 	}
 
 	/**
@@ -164,19 +139,18 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	function onAfterWrite() {
 		if(!$this->owner->EditorGroups()->Count()) {
 			$SQL_group = Convert::raw2sql('site-content-authors');
-	        $groupCheckObj = DataObject::get_one('Group', "Code = '{$SQL_group}'");
-			//Debug::show(DataObject::get('Group'));
-	        $this->owner->EditorGroups()->add($groupCheckObj);
+			$groupCheckObj = DataObject::get_one('Group', "Code = '{$SQL_group}'");
+			if($groupCheckObj) $this->owner->EditorGroups()->add($groupCheckObj);
 			
 			$SQL_group = Convert::raw2sql('site-content-publishers');
 			$groupCheckObj = DataObject::get_one('Group', "Code = '{$SQL_group}'");
-			$this->owner->EditorGroups()->add($groupCheckObj);
+			if($groupCheckObj) $this->owner->EditorGroups()->add($groupCheckObj);
 		}
 		
 		if(!$this->owner->PublisherGroups()->Count()) {
 			$SQL_group = Convert::raw2sql('site-content-publishers');
 			$groupCheckObj = DataObject::get_one('Group', "Code = '{$SQL_group}'");
-			$this->owner->PublisherGroups()->add($groupCheckObj);
+			if($groupCheckObj) $this->owner->PublisherGroups()->add($groupCheckObj);
 		}
 
 	}
@@ -207,7 +181,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	 * After publishing remove from the report of items needing publication 
 	 */
 	function onAfterPublish() {
-		$this->owner->NeedsPublication = false;
+		$this->owner->NeedsReview = false;
 		$this->owner->writeWithoutVersion();
 	}
 	

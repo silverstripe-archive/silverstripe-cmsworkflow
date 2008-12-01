@@ -9,7 +9,7 @@ class PublisherReviewSideReport extends SideReport {
 		return _t('PublisherReviewSideReport.TITLE',"Needing to be published");
 	}
 	function records() {
-		return DataObject::get("SiteTree", "`SiteTree`.NeedsPublication", "`SiteTree`.`LastEdited` DESC");
+		return DataObject::get("SiteTree", "`SiteTree`.NeedsReview", "`SiteTree`.`LastEdited` DESC");
 	}
 	function fieldsToShow() {
 		return array(
