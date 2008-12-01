@@ -54,6 +54,10 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		// "publish" to "request publish" etc.
 		if(!$this->owner->canPublish()) {
 
+			// authors shouldn't be able to revert, as this republishes the page.
+			// they should rather change the page and re-request publication
+			$actions->removeByName('action_revert');
+
 			// "request publication"
 			$actions->removeByName('action_publish');
 			if($this->owner->canEdit() && $this->owner->stagesDiffer('Stage', 'Live')) { 
