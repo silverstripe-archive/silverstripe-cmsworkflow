@@ -7,17 +7,14 @@
 					<td scope="row" colspan="2" class="typography">
 						Hi $Receiver.Name,<br />
 						<p>
-						$Sender.Name has recently updated the page titled "$Page.Title" and would like to have the changes published.
+						$Sender.Name has recently updated the page titled "<a href="$LiveSiteLink">$Page.Title</a>" and would like to have the changes published.
 						</p>
-						<p>
-						To publish the page, you can go to CMS by clicking <a href="$PageCMSLink">here</a>.
-						</p>
-						<p>
-						To view the page in draft site, click <a href="$StageSiteLink">here</a>.
-						</p>
-						<p>
-						To view the page in published site, click <a href="$LiveSiteLink">here</a>.
-						</p>
+						<ul>
+							<li><a href="$PageCMSLink">Publish the page in the CMS</a></li>
+							<li><a href="$StageSiteLink">View the changed draft</a></li>
+							<li><a href="$LiveSiteLink">View the published site</a></li>
+							<li><a href="$DiffCMSLink">Compare changes between live and the changed draft</a></li>
+						</ul>
 						<br />
 						Thanks.
 					</td>

@@ -61,6 +61,7 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 					"Page" => $record,
 					"StageSiteLink"	=> $record->Link()."?stage=stage",
 					"LiveSiteLink"	=> $record->Link()."?stage=live",
+					"DiffCMSLink" => $this->diffAdminLink($record)
 				);
 				$notify->populateTemplate($emailData);
 				$notify->send();
@@ -121,12 +122,27 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 					"Page" => $record,
 					"StageSiteLink"	=> $record->Link()."?stage=stage",
 					"LiveSiteLink"	=> $record->Link()."?stage=live",
+					"DiffCMSLink" => $this->diffAdminLink($record)
 				);
 				$notify->populateTemplate($emailData);
 				$notify->send();
 			}
 		}
 		return $this;
+	}
+	
+	/**
+	 * Returns a CMS link to see differences made in the request
+	 * 
+	 * @param Page $record
+	 * @return string URL
+	 */
+	protected function diffAdminLink($record) {
+		$fromVersion = $record->Version;
+		$latestPublished = Versioned::get_one_by_stage($record->class, 'Live', "`SiteTree_Live`.ID = {$record->ID}", true, "Created DESC");
+		if($latestPublished) $latestPublishedVersion = $latestPublished->Version;
+		
+		return "admin/compareversions/$record->ID/?From={$fromVersion}&To={$latestPublishedVersion}";
 	}
 
 }
