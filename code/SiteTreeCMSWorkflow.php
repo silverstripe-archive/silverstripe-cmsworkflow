@@ -60,7 +60,11 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 
 			// "request publication"
 			$actions->removeByName('action_publish');
-			if($this->owner->canEdit() && $this->owner->stagesDiffer('Stage', 'Live')) { 
+			if(
+				$this->owner->canEdit() 
+				&& $this->owner->stagesDiffer('Stage', 'Live')
+				&& $this->owner->Version > 1 // page has been saved at least once
+			) { 
 				$actions->push(
 					new FormAction(
 						'cms_requestpublication', 
@@ -71,7 +75,11 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			
 			// "request removal"
 			$actions->removeByName('action_deletefromlive');
-			if($this->owner->canEdit() && $this->owner->stagesDiffer('Stage', 'Live')) { 
+			if(
+				$this->owner->canEdit() 
+				&& $this->owner->stagesDiffer('Stage', 'Live')
+				&& $this->owner->isPublished()
+			) { 
 				$actions->push(
 					new FormAction(
 						'cms_requestdeletefromlive', 
