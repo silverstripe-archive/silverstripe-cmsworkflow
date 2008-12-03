@@ -54,6 +54,28 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 		);
 	}
 	
+	function testAccessTabOnlyDisplaysWithGrantAccessPermissions() {
+		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
+		
+		$customauthor = $this->objFromFixture('Member', 'customauthor');
+		$this->session()->inst_set('loggedInAs', $customauthor->ID);
+		$fields = $page->getCMSFields();
+		$this->assertTrue(
+			$fields->dataFieldByName('CanPublishType')->isReadonly(),
+			'Users with publish or SITETREE_GRANT_ACCESS permission can change "publish" group assignments in cms fields'
+		);
+		
+		$custompublisher = $this->objFromFixture('Member', 'custompublisher');
+		$this->session()->inst_set('loggedInAs', $custompublisher->ID);
+		$fields = $page->getCMSFields();
+		$this->assertFalse(
+			$fields->dataFieldByName('CanPublishType')->isReadonly(),
+			'Users without publish or SITETREE_GRANT_ACCESS permission cannot change "publish" group assignments in cms fields'
+		);
+		
+		$this->session()->inst_set('loggedInAs', null);
+	}
+	
 	// doesn't work because Member::currentUser() doesn't respect test session data in SiteTree->canEdit()
 	/*
 	function testCmsActionsLimited() {

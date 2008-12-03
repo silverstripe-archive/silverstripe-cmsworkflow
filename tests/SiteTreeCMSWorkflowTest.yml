@@ -3,10 +3,12 @@ Permission:
       Code: CMS_ACCESS_CMSMain
    accesscmsmain2:
       Code: CMS_ACCESS_CMSMain
+   grantaccess1:
+      Code: SITETREE_GRANT_ACCESS
 Group:
    custompublishergroup:
       Title: custompublishergroup
-      Permissions: =>Permission.accesscmsmain1
+      Permissions: =>Permission.accesscmsmain1,=>Permission.grantaccess1
    customauthorsgroup:
       Title: customauthorsgroup
       Permissions: =>Permission.accesscmsmain2

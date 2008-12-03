@@ -23,23 +23,22 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	}
 	
 	public function updateCMSFields(&$fields) {
-		if($this->owner->canPublish()) {
-			$fields->addFieldsToTab("Root.Access", array(
-				new HeaderField(_t('SiteTreeCMSWorkflow.PUBLISHHEADER', "Who can publish this inside the CMS?"), 2),
-				new OptionsetField(
-					"CanPublishType", 
-					"",
-					array(
-						"LoggedInUsers" => _t('SiteTree.EDITANYONE', "Anyone who can log-in to the CMS"),
-						"OnlyTheseUsers" => _t('SiteTree.EDITONLYTHESE', "Only these people (choose from list)")
-					),
-					"OnlyTheseUsers"
+		$fields->addFieldsToTab("Root.Access", array(
+			new HeaderField(_t('SiteTreeCMSWorkflow.PUBLISHHEADER', "Who can publish this inside the CMS?"), 2),
+			$publishTypeField = new OptionsetField(
+				"CanPublishType", 
+				"",
+				array(
+					"LoggedInUsers" => _t('SiteTree.EDITANYONE', "Anyone who can log-in to the CMS"),
+					"OnlyTheseUsers" => _t('SiteTree.EDITONLYTHESE', "Only these people (choose from list)")
 				),
-				new TreeMultiselectField("PublisherGroups", $this->owner->fieldLabel('PublisherGroups'))
-			));
-			
-		} else {
-			$fields->removeFieldFromTab("Root", "Access");
+				"OnlyTheseUsers"
+			),
+			$publisherGroupsField = new TreeMultiselectField("PublisherGroups", $this->owner->fieldLabel('PublisherGroups'))
+		));
+		if(!$this->owner->canPublish() || !Permission::check('SITETREE_GRANT_ACCESS')) {
+			$fields->replaceField('CanPublishType', $publishTypeField->performReadonlyTransformation());
+			$fields->replaceField('PublisherGroups', $publisherGroupsField->performReadonlyTransformation());
 		}
 	}
 	
