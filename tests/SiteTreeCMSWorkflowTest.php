@@ -76,8 +76,6 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 		$this->session()->inst_set('loggedInAs', null);
 	}
 	
-	// doesn't work because Member::currentUser() doesn't respect test session data in SiteTree->canEdit()
-	/*
 	function testCmsActionsLimited() {
 		$custompublisherspage = $this->objFromFixture('SiteTree', 'custompublisherpage');
 		
@@ -91,36 +89,161 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 		
 		$unpublishedRecord = new Page();
 		$unpublishedRecord->write();
+		$unpublishedRecord->PublisherGroups()->add($custompublishersgroup);
 		
 		$publishedRecord = new Page();
 		$publishedRecord->write();
 		$publishedRecord->publish('Stage', 'Live');
+		$publishedRecord->PublisherGroups()->add($custompublishersgroup);
 		
 		$deletedFromLiveRecord = new Page();
 		$deletedFromLiveRecord->write();
 		$deletedFromLiveRecord->publish('Stage', 'Live');
 		$deletedFromLiveRecord->deleteFromStage('Live');
+		$deletedFromLiveRecord->PublisherGroups()->add($custompublishersgroup);
+		
+		$deletedFromStageRecord = new Page();
+		$deletedFromStageRecord->write();
+		$deletedFromStageRecord->publish('Stage', 'Live');
+		$deletedFromStageRecord->deleteFromStage('Stage');
+		// @todo Workaround for datamodel flags not being set in the right places
+		$deletedFromStageRecord->DeletedFromStage = true;
+		$deletedFromStageRecord->PublisherGroups()->add($custompublishersgroup);
 		
 		$changedOnStageRecord = new Page();
 		$changedOnStageRecord->write();
 		$changedOnStageRecord->publish('Stage', 'Live');
 		$changedOnStageRecord->Content = 'Changed on Stage';
 		$changedOnStageRecord->write();
+		$changedOnStageRecord->PublisherGroups()->add($custompublishersgroup);
 		
-		// test for author
-		var_dump($customauthor->Email);
+		// test "publish" action for author
 		$this->session()->inst_set('loggedInAs', $customauthor->ID);
-		$c = Member::currentUser();
-		var_dump($c);
-		return;
-		$actions = $unpublishedRecord->getCMSActions();
 		$this->assertNotContains(
 			'action_publish',
-			$unpublishedRecord->getCMSActions(),
+			$unpublishedRecord->getCMSActions()->column('Name'),
 			'Author cant trigger publish button'
 		);
+		$this->assertNotContains(
+			'action_publish',
+			$publishedRecord->getCMSActions()->column('Name'),
+			'Author cant trigger publish button'
+		);
+		$this->assertNotContains(
+			'action_publish',
+			$deletedFromLiveRecord->getCMSActions()->column('Name'),
+			'Author cant trigger publish button'
+		);
+		$this->assertNotContains(
+			'action_publish',
+			$changedOnStageRecord->getCMSActions()->column('Name'),
+			'Author cant trigger publish button'
+		);
+		
+		// test "publish" action for publisher
+		$this->session()->inst_set('loggedInAs', $custompublisher->ID);
+		$this->assertContains(
+			'action_publish',
+			$unpublishedRecord->getCMSActions()->column('Name'),
+			'Publisher can trigger publish button on unpublished pages'
+		);
+		$this->assertContains(
+			'action_publish',
+			$publishedRecord->getCMSActions()->column('Name'),
+			'Publisher can trigger publish button on published pages'
+		);
+		$this->assertContains(
+			'action_publish',
+			$deletedFromLiveRecord->getCMSActions()->column('Name'),
+			'Publisher can trigger publish button on published pages'
+		);
+		$this->assertContains(
+			'action_publish',
+			$changedOnStageRecord->getCMSActions()->column('Name'),
+			'Publisher can trigger publish button on published pages'
+		);
+		
+		// test "request publication" action for author
+		$this->session()->inst_set('loggedInAs', $customauthor->ID);
+		$this->assertNotContains(
+			'action_cms_requestpublication',
+			$unpublishedRecord->getCMSActions()->column('Name'),
+			'Author cant trigger request publication button if page hasnt been altered'
+		);
+		$this->assertNotContains(
+			'action_cms_requestpublication',
+			$publishedRecord->getCMSActions()->column('Name'),
+			'Author cant trigger request publication button if page has been published but not altered on stage'
+		);
+		$this->assertContains(
+			'action_cms_requestpublication',
+			$changedOnStageRecord->getCMSActions()->column('Name'),
+			'Author can trigger request publication button if page has been changed on stage'
+		);
+		
+		// test "request publication" action for publisher
+		$this->session()->inst_set('loggedInAs', $custompublisher->ID);
+		$this->assertNotContains(
+			'action_cms_requestpublication',
+			$unpublishedRecord->getCMSActions()->column('Name'),
+			'Publisher doesnt need request publication button'
+		);
+		$this->assertNotContains(
+			'action_cms_requestpublication',
+			$changedOnStageRecord->getCMSActions()->column('Name'),
+			'Publisher doesnt need request publication button'
+		);
+		
+		// test "delete from live" action for author
+		$this->session()->inst_set('loggedInAs', $customauthor->ID);
+		$this->assertNotContains(
+			'action_deletefromlive',
+			$deletedFromStageRecord->getCMSActions()->column('Name'),
+			'Author cant trigger delete from live button on published pages'
+		);
+		
+		// test "delete from live" action for publisher
+		$this->session()->inst_set('loggedInAs', $custompublisher->ID);
+		$this->assertContains(
+			'action_deletefromlive',
+			$deletedFromStageRecord->getCMSActions()->column('Name'),
+			'Publisher can trigger delete from live button on published pages'
+		);
+		
+		// test "request removal" action for author
+		$this->session()->inst_set('loggedInAs', $customauthor->ID);
+		$this->assertNotContains(
+			'action_cms_requestdeletefromlive',
+			$unpublishedRecord->getCMSActions()->column('Name'),
+			'Author cant trigger request removal button if page hasnt been altered'
+		);
+		$this->assertNotContains(
+			'action_cms_requestdeletefromlive',
+			$publishedRecord->getCMSActions()->column('Name'),
+			'Author cant trigger request removal button if page has been published but not altered on stage'
+		);
+		$this->assertContains(
+			'action_cms_requestdeletefromlive',
+			$changedOnStageRecord->getCMSActions()->column('Name'),
+			'Author can trigger request removal button if page has been changed on stage'
+		);
+		
+		// test "request removal" action for publisher
+		$this->session()->inst_set('loggedInAs', $custompublisher->ID);
+		$this->assertNotContains(
+			'action_cms_requestdeletefromlive',
+			$unpublishedRecord->getCMSActions()->column('Name'),
+			'Publisher doesnt need request publication button'
+		);
+		$this->assertNotContains(
+			'action_cms_requestdeletefromlive',
+			$changedOnStageRecord->getCMSActions()->column('Name'),
+			'Publisher doesnt need request removal button'
+		);
+	
+		// reset login
+		$this->session()->inst_set('loggedInAs', null);
 	}
-	*/
 	
 }
 ?>
