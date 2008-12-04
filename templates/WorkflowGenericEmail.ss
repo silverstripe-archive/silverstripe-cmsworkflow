@@ -5,12 +5,12 @@
 			<tbody>
 				<tr>
 					<td scope="row" colspan="2" class="typography">
-						Hi $Receiver.Name,<br />
+						Hi $Recipient.Name,<br />
 						<p>
-						$Sender.Name wants to remove the page titled "<a href="$LiveSiteLink">$Page.Title</a>".
+						$Sender.Name has changed the workflow status on "<a href="$LiveSiteLink">$Page.Title</a>".
 						</p>
 						<ul>
-							<li><a href="$PageCMSLink">Review and delete the page in the CMS</a></li>
+							<li><a href="$PageCMSLink">Review the page in the CMS</a></li>
 							<li><a href="$LiveSiteLink">View the published site</a></li>
 							<li><a href="$DiffCMSLink">View unpublished changes</a></li>
 						</ul>

@@ -4,13 +4,13 @@
  * 
  * @package cmsworkflow
  */
-class PublisherReviewSideReport extends SideReport {
+class DeletionRequestSideReport extends SideReport {
 	function title() {
-		return _t('PublisherReviewSideReport.TITLE',"Awaiting publication");
+		return _t('DeletionRequestSideReport.TITLE',"Awaiting deletion");
 	}
 	function records() {
 		return WorkflowRequest::get_by_publisher(
-			'WorkflowPublicationRequest',
+			'WorkflowDeletionRequest',
 			Member::currentUser()
 		);
 	}

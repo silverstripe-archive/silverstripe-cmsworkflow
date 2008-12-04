@@ -11,10 +11,13 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 	 */
 	public function cms_requestpublication($urlParams, $form) {
 		$id = $urlParams['ID'];
-		$record = DataObject::get_by_id("SiteTree", $id);
-		$this->doRequestPublication($record);
+		$page = DataObject::get_by_id("SiteTree", $id);
 		
-		$members = $record->PublisherMembers();
+		// request publication
+		$page->requestPublication();
+		
+		// gather members for status output
+		$members = $page->PublisherMembers();
 		foreach($members as $member) {
 			$emails[] = $member->Email;
 		}
@@ -30,51 +33,14 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		return FormResponse::respond();	
 	}
 	
-	public function doRequestPublication($record){
-		$record->NeedsReview = true;
-		$record->writeWithoutVersion();
-		$currentUser = Member::CurrentUser();
-
-		global $project;
-
-		$members = $record->PublisherMembers();
-		if($members->count()){
-			foreach($members as $member){
-				$notify = new PublishRequestEmail();
-				$notify->setTo($member->Email);
-				if($currentUser->Email) {
-					$notify->setFrom($currentUser->Email);
-				}else{
-					$notify->setFrom(Email::getAdminEmail());
-				}
-				$notify->setSubject(
-					_t(
-						"SiteTreeCMSWorkflow.REQUEST_PUBLICATION_EMAIL_SUBJECT", 
-						"Please review and publish the \"{$record->Title}\" page on your site."
-					)
-				);
-				$emailData = array(
-					"ProjectTitle" => strtoupper($project),
-					"PageCMSLink" => "admin/show/".$record->ID,
-					"Receiver" => $member,
-					"Sender" => $currentUser,
-					"Page" => $record,
-					"StageSiteLink"	=> $record->Link()."?stage=stage",
-					"LiveSiteLink"	=> $record->Link()."?stage=live",
-					"DiffCMSLink" => $this->diffAdminLink($record)
-				);
-				$notify->populateTemplate($emailData);
-				$notify->send();
-			}
-		}
-		return $this;
-	}
-	
 	public function cms_requestdeletefromlive($urlParams, $form) {
 		$id = $urlParams['ID'];
-		$record = DataObject::get_by_id("SiteTree", $id);
-		$this->doRequestDeleteFromLive($record);
+		$page = DataObject::get_by_id("SiteTree", $id);
 		
+		// request publication
+		$page->requestDeletion();
+		
+		// gather members for status output
 		$members = $record->PublisherMembers();
 		foreach($members as $member) {
 			$emails[] = $member->Email;
@@ -89,60 +55,6 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 			'good'
 		);
 		return FormResponse::respond();	
-	}
-	
-	public function doRequestDeleteFromLive($record){
-		$record->NeedsReview = true;
-		$record->writeWithoutVersion();
-		$currentUser = Member::CurrentUser();
-
-		global $project;
-
-		$members = $record->PublisherMembers();
-		if($members->count()){
-			foreach($members as $member){
-				$notify = new DeleteFromLiveRequestEmail();
-				$notify->setTo($member->Email);
-				if($currentUser->Email) {
-					$notify->setFrom($currentUser->Email);
-				}else{
-					$notify->setFrom(Email::getAdminEmail());
-				}
-				$notify->setSubject(
-					_t(
-						"SiteTreeCMSWorkflow.REQUEST_DELETEFROMLIVE_EMAIL_SUBJECT", 
-						"Please review and delete the \"{$record->Title}\" page on your site."
-					)
-				);
-				$emailData = array(
-					"ProjectTitle" => strtoupper($project),
-					"PageCMSLink" => "admin/show/".$record->ID,
-					"Receiver" => $member,
-					"Sender" => $currentUser,
-					"Page" => $record,
-					"StageSiteLink"	=> $record->Link()."?stage=stage",
-					"LiveSiteLink"	=> $record->Link()."?stage=live",
-					"DiffCMSLink" => $this->diffAdminLink($record)
-				);
-				$notify->populateTemplate($emailData);
-				$notify->send();
-			}
-		}
-		return $this;
-	}
-	
-	/**
-	 * Returns a CMS link to see differences made in the request
-	 * 
-	 * @param Page $record
-	 * @return string URL
-	 */
-	protected function diffAdminLink($record) {
-		$fromVersion = $record->Version;
-		$latestPublished = Versioned::get_one_by_stage($record->class, 'Live', "`SiteTree_Live`.ID = {$record->ID}", true, "Created DESC");
-		if($latestPublished) $latestPublishedVersion = $latestPublished->Version;
-		
-		return "admin/compareversions/$record->ID/?From={$fromVersion}&To={$latestPublishedVersion}";
 	}
 
 }

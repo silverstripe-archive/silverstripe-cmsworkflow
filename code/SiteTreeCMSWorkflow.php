@@ -10,8 +10,11 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	function extraDBFields() {
 		return array(
 			'db' => array(
-				"NeedsReview" => "Boolean",
 				"CanPublishType" =>"Enum('LoggedInUsers, OnlyTheseUsers', 'OnlyTheseUsers')", 
+			),
+			'has_many' => array(
+				// has_one OpenWorkflowRequest is implemented as custom getter
+				'WorkflowRequests' => 'WorkflowRequest', 
 			),
 			'many_many' => array(
 				"PublisherGroups" => "Group",
@@ -93,17 +96,57 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	 * Returns a DataObjectSet of all the members that can publish this page
 	 */
 	public function PublisherMembers() {
-		if($this->owner->CanPublisherType == 'OnlyTheseUsers'){
+		if($this->owner->CanPublishType == 'OnlyTheseUsers'){
 			$groups = $this->owner->PublisherGroups();
 			$members = new DataObjectSet();
 			foreach($groups as $group) {
-				$members->merge($groups->Members());
+				$members->merge($group->Members());
 			}
 			return $members;
 		} else {
 			$group = Permission::get_groups_by_permission('ADMIN')->first();
 			return $group->Members();
 		}
+	}
+	
+	/**
+	 * Return a workflow request which has not already been
+	 * approved or declined.
+	 * 
+	 * @return WorkflowRequest
+	 */
+	public function OpenWorkflowRequest($filter = "", $sort = "", $join = "", $limit = "") {
+		$this->componentCache = array();
+		
+		if($filter) $filter .= ' AND ';
+		$filter .= "Status NOT IN ('Approved','Declined')";
+		return $this->owner->getComponents(
+			'WorkflowRequests',
+			$filter,
+			$sort,
+			$join,
+			$limit
+		)->First();
+	}
+
+	/**
+	 * Return a workflow request which has not already been
+	 * approved or declined.
+	 * 
+	 * @return DataObjectSet Set of WorkflowRequest objects
+	 */
+	public function ClosedWorkflowRequests($filter = "", $sort = "", $join = "", $limit = "") {
+		$this->componentCache = array();
+		
+		if($filter) $filter .= ' AND ';
+		$filter .= "Status IN ('Approved','Declined')";
+		return $this->owner->getComponents(
+			'WorkflowRequests',
+			$filter,
+			$sort,
+			$join,
+			$limit
+		);
 	}
 
 	/**
@@ -192,8 +235,106 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	 * After publishing remove from the report of items needing publication 
 	 */
 	function onAfterPublish() {
-		$this->owner->NeedsReview = false;
-		$this->owner->writeWithoutVersion();
+		$currentPublisher = Member::currentUser();
+		$request = $this->owner->OpenWorkflowRequest();
+		if(!$request || !$request->ID) {
+			$request->PublisherID = $currentPublisher->ID;
+			$request->write();
+			// open the request and notify interested parties
+			$request->Status = 'Approved';
+			$request->write();
+			$request->notifyApproved();
+		}
+	}
+	
+	/**
+	 * @param Member $member The user requesting publication
+	 * @param DataObjectSet $publishers Publishers assigned to this request.
+	 * @return boolean
+	 */
+	public function requestPublication($author = null, $publishers = null){
+		if(!$author && $author !== FALSE) $author = Member::currentUser();
+		
+		// take all members from the PublisherGroups relation on this record as a default
+		if(!$publishers) $publishers = $this->PublisherMembers();
+		
+		// if no publishers are set, the request will end up nowhere
+		if(!$publishers->Count()) {
+			return false;
+		}
+		
+		// get or create a publication request
+		$request = $this->owner->OpenWorkflowRequest();
+		if(!$request || !$request->ID) {
+			$request = new WorkflowPublicationRequest();
+			$request->PageID = $this->owner->ID;
+			$request->write();
+		}
+		
+		// @todo Check for correct workflow class (a "publication" request might be overwritten with a "deletion" request)
+		
+		// @todo reassign original author as a reviewer if present
+		$request->AuthorID = $author->ID;
+		$request->write();
+		
+		// assign publishers to this specific request
+		foreach($publishers as $publisher) {
+			$request->Publishers()->add($publisher);
+		}
+
+		// open the request and notify interested parties
+		$request->Status = 'AwaitingApproval';
+		$request->write();
+		$request->notifiyAwaitingApproval();
+		
+		$this->owner->flushCache();
+		
+		return $this;
+	}
+	
+	/**
+	 * @param Member $member The user requesting deletion
+	 * @param DataObjectSet $publishers Publishers assigned to this request.
+	 * @return boolean
+	 */
+	public function requestDeletion($author = null, $publishers = null){
+		if(!$author && $author !== FALSE) $author = Member::currentUser();
+		
+		// take all members from the PublisherGroups relation on this record as a default
+		if(!$publishers) $publishers = $this->PublisherMembers();
+		
+		// if no publishers are set, the request will end up nowhere
+		if(!$publishers->Count()) {
+			return false;
+		}
+		
+		// get or create a publication request
+		$request = $this->owner->OpenWorkflowRequest();
+		if(!$request || !$request->ID) {
+			$request = new WorkflowDeletionRequest();
+			$request->PageID = $this->owner->ID;
+			$request->write();
+		}
+		
+		// @todo Check for correct workflow class (a "publication" request might be overwritten with a "deletion" request)
+		
+		// @todo reassign original author as a reviewer if present
+		$request->AuthorID = $author->ID;
+		$request->write();
+		
+		// assign publishers to this specific request
+		foreach($publishers as $publisher) {
+			$request->Publishers()->add($publisher);
+		}
+
+		// open the request and notify interested parties
+		$request->Status = 'AwaitingApproval';
+		$request->write();
+		$request->notifiyAwaitingApproval();
+		
+		$this->owner->flushCache();
+		
+		return $this;
 	}
 	
 }

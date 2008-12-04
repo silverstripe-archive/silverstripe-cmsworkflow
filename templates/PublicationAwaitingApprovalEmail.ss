@@ -5,15 +5,16 @@
 			<tbody>
 				<tr>
 					<td scope="row" colspan="2" class="typography">
-						Hi $Receiver.Name,<br />
+						Hi $Recipient.Name,<br />
 						<p>
-						$Sender.Name has recently updated the page titled "<a href="$LiveSiteLink">$Page.Title</a>" and would like to have the changes published.
+						$Sender.Name has recently updated the page titled "<a href="$LiveSiteLink">$Page.Title</a>" 
+						and would like to have the changes published.
 						</p>
 						<ul>
 							<li><a href="$PageCMSLink">Publish the page in the CMS</a></li>
 							<li><a href="$StageSiteLink">View the changed draft</a></li>
 							<li><a href="$LiveSiteLink">View the published site</a></li>
-							<li><a href="$DiffCMSLink">Compare changes between live and the changed draft</a></li>
+							<% if DiffLink %><li><a href="$DiffLink">Compare changes between live and the changed draft</a></li><% end_if %>
 						</ul>
 						<br />
 						Thanks.
