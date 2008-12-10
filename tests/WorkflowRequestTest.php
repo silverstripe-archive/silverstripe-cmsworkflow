@@ -109,5 +109,35 @@ class WorkflowRequestTest extends FunctionalTest {
 		
 		$this->session()->inst_set('loggedInAs', null);
 	}
+	
+	function testSecondRequestOpeningDeniedIfDifferentAuthor() {
+		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
+
+		$customauthorsgroup = $this->objFromFixture('Group', 'customauthorsgroup');
+		$customauthor = $this->objFromFixture('Member', 'customauthor');
+		$customauthor->Groups()->add($customauthorsgroup);
+		$customauthor2 = $this->objFromFixture('Member', 'customauthor2');
+		$customauthor2->Groups()->add($customauthorsgroup);
+		
+		// first request
+		$request1 = $page->requestPublication($customauthor, $page->PublisherMembers());
+		
+		// second request by original author
+		$request2 = $page->requestPublication($customauthor, $page->PublisherMembers());
+		$this->assertEquals(
+			$request1->ID,
+			$request2->ID,
+			'Each page can only have one open (not approved or declined) request'
+		);
+		
+		// second request by other author
+		$request3 = $page->requestPublication($customauthor2, $page->PublisherMembers());
+		$this->assertFalse(
+			$request3,
+			'If open request exists, a member who is not the author of the original request cant create a new request'
+		);
+		
+		$this->session()->inst_set('loggedInAs', null);
+	}
 }
 ?>

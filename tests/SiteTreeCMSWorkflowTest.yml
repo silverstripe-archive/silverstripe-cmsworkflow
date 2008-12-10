@@ -23,6 +23,9 @@ Member:
    customauthor:
       Email: customauthor@test.com
       Groups: =>Group.customauthorsgroup
+   customauthor2:
+        Email: customauthor2@test.com
+        Groups: =>Group.customauthorsgroup
 SiteTree:
    defaultpublisherspage:
       Title: defaultpublisherspage

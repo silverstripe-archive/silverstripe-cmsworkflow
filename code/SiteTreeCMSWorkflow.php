@@ -68,11 +68,15 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 				&& $this->owner->Version > 1 // page has been saved at least once
 			) { 
 				$actions->push(
-					new FormAction(
+					$requestPublicationAction = new FormAction(
 						'cms_requestpublication', 
 						_t('SiteTreeCMSWorkflow.BUTTONREQUESTPUBLICATION', 'Request Publication')
 					)
 				);
+				// don't allow creation of a second request by another author
+				if(!$this->owner->canCreatePublicationRequest()) {
+					$actions->makeFieldReadonly($requestPublicationAction->Name());
+				}
 			}
 			
 			// "request removal"
@@ -83,11 +87,16 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 				&& $this->owner->isPublished()
 			) { 
 				$actions->push(
-					new FormAction(
+					$requestDeletionAction = new FormAction(
 						'cms_requestdeletefromlive', 
 						_t('SiteTreeCMSWorkflow.BUTTONREQUESTREMOVAL', 'Request Removal')
 					)
 				);
+				
+				// don't allow creation of a second request by another author
+				if(!$this->owner->canCreatePublicationRequest()) {
+					$requestDeletionAction = $requestDeletionAction->performReadonlyTransformation();
+				}
 			}
 		}
 	}
@@ -187,6 +196,29 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		return true;
 	}
 	
+	public function canCreatePublicationRequest($member = NULL) {
+		if(!$member && $member !== FALSE) {
+			$member = Member::currentUser();
+		}
+		
+		// if user can't edit page, he shouldn't be able to request publication
+		if(!$this->owner->canEdit($member)) return false;
+		
+		$request = $this->owner->OpenWorkflowRequest();
+		
+		// if no request exists, allow creation of a new one (we can just have one open request at each point in time)
+		if(!$request || !$request->ID) return true;
+		
+		// members can re-submit their own publication requests
+		if($member && $member->ID == $request->AuthorID) return true;
+		
+		return false;
+	}
+	
+	public function canCreateDeletionRequest($member = NULL) {
+		return $this->canCreatePublicationRequest();
+	}
+	
 	/**
 	 * Adds mappings of the default groups created 
 	 */
@@ -237,7 +269,9 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	function onAfterPublish() {
 		$currentPublisher = Member::currentUser();
 		$request = $this->owner->OpenWorkflowRequest();
-		if(!$request || !$request->ID) {
+		// this assumes that a publisher knows about the ongoing approval discussion
+		// which might not always be the case
+		if($request && $request->ID) {
 			$request->PublisherID = $currentPublisher->ID;
 			$request->write();
 			// open the request and notify interested parties
@@ -250,7 +284,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	/**
 	 * @param Member $member The user requesting publication
 	 * @param DataObjectSet $publishers Publishers assigned to this request.
-	 * @return boolean
+	 * @return boolean|WorkflowPublicationRequest
 	 */
 	public function requestPublication($author = null, $publishers = null){
 		if(!$author && $author !== FALSE) $author = Member::currentUser();
@@ -260,6 +294,10 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		
 		// if no publishers are set, the request will end up nowhere
 		if(!$publishers->Count()) {
+			return false;
+		}
+		
+		if(!$this->owner->canCreatePublicationRequest($author)) {
 			return false;
 		}
 		
@@ -289,16 +327,20 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		
 		$this->owner->flushCache();
 		
-		return $this;
+		return $request;
 	}
 	
 	/**
 	 * @param Member $member The user requesting deletion
 	 * @param DataObjectSet $publishers Publishers assigned to this request.
-	 * @return boolean
+	 * @return boolean|WorkflowDeletionRequest
 	 */
 	public function requestDeletion($author = null, $publishers = null){
 		if(!$author && $author !== FALSE) $author = Member::currentUser();
+		
+		if(!$this->owner->canCreateDeletionRequest($author)) {
+			return false;
+		}
 		
 		// take all members from the PublisherGroups relation on this record as a default
 		if(!$publishers) $publishers = $this->PublisherMembers();
@@ -334,7 +376,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		
 		$this->owner->flushCache();
 		
-		return $this;
+		return $request;
 	}
 	
 }
