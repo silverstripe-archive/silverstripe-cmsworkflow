@@ -4,6 +4,8 @@
  * actions based on a single page.
  * Each request is related to one page.
  * Only one request can exist for each page at any given point in time.
+ * Each change of the {@link $Status} property triggers the creation
+ * of a new {@link WorkflowRequestChange} object to keep the history of a change request.
  * 
  * @package cmsworkflow
  */
@@ -18,6 +20,10 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		'Author' => 'Member',
 		'Publisher' => 'Member', // see SiteTreeCMSWorkflow->onBeforeWrite()
 		'Page' => 'SiteTree'
+	);
+	
+	static $has_many = array(
+		'Changes' => 'WorkflowRequestChange', // see WorkflowRequest->onBeforeWrite()
 	);
 	
 	static $many_many = array(
@@ -43,6 +49,25 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * @param string $emailtemplate_awaitingedit
 	 */
 	protected static $emailtemplate_awaitingedit = 'WorkflowGenericEmail';
+	
+	function onBeforeWrite() {
+		// if we have a new record, or its status has changed, we track it through a separate relation
+		$changedFields = $this->getChangedFields();
+		if(!$this->ID || (isset($changedFields['Status']) && $changedFields['Status'])) {
+			$change = new WorkflowRequestChange();
+			$change->AuthorID = Member::currentUserID();
+			$change->Status = $this->Status;
+			$page = $this->Page();
+			$draftPage = Versioned::get_one_by_stage('SiteTree', 'Draft', "`SiteTree`.`ID` = $page->ID", false, "Created DESC");
+			$change->PageDraftVersion = $draftPage->Version;
+			$livePage = Versioned::get_one_by_stage('SiteTree', 'Live', "`SiteTree`.`ID` = $page->ID", false, "Created DESC");
+			if($livePage) $change->PageLiveVersion = $livePage->Version;
+			$change->write();
+			$this->Changes()->add($change);
+		}
+		
+		parent::onBeforeWrite();
+	}
 	
 	/**
 	 * Notify any publishers assigned to this page when a new request
@@ -181,6 +206,38 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 			"LEFT JOIN `WorkflowRequest` ON `WorkflowRequest`.PageID = `SiteTree`.ID " .
 			"LEFT JOIN `WorkflowRequest_Publishers` ON `WorkflowRequest`.ID = `WorkflowRequest_Publishers`.WorkflowRequestID"
 		);
+	}
+	
+	/**
+	 * @return string Translated $Status property
+	 */
+	public function i18n_Status() {
+		switch($this->Status) {
+			case 'Open':
+				return _t('SiteTreeCMSWorkflow.STATUS_OPEN', 'Open');
+			case 'Approved':
+				return _t('SiteTreeCMSWorkflow.STATUS_APPROVED', 'Approved');
+			case 'AwaitingApproval':
+				return _t('SiteTreeCMSWorkflow.STATUS_AWAITINGAPPROVAL', 'Awaiting Approval');
+			case 'AwaitingReview':
+				return _t('SiteTreeCMSWorkflow.STATUS_AWAITINGEDIT', 'Awaiting Edit');
+			case 'Denied':
+				return _t('SiteTreeCMSWorkflow.STATUS_DENIED', 'Denied');
+			default:
+				return _t('SiteTreeCMSWorkflow.STATUS_UNKNOWN', 'Unknown');
+		}
+	}
+	
+	function fieldLabels() {
+		$labels = parent::fieldLabels();
+		
+		$labels['Status'] = _t('SiteTreeCMSWorkflow.FIELDLABEL_STATUS', "Status");
+		$labels['Author'] = _t('SiteTreeCMSWorkflow.FIELDLABEL_AUTHOR', "Author");
+		$labels['Publisher'] = _t('SiteTreeCMSWorkflow.FIELDLABEL_PUBLISHER', "Publisher");
+		$labels['Page'] = _t('SiteTreeCMSWorkflow.FIELDLABEL_PAGE', "Page");
+		$labels['Publishers'] = _t('SiteTreeCMSWorkflow.FIELDLABEL_PUBLISHERS', "Publishers");
+		
+		return $labels;
 	}
 	
 	function provideI18nEntities() {
