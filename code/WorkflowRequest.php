@@ -69,6 +69,34 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		parent::onBeforeWrite();
 	}
 	
+	function getCMSFields() {
+		$fields = parent::getCMSFields();
+		
+		$diffLinkTitle = _t('SiteTreeCMSWorkflow.DIFFERENCESLINK', 'Show differences to live');
+		
+		$tf = $fields->dataFieldByName('Changes');
+		$tf->setFieldList(array(
+			'Created' => $this->fieldLabel('Created'), 
+			'Author.Title' => $this->fieldLabel('Author'), 
+			'StatusDescription' => $this->fieldLabel('Status'), 
+			'DiffLinkToLastPublished' => _t('SiteTreeCMSWorkflow.DIFFERENCESTOLIVECOLUMN', 'Differences to live'),
+			'DiffLinkToPrevious' => _t('SiteTreeCMSWorkflow.DIFFERENCESTHISCHANGECOLUMN', 'Differences in this change'),
+		));
+		$tf->setFieldCasting(array(
+			'Created' => 'Date->Nice'
+		));
+		$tf->setFieldFormatting(array(
+			"DiffLinkToLastPublished" => '<a href=\"$value\" target=\"_blank\">Show</a>',
+			"DiffLinkToPrevious" => '<a href=\"$value\" target=\"_blank\">Show</a>'
+		));
+		$fields->replaceField(
+			'Status',
+			new ReadonlyField('StatusDescription', $this->fieldLabel('Status'), $this->StatusDescription)
+		);
+		
+		return $fields;
+	}
+	
 	/**
 	 * Notify any publishers assigned to this page when a new request
 	 * is lodged.
@@ -138,7 +166,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 			"Page" => $this->Page(),
 			"StageSiteLink"	=> $this->Page()->Link()."?stage=stage",
 			"LiveSiteLink"	=> $this->Page()->Link()."?stage=live",
-			"DiffLink" => $this->diffLink()
+			"DiffLink" => $this->DiffLinkToLastPublished()
 		));
 		return $email->send();
 	}
@@ -160,7 +188,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * 
 	 * @return string URL
 	 */
-	protected function diffLink() {
+	protected function getDiffLinkToLastPublished() {
 		$page = $this->Page();
 		$fromVersion = $page->Version;
 		$latestPublished = Versioned::get_one_by_stage($page->class, 'Live', "`SiteTree_Live`.ID = {$page->ID}", true, "Created DESC");
@@ -211,8 +239,12 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	/**
 	 * @return string Translated $Status property
 	 */
-	public function i18n_Status() {
-		switch($this->Status) {
+	public function getStatusDescription() {
+		return self::get_status_description($this->Status);
+	}
+	
+	public static function get_status_description($status) {
+		switch($status) {
 			case 'Open':
 				return _t('SiteTreeCMSWorkflow.STATUS_OPEN', 'Open');
 			case 'Approved':

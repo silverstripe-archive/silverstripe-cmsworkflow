@@ -43,6 +43,75 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			$fields->replaceField('CanPublishType', $publishTypeField->performReadonlyTransformation());
 			$fields->replaceField('PublisherGroups', $publisherGroupsField->performReadonlyTransformation());
 		}
+		
+		$fields->findOrMakeTab('Root.Workflow', _t('SiteTreeCMSWorkflow.WORKFLOWTABTITLE', 'Workflow'));
+		$fields->addFieldsToTab('Root.Workflow', $this->getWorkflowCMSFields());
+	}
+	
+	/**
+	 * @return FieldSet
+	 */
+	public function getWorkflowCMSFields() {
+		$fields = new FieldSet();
+		
+		$diffLinkTitle = _t('SiteTreeCMSWorkflow.DIFFERENCESLINK', 'Show differences to live');
+		
+		// list all open requests
+		$fields->push(new HeaderField(
+			'WorkflowOpenRequestHeader', 
+			_t('SiteTreeCMSWorkflow.OPENREQUESTHEADER', 'Open Requests')
+		));
+		// @todo more inline view
+		$openRequestsTF = new ComplexTableField(
+			$this,
+			'OpenWorkflowRequest',
+			'WorkflowRequest',
+			array(
+				'Created' => singleton('WorkflowRequest')->fieldLabel('Created'), 
+				'StatusDescription' => singleton('WorkflowRequest')->fieldLabel('Status'),
+				'Author.Title' => singleton('WorkflowRequest')->fieldLabel('Author'),
+				'DiffLinkToLastPublished' => _t('SiteTreeCMSWorkflow.DIFFERENCESCOLUMN', 'Differences'),
+			)
+		);
+		$openRequestsTF->setPermissions(array('show'));
+		$openRequestsTF->setFieldCasting(array(
+			'Created' => 'Date->Nice'
+		));
+		$openRequestsTF->setFieldFormatting(array(
+			"DiffLinkToLastPublished" => '<a href=\"$value\" target=\"_blank\">' . $diffLinkTitle . '</a>'
+		));
+		$openRequests = new DataObjectSet();
+		$openRequests->push($this->OpenWorkflowRequest());
+		$openRequestsTF->setCustomSourceItems($openRequests);
+		$fields->push($openRequestsTF);
+		
+		// list all closed requests
+		$fields->push(new HeaderField(
+			'WorkflowClosedRequestsHeader', 
+			_t('SiteTreeCMSWorkflow.CLOSEDREQUESTSHEADER', 'Closed Requests')
+		));
+		$closedRequestsTF = new ComplexTableField(
+			$this,
+			'ClosedWorkflowRequests',
+			'WorkflowRequest',
+			array(
+				'Created' => singleton('WorkflowRequest')->fieldLabel('Created'), 
+				'StatusDescription' => singleton('WorkflowRequest')->fieldLabel('Status'),
+				'Author.Title' => singleton('WorkflowRequest')->fieldLabel('Author'),
+				'DiffLinkToLastPublished' => _t('SiteTreeCMSWorkflow.DIFFERENCESCOLUMN', 'Differences'),
+			)
+		);
+		$closedRequestsTF->setPermissions(array('show'));
+		$closedRequestsTF->setFieldCasting(array(
+			'Created' => 'Date->Nice'
+		));
+		$closedRequestsTF->setFieldFormatting(array(
+			"DiffLinkToLastPublished" => '<a href=\"$value\" target=\"_blank\">' . $diffLinkTitle . '</a>'
+		));
+		$closedRequestsTF->setCustomSourceItems($this->ClosedWorkflowRequests());
+		$fields->push($closedRequestsTF);
+		
+		return $fields;
 	}
 	
 	/**
@@ -196,6 +265,10 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		return true;
 	}
 	
+	/**
+	 * @param Member $member
+	 * @return boolean
+	 */
 	public function canCreatePublicationRequest($member = NULL) {
 		if(!$member && $member !== FALSE) {
 			$member = Member::currentUser();
@@ -215,12 +288,18 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		return false;
 	}
 	
+	/**
+	 * @param Member $member
+	 * @return boolean
+	 */
 	public function canCreateDeletionRequest($member = NULL) {
 		return $this->canCreatePublicationRequest();
 	}
 	
 	/**
-	 * Adds mappings of the default groups created 
+	 * Adds mappings of the default groups created.
+	 * @todo Also re-adds default groups if all existing custom groups
+	 * are deselected from a record - is this desired behaviour?
 	 */
 	function onAfterWrite() {
 		if(!$this->owner->EditorGroups()->Count()) {
@@ -291,12 +370,12 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		
 		// take all members from the PublisherGroups relation on this record as a default
 		if(!$publishers) $publishers = $this->PublisherMembers();
-		
+
 		// if no publishers are set, the request will end up nowhere
 		if(!$publishers->Count()) {
 			return false;
 		}
-		
+
 		if(!$this->owner->canCreatePublicationRequest($author)) {
 			return false;
 		}
@@ -306,15 +385,14 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		if(!$request || !$request->ID) {
 			$request = new WorkflowPublicationRequest();
 			$request->PageID = $this->owner->ID;
-			$request->write();
 		}
-		
+
 		// @todo Check for correct workflow class (a "publication" request might be overwritten with a "deletion" request)
-		
+
 		// @todo reassign original author as a reviewer if present
 		$request->AuthorID = $author->ID;
 		$request->write();
-		
+
 		// assign publishers to this specific request
 		foreach($publishers as $publisher) {
 			$request->Publishers()->add($publisher);
@@ -325,7 +403,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		$request->write();
 		$request->notifiyAwaitingApproval();
 		
-		$this->owner->flushCache();
+		//$this->owner->flushCache();
 		
 		return $request;
 	}
@@ -378,6 +456,5 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		
 		return $request;
 	}
-	
 }
 ?>
