@@ -6,6 +6,10 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		'cms_requestdeletefromlive',
 	);
 	
+	function init() {
+		Requirements::javascript('cmsworkflow/javascript/LeftAndMainCMSWorkflow.js');
+	}
+	
 	/**
 	 * Handler for the CMS button
 	 */

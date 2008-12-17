@@ -78,7 +78,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			'Created' => 'Date->Nice'
 		));
 		$openRequestsTF->setFieldFormatting(array(
-			"DiffLinkToLastPublished" => '<a href=\"$value\" target=\"_blank\">' . $diffLinkTitle . '</a>'
+			"DiffLinkToLastPublished" => '<a href=\"$value\" target=\"_blank\" class=\"externallink\">' . $diffLinkTitle . '</a>'
 		));
 		$openRequests = new DataObjectSet();
 		$openRequests->push($this->OpenWorkflowRequest());
@@ -106,7 +106,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			'Created' => 'Date->Nice'
 		));
 		$closedRequestsTF->setFieldFormatting(array(
-			"DiffLinkToLastPublished" => '<a href=\"$value\" target=\"_blank\">' . $diffLinkTitle . '</a>'
+			"DiffLinkToLastPublished" => '<a href=\"$value\" target=\"_blank\" class=\"externallink\">' . $diffLinkTitle . '</a>'
 		));
 		$closedRequestsTF->setCustomSourceItems($this->ClosedWorkflowRequests());
 		$fields->push($closedRequestsTF);
