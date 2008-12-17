@@ -86,8 +86,8 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 			'Created' => 'Date->Nice'
 		));
 		$tf->setFieldFormatting(array(
-			"DiffLinkToLastPublished" => '<a href=\"$value\" target=\"_blank\">Show</a>',
-			"DiffLinkToPrevious" => '<a href=\"$value\" target=\"_blank\">Show</a>'
+			"DiffLinkToLastPublished" => '<a href=\"$value\" target=\"_blank\" class=\"externallink\">Show</a>',
+			"DiffLinkToPrevious" => '<a href=\"$value\" target=\"_blank\" class=\"externallink\">Show</a>'
 		));
 		$fields->replaceField(
 			'Status',
