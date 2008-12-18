@@ -51,22 +51,48 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	protected static $emailtemplate_awaitingedit = 'WorkflowGenericEmail';
 	
 	function onBeforeWrite() {
-		// if we have a new record, or its status has changed, we track it through a separate relation
+		// if the request status has changed, we track it through a separate relation
 		$changedFields = $this->getChangedFields();
-		if(!$this->ID || (isset($changedFields['Status']) && $changedFields['Status'])) {
-			$change = new WorkflowRequestChange();
-			$change->AuthorID = Member::currentUserID();
-			$change->Status = $this->Status;
-			$page = $this->Page();
-			$draftPage = Versioned::get_one_by_stage('SiteTree', 'Draft', "`SiteTree`.`ID` = $page->ID", false, "Created DESC");
-			$change->PageDraftVersion = $draftPage->Version;
-			$livePage = Versioned::get_one_by_stage('SiteTree', 'Live', "`SiteTree`.`ID` = $page->ID", false, "Created DESC");
-			if($livePage) $change->PageLiveVersion = $livePage->Version;
-			$change->write();
-			$this->Changes()->add($change);
+		if((isset($changedFields['Status']) && $changedFields['Status'])) {
+			$change = $this->addNewChange();
 		}
 		
+		// see onAfterWrite() for creation of the first change when the request is initiated
+		
 		parent::onBeforeWrite();
+	}
+	
+	function onAfterWrite() {
+		// if request has no changes (= was just created),
+		// add a new change. this is necessary because we don't
+		// have the required WorkflowRequestID in the first call
+		// to onBeforeWrite()
+		if(!$this->Changes()->Count()) {
+			$change = $this->addNewChange();
+		}
+		
+		parent::onAfterWrite();
+	}
+	
+	/**
+	 * Create a new {@link WorkflowRequestChange} with the current
+	 * page status and versions, and link it to this object.
+	 *
+	 * @return WorkflowRequestChange
+	 */
+	protected function addNewChange() {
+		$change = new WorkflowRequestChange();
+		$change->AuthorID = Member::currentUserID();
+		$change->Status = $this->Status;
+		$page = $this->Page();
+		$draftPage = Versioned::get_one_by_stage('SiteTree', 'Draft', "`SiteTree`.`ID` = $page->ID", false, "Created DESC");
+		$change->PageDraftVersion = $draftPage->Version;
+		$livePage = Versioned::get_one_by_stage('SiteTree', 'Live', "`SiteTree`.`ID` = $page->ID", false, "Created DESC");
+		if($livePage) $change->PageLiveVersion = $livePage->Version;
+		$change->write();
+		$this->Changes()->add($change);
+		
+		return $change;
 	}
 	
 	function getCMSFields() {
@@ -166,7 +192,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 			"Page" => $this->Page(),
 			"StageSiteLink"	=> $this->Page()->Link()."?stage=stage",
 			"LiveSiteLink"	=> $this->Page()->Link()."?stage=live",
-			"DiffLink" => $this->DiffLinkToLastPublished()
+			"DiffLink" => $this->DiffLinkToLastPublished
 		));
 		return $email->send();
 	}
@@ -221,15 +247,26 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * 
 	 * @param string $class WorkflowRequest subclass
 	 * @param Member $publisher
+	 * @param array $status One or more stati from the $Status property
 	 * @return DataObjectSet
 	 */
-	public static function get_by_publisher($class, $publisher) {
+	public static function get_by_publisher($class, $publisher, $status = null) {
+		if($status) $statusStr = implode(',', $status);
 		$classes = (array)ClassInfo::subclassesFor($class);
 		$classes[] = $class;
 		$classesSQL = implode("','", $classes);
+		
+		// build filter
+		$filter = "`WorkflowRequest_Publishers`.MemberID = {$publisher->ID} 
+			AND `WorkflowRequest`.ClassName IN ('$classesSQL')
+		";
+		if($status) {
+			$filter .= "AND `WorkflowRequest`.Status IN ('" . Convert::raw2sql($statusStr) . "')";
+		} 
+		
 		return DataObject::get(
 			"SiteTree", 
-			"`WorkflowRequest_Publishers`.MemberID = {$publisher->ID} AND `WorkflowRequest`.ClassName IN ('$classesSQL')", 
+			$filter, 
 			"`SiteTree`.`LastEdited` DESC",
 			"LEFT JOIN `WorkflowRequest` ON `WorkflowRequest`.PageID = `SiteTree`.ID " .
 			"LEFT JOIN `WorkflowRequest_Publishers` ON `WorkflowRequest`.ID = `WorkflowRequest_Publishers`.WorkflowRequestID"
