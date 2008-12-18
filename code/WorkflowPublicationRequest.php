@@ -18,7 +18,7 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 	/**
 	 * @param string $emailtemplate_approved
 	 */
-	protected static $emailtemplate_approved = 'WorkflowGenericEmail';
+	protected static $emailtemplate_approved = 'PublicationApprovedEmail';
 	
 	/**
 	 * @param string $emailtemplate_declined
