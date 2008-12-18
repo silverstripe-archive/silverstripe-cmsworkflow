@@ -4,14 +4,15 @@
  * 
  * @package cmsworkflow
  */
-class PublisherReviewSideReport extends SideReport {
+class MyPublicationRequestsSideReport extends SideReport {
 	function title() {
 		return _t('PublisherReviewSideReport.TITLE',"Awaiting publication");
 	}
 	function records() {
 		return WorkflowRequest::get_by_publisher(
 			'WorkflowPublicationRequest',
-			Member::currentUser()
+			Member::currentUser(),
+			array('AwaitingApproval')
 		);
 	}
 	function fieldsToShow() {
