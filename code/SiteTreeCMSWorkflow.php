@@ -62,6 +62,9 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			_t('SiteTreeCMSWorkflow.OPENREQUESTHEADER', 'Open Requests')
 		));
 		// @todo more inline view
+		$openRequest = $this->OpenWorkflowRequest();
+		$openRequests = new DataObjectSet();
+		if($openRequest) $openRequests->push($openRequest);
 		$openRequestsTF = new ComplexTableField(
 			$this,
 			'OpenWorkflowRequest',
@@ -80,8 +83,6 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		$openRequestsTF->setFieldFormatting(array(
 			"DiffLinkToLastPublished" => '<a href=\"$value\" target=\"_blank\" class=\"externallink\">' . $diffLinkTitle . '</a>'
 		));
-		$openRequests = new DataObjectSet();
-		$openRequests->push($this->OpenWorkflowRequest());
 		$openRequestsTF->setCustomSourceItems($openRequests);
 		$fields->push($openRequestsTF);
 		
@@ -90,6 +91,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			'WorkflowClosedRequestsHeader', 
 			_t('SiteTreeCMSWorkflow.CLOSEDREQUESTSHEADER', 'Closed Requests')
 		));
+		$closedRequests = $this->ClosedWorkflowRequests();
 		$closedRequestsTF = new ComplexTableField(
 			$this,
 			'ClosedWorkflowRequests',
@@ -108,7 +110,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		$closedRequestsTF->setFieldFormatting(array(
 			"DiffLinkToLastPublished" => '<a href=\"$value\" target=\"_blank\" class=\"externallink\">' . $diffLinkTitle . '</a>'
 		));
-		$closedRequestsTF->setCustomSourceItems($this->ClosedWorkflowRequests());
+		$closedRequestsTF->setCustomSourceItems($closedRequests);
 		$fields->push($closedRequestsTF);
 		
 		return $fields;
@@ -154,6 +156,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 				$this->owner->canEdit() 
 				&& $this->owner->stagesDiffer('Stage', 'Live')
 				&& $this->owner->isPublished()
+				&& $this->owner->IsDeletedFromStage
 			) { 
 				$actions->push(
 					$requestDeletionAction = new FormAction(
