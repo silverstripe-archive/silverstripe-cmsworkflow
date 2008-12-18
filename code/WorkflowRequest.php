@@ -229,13 +229,24 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * @param Member $author
 	 * @return DataObjectSet
 	 */
-	public static function get_by_author($class, $author) {
+	public static function get_by_author($class, $author, $status = null) {
+		if($status) $statusStr = implode(',', $status);
+
 		$classes = (array)ClassInfo::subclassesFor($class);
 		$classes[] = $class;
 		$classesSQL = implode("','", $classes);
+		
+		// build filter
+		$filter = "`Member`.ID = {$author->ID}  
+			AND `WorkflowRequest`.ClassName IN ('$classesSQL')
+		";
+		if($status) {
+			$filter .= "AND `WorkflowRequest`.Status IN ('" . Convert::raw2sql($statusStr) . "')";
+		}
+		
 		return DataObject::get(
 			"SiteTree", 
-			"`Member`.ID = {$author->ID} AND `WorkflowRequest`.ClassName IN ('$classesSQL')", 
+			$filter, 
 			"`SiteTree`.`LastEdited` DESC",
 			"LEFT JOIN `WorkflowRequest` ON `WorkflowRequest`.PageID = `SiteTree`.ID " .
 			"LEFT JOIN `Member` ON `Member`.ID = `WorkflowRequest`.AuthorID"
@@ -252,6 +263,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 */
 	public static function get_by_publisher($class, $publisher, $status = null) {
 		if($status) $statusStr = implode(',', $status);
+
 		$classes = (array)ClassInfo::subclassesFor($class);
 		$classes[] = $class;
 		$classesSQL = implode("','", $classes);
