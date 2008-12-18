@@ -6,7 +6,7 @@
  */
 class MyDeletionRequestsSideReport extends SideReport {
 	function title() {
-		return _t('DeletionRequestSideReport.TITLE',"Awaiting deletion");
+		return _t('DeletionRequestSideReport.TITLE',"Workflow: Awaiting deletion");
 	}
 	function records() {
 		return WorkflowRequest::get_by_publisher(

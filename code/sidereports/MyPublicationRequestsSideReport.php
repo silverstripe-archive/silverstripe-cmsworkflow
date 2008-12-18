@@ -6,7 +6,7 @@
  */
 class MyPublicationRequestsSideReport extends SideReport {
 	function title() {
-		return _t('PublisherReviewSideReport.TITLE',"Awaiting publication");
+		return _t('PublisherReviewSideReport.TITLE',"Workflow: Awaiting publication");
 	}
 	function records() {
 		return WorkflowRequest::get_by_publisher(
