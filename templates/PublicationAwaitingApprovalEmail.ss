@@ -5,19 +5,21 @@
 			<tbody>
 				<tr>
 					<td scope="row" colspan="2" class="typography">
-						Hi $Recipient.Name,<br />
+						<% sprintf(_t('WorkflowRequest.EMAILGREETING','Hi %s'),$Recipient.Name) %>,<br />
 						<p>
-						$Sender.Name has recently updated the page titled "<a href="$LiveSiteLink">$Page.Title</a>" 
-						and would like to have the changes published.
+						<% sprintf(_t('WorkflowRequest.EMAILRECENTLYUPDATED1','%s has recently updated the page titled'),$Sender.Name) %> "<a href="$LiveSiteLink">$Page.Title</a>",
+						<% _t('WorkflowRequest.EMAILRECENTLYUPDATED2','and would like to have the changes published.') %>
 						</p>
 						<ul>
-							<li><a href="$PageCMSLink">Publish the page in the CMS</a></li>
-							<li><a href="$StageSiteLink">View the changed draft</a></li>
-							<li><a href="$LiveSiteLink">View the published site</a></li>
-							<% if DiffLink %><li><a href="$DiffLink">Compare changes between live and the changed draft</a></li><% end_if %>
+							<li><a href="$PageCMSLink"><% _t('WorkflowRequest.REVIEWANDPUBLISHPAGELINK','Review and publish the page in the CMS') %></a></li>
+							<li><a href="$StageSiteLink"><% _t('WorkflowRequest.VIEWCHANGEDDRAFTLINK','View the changed draft') %></a></li>
+							<li><a href="$LiveSiteLink"><% _t('WorkflowRequest.VIEWPUBLISHEDLINK','View the published site') %></a></li>
+							<% if DiffLink %>
+								<li><a href="$DiffLink"><% _t('WorkflowRequest.COMPAREDRAFTLIVELINK','Compare changes between live and the changed draft') %></a></li>
+							<% end_if %>
 						</ul>
 						<br />
-						Thanks.
+						<% _t('WorkflowRequest.EMAILTHANKS','Thanks.') %>
 					</td>
 				</tr>
 			</tbody>

@@ -5,17 +5,17 @@
 			<tbody>
 				<tr>
 					<td scope="row" colspan="2" class="typography">
-						Hi $Recipient.Name,<br />
+						<% sprintf(_t('WorkflowRequest.EMAILGREETING','Hi %s'),$Recipient.Name) %>,<br />
 						<p>
-						$Sender.Name has changed the workflow status on "<a href="$LiveSiteLink">$Page.Title</a>".
+							<% sprintf(_t('WorkflowRequest.EMAILCHANGEDSTATUS','%s has changed the workflow status on',)$Sender.Name) %> "<a href="$LiveSiteLink">$Page.Title</a>".
 						</p>
 						<ul>
-							<li><a href="$PageCMSLink">Review the page in the CMS</a></li>
-							<li><a href="$LiveSiteLink">View the published site</a></li>
-							<li><a href="$DiffCMSLink">View unpublished changes</a></li>
+							<li><a href="$PageCMSLink"><% _t('WorkflowRequest.REVIEWPAGELINK','Review the page in the CMS') %></a></li>
+							<li><a href="$LiveSiteLink"><% _t('WorkflowRequest.VIEWPUBLISHEDLINK','View the published site') %></a></li>
+							<li><a href="$DiffCMSLink"><% _t('WorkflowRequest.VIEWUNPUBLISHEDCHANGESLINK','View unpublished changes') %></a></li>
 						</ul>
 						<br />
-						Thanks.
+						<% _t('WorkflowRequest.EMAILTHANKS','Thanks.') %>
 					</td>
 				</tr>
 			</tbody>

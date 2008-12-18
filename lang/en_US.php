@@ -70,11 +70,24 @@ $lang['en_US']['WorkflowPublicationRequest']['EMAIL_SUBJECT_DECLINED'] = array(
 	50,
 	'Email subject with page title'
 );
+$lang['en_US']['WorkflowRequest']['COMPAREDRAFTLIVELINK'] = 'Compare changes between live and the changed draft';
+$lang['en_US']['WorkflowRequest']['EMAILCHANGEDSTATUS'] = '%s has changed the workflow status on';
+$lang['en_US']['WorkflowRequest']['EMAILGREETING'] = 'Hi %s';
+$lang['en_US']['WorkflowRequest']['EMAILRECENTLYUPDATED1'] = '%s has recently updated the page titled';
+$lang['en_US']['WorkflowRequest']['EMAILRECENTLYUPDATED2'] = 'and would like to have the changes published.';
+$lang['en_US']['WorkflowRequest']['EMAILREQUESTREMOVE'] = '%s wants to remove the page titled';
+$lang['en_US']['WorkflowRequest']['EMAILTHANKS'] = 'Thanks.';
 $lang['en_US']['WorkflowRequest']['EMAIL_SUBJECT_GENERIC'] = array(
 	'The workflow status of the "%s" page has changed',
 	50,
 	'Email subject with page title'
 );
+$lang['en_US']['WorkflowRequest']['REVIEWANDDELETEPAGELINK'] = 'Review and delete the page in the CMS';
+$lang['en_US']['WorkflowRequest']['REVIEWANDPUBLISHPAGELINK'] = 'Review and publish the page in the CMS';
+$lang['en_US']['WorkflowRequest']['REVIEWPAGELINK'] = 'Review the page in the CMS';
+$lang['en_US']['WorkflowRequest']['VIEWCHANGEDDRAFTLINK'] = 'View the changed draft';
+$lang['en_US']['WorkflowRequest']['VIEWPUBLISHEDLINK'] = 'View the published site';
+$lang['en_US']['WorkflowRequest']['VIEWUNPUBLISHEDCHANGESLINK'] = 'View unpublished changes';
 $lang['en_US']['WorkflowRequestChange']['PLURALNAME'] = array(
 	'Workflow Request Changs',
 	50,
