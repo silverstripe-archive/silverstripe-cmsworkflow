@@ -51,7 +51,7 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		if(!$request) return false;
 		
 		// gather members for status output
-		$members = $record->PublisherMembers();
+		$members = $page->PublisherMembers();
 		foreach($members as $member) {
 			$emails[] = $member->Email;
 		}
