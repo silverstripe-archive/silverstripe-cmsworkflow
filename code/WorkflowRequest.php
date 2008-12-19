@@ -86,8 +86,10 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$change->Status = $this->Status;
 		$page = $this->Page();
 		$draftPage = Versioned::get_one_by_stage('SiteTree', 'Draft', "`SiteTree`.`ID` = $page->ID", false, "Created DESC");
-		$change->PageDraftVersion = $draftPage->Version;
+		// draftpage might not exist for pages "deleted from stage"
+		if($draftPage) $change->PageDraftVersion = $draftPage->Version;
 		$livePage = Versioned::get_one_by_stage('SiteTree', 'Live', "`SiteTree`.`ID` = $page->ID", false, "Created DESC");
+		// livepage might not exist for pages which have never been published
 		if($livePage) $change->PageLiveVersion = $livePage->Version;
 		$change->write();
 		$this->Changes()->add($change);
