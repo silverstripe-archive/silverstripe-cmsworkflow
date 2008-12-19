@@ -7,7 +7,7 @@
 					<td scope="row" colspan="2" class="typography">
 						<% sprintf(_t('WorkflowRequest.EMAILGREETING','Hi %s'),$Recipient.Name) %>,<br />
 						<p>
-							<% sprintf(_t('WorkflowRequest.EMAILCHANGEDSTATUS','%s has changed the workflow status on',)$Sender.Name) %> "<a href="$LiveSiteLink">$Page.Title</a>".
+							<% sprintf(_t('WorkflowRequest.EMAILCHANGEDSTATUS','%s has changed the workflow status on'),$Sender.Name) %> "<a href="$LiveSiteLink">$Page.Title</a>".
 						</p>
 						<ul>
 							<li><a href="$PageCMSLink"><% _t('WorkflowRequest.REVIEWPAGELINK','Review the page in the CMS') %></a></li>

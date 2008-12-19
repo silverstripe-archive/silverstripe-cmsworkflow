@@ -38,7 +38,7 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 			'Email subject with page title'
 		);
 		$entities["{$this->class}.EMAIL_SUBJECT_APPROVED"] = array(
-			"Your deletion request for the \"%s\" page has been denied",
+			"Your deletion request for the \"%s\" page has been approved",
 			PR_MEDIUM,
 			'Email subject with page title'
 		);

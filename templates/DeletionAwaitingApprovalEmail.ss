@@ -5,9 +5,9 @@
 			<tbody>
 				<tr>
 					<td scope="row" colspan="2" class="typography">
-						<% sprintf(_t('WorkflowRequest.EMAILGREETING','Hi %s'), $Recipient.Name) %>,<br />
+						<% sprintf(_t('WorkflowRequest.EMAILGREETING','Hi %s'),$Recipient.Name) %>,<br />
 						<p>
-						<% sprintf(_t('WorkflowRequest.EMAILREQUESTREMOVE','%s wants to remove the page titled'), $Sender.Name) %> "<a href="$LiveSiteLink">$Page.Title</a>".
+						<% sprintf(_t('WorkflowRequest.EMAILREQUESTREMOVE','%s wants to remove the page titled'),$Sender.Name) %> "<a href="$LiveSiteLink">$Page.Title</a>".
 						</p>
 						<ul>
 							<li><a href="$PageCMSLink"><% _t('WorkflowRequest.REVIEWANDDELETEPAGELINK','Review and delete the page in the CMS') %></a></li>
