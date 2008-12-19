@@ -156,7 +156,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 				$this->owner->canEdit() 
 				&& $this->owner->stagesDiffer('Stage', 'Live')
 				&& $this->owner->isPublished()
-				&& $this->owner->IsDeletedFromStage
+				&& $this->owner->DeletedFromStage
 			) { 
 				$actions->push(
 					$requestDeletionAction = new FormAction(
@@ -166,8 +166,8 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 				);
 				
 				// don't allow creation of a second request by another author
-				if(!$this->owner->canCreatePublicationRequest()) {
-					$requestDeletionAction = $requestDeletionAction->performReadonlyTransformation();
+				if(!$this->owner->canCreateDeletionRequest()) {
+					$actions->makeFieldReadonly($requestDeletionAction->Name());
 				}
 			}
 		}
@@ -282,6 +282,9 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		
 		$request = $this->owner->OpenWorkflowRequest();
 		
+		// if a request from a different classname exists, we can't allow creation of a new one
+		if($request && $request->ClassName != 'WorkflowPublicationRequest') return false;
+		
 		// if no request exists, allow creation of a new one (we can just have one open request at each point in time)
 		if(!$request || !$request->ID) return true;
 		
@@ -296,7 +299,25 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	 * @return boolean
 	 */
 	public function canCreateDeletionRequest($member = NULL) {
-		return $this->canCreatePublicationRequest();
+		if(!$member && $member !== FALSE) {
+			$member = Member::currentUser();
+		}
+
+		// if user can't edit page, he shouldn't be able to request publication
+		if(!$this->owner->canEdit($member)) return false;
+
+		$request = $this->owner->OpenWorkflowRequest();
+
+		// if a request from a different classname exists, we can't allow creation of a new one
+		if($request && $request->ClassName != 'WorkflowDeletionRequest') return false;
+
+		// if no request exists, allow creation of a new one (we can just have one open request at each point in time)
+		if(!$request || !$request->ID) return true;
+
+		// members can re-submit their own publication requests
+		if($member && $member->ID == $request->AuthorID) return true;
+
+		return false;
 	}
 	
 	/**
@@ -349,6 +370,24 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	 * After publishing remove from the report of items needing publication 
 	 */
 	function onAfterPublish() {
+		$currentPublisher = Member::currentUser();
+		$request = $this->owner->OpenWorkflowRequest();
+		// this assumes that a publisher knows about the ongoing approval discussion
+		// which might not always be the case
+		if($request && $request->ID) {
+			$request->PublisherID = $currentPublisher->ID;
+			$request->write();
+			// open the request and notify interested parties
+			$request->Status = 'Approved';
+			$request->write();
+			$request->notifyApproved();
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	function onAfterDelete() {
 		$currentPublisher = Member::currentUser();
 		$request = $this->owner->OpenWorkflowRequest();
 		// this assumes that a publisher knows about the ongoing approval discussion
