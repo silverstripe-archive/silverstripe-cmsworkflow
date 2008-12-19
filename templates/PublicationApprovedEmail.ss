@@ -11,8 +11,8 @@
 						</p>
 						<ul>
 							<li><a href="$PageCMSLink"><% _t('WorkflowRequest.REVIEWPAGELINK','Review the page in the CMS') %></a></li>
-							<li><a href="$LiveSiteLink"><% _t('WorkflowRequest.VIEWPUBLISHEDLINK','View the published site') %></a></li>
-							<li><a href="$DiffCMSLink"><% _t('WorkflowRequest.VIEWPUBLISHEDCHANGESLINK','View published changes') %></a></li>
+							<li><a href="$LiveSiteLink"><% _t('WorkflowRequest.VIEWPUBLISHEDLINK') %></a></li>
+							<li><a href="$DiffCMSLink"><% _t('WorkflowRequest.VIEWPUBLISHEDCHANGESLINK','Review published changes in the CMS') %></a></li>
 						</ul>
 						<br />
 						<% _t('WorkflowRequest.EMAILTHANKS','Thanks.') %>

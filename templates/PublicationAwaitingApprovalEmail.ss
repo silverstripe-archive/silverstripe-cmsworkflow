@@ -13,7 +13,7 @@
 						<ul>
 							<li><a href="$PageCMSLink"><% _t('WorkflowRequest.REVIEWANDPUBLISHPAGELINK','Review and publish the page in the CMS') %></a></li>
 							<li><a href="$StageSiteLink"><% _t('WorkflowRequest.VIEWCHANGEDDRAFTLINK','View the changed draft') %></a></li>
-							<li><a href="$LiveSiteLink"><% _t('WorkflowRequest.VIEWPUBLISHEDLINK','View the published site') %></a></li>
+							<li><a href="$LiveSiteLink"><% _t('WorkflowRequest.VIEWPUBLISHEDLINK') %></a></li>
 							<% if DiffLink %>
 								<li><a href="$DiffLink"><% _t('WorkflowRequest.COMPAREDRAFTLIVELINK','Compare changes between live and the changed draft') %></a></li>
 							<% end_if %>

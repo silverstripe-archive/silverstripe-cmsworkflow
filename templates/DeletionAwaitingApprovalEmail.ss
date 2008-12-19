@@ -11,10 +11,7 @@
 						</p>
 						<ul>
 							<li><a href="$PageCMSLink"><% _t('WorkflowRequest.REVIEWANDDELETEPAGELINK','Review and delete the page in the CMS') %></a></li>
-							<li><a href="$LiveSiteLink"><% _t('WorkflowRequest.VIEWPUBLISHEDLINK','View the published site') %></a></li>
-							<% if DiffLink %>
-								<li><a href="$DiffLink"><% _t('WorkflowRequest.COMPAREDRAFTLIVELINK','Compare changes between live and the changed draft') %></a></li>
-							<% end_if %>
+							<li><a href="$LiveSiteLink"><% _t('WorkflowRequest.VIEWPUBLISHEDLINK') %></a></li>
 						</ul>
 						<br />
 						<% _t('WorkflowRequest.EMAILTHANKS','Thanks.') %>

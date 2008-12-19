@@ -31,7 +31,7 @@ $lang['en_US']['SiteTreeCMSWorkflow']['STATUS_OPEN'] = 'Open';
 $lang['en_US']['SiteTreeCMSWorkflow']['STATUS_UNKNOWN'] = 'Unknown';
 $lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOWTABTITLE'] = 'Workflow';
 $lang['en_US']['WorkflowDeletionRequest']['EMAIL_SUBJECT_APPROVED'] = array(
-	'Your deletion request for the "%s" page has been denied',
+	'Your deletion request for the "%s" page has been approved',
 	50,
 	'Email subject with page title'
 );
@@ -73,6 +73,7 @@ $lang['en_US']['WorkflowPublicationRequest']['EMAIL_SUBJECT_DECLINED'] = array(
 $lang['en_US']['WorkflowRequest']['COMPAREDRAFTLIVELINK'] = 'Compare changes between live and the changed draft';
 $lang['en_US']['WorkflowRequest']['EMAILCHANGEDSTATUS'] = '%s has changed the workflow status on';
 $lang['en_US']['WorkflowRequest']['EMAILGREETING'] = 'Hi %s';
+$lang['en_US']['WorkflowRequest']['EMAILHASBEENPUBLISHED'] = 'A page you wrote has now been published by %s';
 $lang['en_US']['WorkflowRequest']['EMAILRECENTLYUPDATED1'] = '%s has recently updated the page titled';
 $lang['en_US']['WorkflowRequest']['EMAILRECENTLYUPDATED2'] = 'and would like to have the changes published.';
 $lang['en_US']['WorkflowRequest']['EMAILREQUESTREMOVE'] = '%s wants to remove the page titled';
@@ -86,8 +87,9 @@ $lang['en_US']['WorkflowRequest']['REVIEWANDDELETEPAGELINK'] = 'Review and delet
 $lang['en_US']['WorkflowRequest']['REVIEWANDPUBLISHPAGELINK'] = 'Review and publish the page in the CMS';
 $lang['en_US']['WorkflowRequest']['REVIEWPAGELINK'] = 'Review the page in the CMS';
 $lang['en_US']['WorkflowRequest']['VIEWCHANGEDDRAFTLINK'] = 'View the changed draft';
-$lang['en_US']['WorkflowRequest']['VIEWPUBLISHEDLINK'] = 'View the published site';
-$lang['en_US']['WorkflowRequest']['VIEWUNPUBLISHEDCHANGESLINK'] = 'View unpublished changes';
+$lang['en_US']['WorkflowRequest']['VIEWPUBLISHEDCHANGESLINK'] = 'Review published changes in the CMS';
+$lang['en_US']['WorkflowRequest']['VIEWPUBLISHEDLINK'] = 'View this page on your website';
+$lang['en_US']['WorkflowRequest']['VIEWUNPUBLISHEDCHANGESLINK'] = 'Compare unpublished changes in the CMS';
 $lang['en_US']['WorkflowRequestChange']['PLURALNAME'] = array(
 	'Workflow Request Changs',
 	50,
