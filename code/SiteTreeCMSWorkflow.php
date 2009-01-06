@@ -63,28 +63,29 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		));
 		// @todo more inline view
 		$openRequest = $this->OpenWorkflowRequest();
-		$openRequests = new DataObjectSet();
-		if($openRequest) $openRequests->push($openRequest);
-		$openRequestsTF = new ComplexTableField(
-			$this,
-			'OpenWorkflowRequest',
-			'WorkflowRequest',
-			array(
-				'Created' => singleton('WorkflowRequest')->fieldLabel('Created'), 
-				'StatusDescription' => singleton('WorkflowRequest')->fieldLabel('Status'),
-				'Author.Title' => singleton('WorkflowRequest')->fieldLabel('Author'),
-				'DiffLinkToLastPublished' => _t('SiteTreeCMSWorkflow.DIFFERENCESCOLUMN', 'Differences'),
-			)
-		);
-		$openRequestsTF->setPermissions(array('show'));
-		$openRequestsTF->setFieldCasting(array(
-			'Created' => 'Date->Nice'
-		));
-		$openRequestsTF->setFieldFormatting(array(
-			"DiffLinkToLastPublished" => '<a href=\"$value\" target=\"_blank\" class=\"externallink\">' . $diffLinkTitle . '</a>'
-		));
-		$openRequestsTF->setCustomSourceItems($openRequests);
-		$fields->push($openRequestsTF);
+		if($openRequest) {
+			$detailFields = $openRequest->getCMSDetailFields();
+			// poor man's Form->loadDataFrom()
+			$dataFields = $detailFields->dataFields();
+			if($dataFields) foreach($dataFields as $field) {
+				$name = $field->Name();
+				$field->setValue($openRequest->$name);
+			}
+			$detailFields->removeByName('Page');
+			$fields->merge($detailFields->makeReadonly());
+		} else {
+			$fields->push(new LiteralField(
+				'NoOpenRequestsNote',
+				sprintf(
+					'<p>%s</p>',
+					_t(
+						'SiteTreeCMSWorkflow.OPENREQUESTSNOFOUND', 
+						'No open request found'
+					)
+				)
+			));
+		}
+		
 		
 		// list all closed requests
 		$fields->push(new HeaderField(

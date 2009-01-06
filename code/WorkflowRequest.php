@@ -125,6 +125,25 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		return $fields;
 	}
 	
+	function getCMSDetailFields() {
+		$fields = $this->getFrontEndFields();
+		
+		$fields->push(new LiteralField(
+			'ShowDifferencesLink',
+			sprintf(
+				'<p><a href="%s">%s</a></p>', 
+				$this->DiffLinkToLastPublished,
+				_t('SiteTreeCMSWorkflow.DIFFERENCESTOLIVECOLUMN', 'Differences to live')
+			)
+		));
+		$fields->replaceField(
+			'Status',
+			new ReadonlyField('StatusDescription', $this->fieldLabel('Status'), $this->StatusDescription)
+		);
+		
+		return $fields;
+	}
+	
 	/**
 	 * Notify any publishers assigned to this page when a new request
 	 * is lodged.
