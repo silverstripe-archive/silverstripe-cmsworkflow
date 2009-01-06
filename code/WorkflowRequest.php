@@ -185,8 +185,20 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		);
 	}
 	
-	function notifyDeclined() {
-		// @todo implement
+	function notifyDenied() {
+		$publisher = Member::currentUser();
+		$author = $this->Author();
+		$subject = sprintf(
+			_t("{$this->class}.EMAIL_SUBJECT_APPROVED"),
+			$this->Page()->Title
+		);
+		$template = self::$emailtemplate_approved;
+		$this->sendNotificationEmail(
+			$publisher, // sender
+			$author, // recipient
+			$subject,
+			$template
+		);
 	}
 	
 	protected function sendNotificationEmail($sender, $recipient, $subject = null, $template = null) {
@@ -242,6 +254,22 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		if(!$latestPublished) return false;
 		
 		return "admin/compareversions/$page->ID/?From={$fromVersion}&To={$latestPublished->Version}";
+	}
+	
+	/**
+	 * Determines if a request can be created by an author for a specific page.
+	 * Add custom authentication checks by subclassing this method.
+	 * 
+	 * @param Member $member
+	 * @param SiteTree $page
+	 * @return boolean
+	 */
+	public static function can_create($member = NULL, $page) {
+		if(!$member && $member !== FALSE) {
+			$member = Member::currentUser();
+		}
+
+		return $page->canEdit($member);
 	}
 	
 	/**

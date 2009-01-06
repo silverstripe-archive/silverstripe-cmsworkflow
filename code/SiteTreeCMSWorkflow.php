@@ -2,7 +2,9 @@
 /**
  * Extension to SiteTree for CMS Workflow support.
  * 
- * Creates
+ * @todo Currently a publication/deletion approval is implicit by the "save and publish" and "delete from live" actions.
+ * This also means that CMS editors not assigned to this workflow, but with publish rights on the page can (unknowingly)
+ * end a workflow request. These assumptions are codified in {@link onAfterPublish()} and {@link onAfterDelete()}
  *
  * @package cmsworkflow
  */
@@ -118,10 +120,12 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	}
 	
 	/**
-	 * Normal authors (without publication permission) can perform the following actions on a page:
-	 * - save
-	 * - cancel draft changes
-	 * - 
+	 * Normal authors (without publication permission) can perform certain actions on a page,
+	 * e.g. "save" and "delete from draft". Other permissions like "publish" or "delete from live"
+	 * are hidden based on the {@link SiteTree->canPublish()} permission, and replaced
+	 * with triggers for requesting these actions ("request publication" and "request deletion").
+	 *
+	 * @param FieldSet $actions
 	 */
 	public function updateCMSActions(&$actions) {
 		// if user doesn't have publish rights, exchange the behavior from
@@ -146,7 +150,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 					)
 				);
 				// don't allow creation of a second request by another author
-				if(!$this->owner->canCreatePublicationRequest()) {
+				if(!WorkflowPublicationRequest::can_create(null, $this->owner)) {
 					$actions->makeFieldReadonly($requestPublicationAction->Name());
 				}
 			}
@@ -155,9 +159,8 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			$actions->removeByName('action_deletefromlive');
 			if(
 				$this->owner->canEdit() 
-				&& $this->owner->stagesDiffer('Stage', 'Live')
+				&& ($this->owner->stagesDiffer('Stage', 'Live') || $this->owner->DeletedFromStage)
 				&& $this->owner->isPublished()
-				&& $this->owner->DeletedFromStage
 			) { 
 				$actions->push(
 					$requestDeletionAction = new FormAction(
@@ -167,10 +170,25 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 				);
 				
 				// don't allow creation of a second request by another author
-				if(!$this->owner->canCreateDeletionRequest()) {
+				if(!WorkflowDeletionRequest::can_create(null, $this->owner)) {
 					$actions->makeFieldReadonly($requestDeletionAction->Name());
 				}
 			}
+		}
+		
+		// "deny publication"
+		$openRequest = $this->owner->OpenWorkflowRequest();
+		if(
+			$this->owner->canPublish()
+			&& $openRequest
+			&& $openRequest instanceof WorkflowPublicationRequest
+		) {
+			$actions->push(
+				$requestDeletionAction = new FormAction(
+					'cms_denypublication',
+					_t('SiteTreeCMSWorkflow.BUTTONDENYPUBLICATION', 'Deny Publication')
+				)
+			);
 		}
 	}
 	
@@ -267,58 +285,6 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		}
 
 		return true;
-	}
-	
-	/**
-	 * @param Member $member
-	 * @return boolean
-	 */
-	public function canCreatePublicationRequest($member = NULL) {
-		if(!$member && $member !== FALSE) {
-			$member = Member::currentUser();
-		}
-		
-		// if user can't edit page, he shouldn't be able to request publication
-		if(!$this->owner->canEdit($member)) return false;
-		
-		$request = $this->owner->OpenWorkflowRequest();
-		
-		// if a request from a different classname exists, we can't allow creation of a new one
-		if($request && $request->ClassName != 'WorkflowPublicationRequest') return false;
-		
-		// if no request exists, allow creation of a new one (we can just have one open request at each point in time)
-		if(!$request || !$request->ID) return true;
-		
-		// members can re-submit their own publication requests
-		if($member && $member->ID == $request->AuthorID) return true;
-		
-		return false;
-	}
-	
-	/**
-	 * @param Member $member
-	 * @return boolean
-	 */
-	public function canCreateDeletionRequest($member = NULL) {
-		if(!$member && $member !== FALSE) {
-			$member = Member::currentUser();
-		}
-
-		// if user can't edit page, he shouldn't be able to request publication
-		if(!$this->owner->canEdit($member)) return false;
-
-		$request = $this->owner->OpenWorkflowRequest();
-
-		// if a request from a different classname exists, we can't allow creation of a new one
-		if($request && $request->ClassName != 'WorkflowDeletionRequest') return false;
-
-		// if no request exists, allow creation of a new one (we can just have one open request at each point in time)
-		if(!$request || !$request->ID) return true;
-
-		// members can re-submit their own publication requests
-		if($member && $member->ID == $request->AuthorID) return true;
-
-		return false;
 	}
 	
 	/**
@@ -419,7 +385,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			return false;
 		}
 
-		if(!$this->owner->canCreatePublicationRequest($author)) {
+		if(!WorkflowPublicationRequest::can_create($author, $this->owner)) {
 			return false;
 		}
 		
@@ -459,7 +425,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	public function requestDeletion($author = null, $publishers = null){
 		if(!$author && $author !== FALSE) $author = Member::currentUser();
 		
-		if(!$this->owner->canCreateDeletionRequest($author)) {
+		if(!WorkflowDeletionRequest::can_create($author, $this->owner)) {
 			return false;
 		}
 		
@@ -494,6 +460,41 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		$request->Status = 'AwaitingApproval';
 		$request->write();
 		$request->notifiyAwaitingApproval();
+		
+		$this->owner->flushCache();
+		
+		return $request;
+	}
+	
+	/**
+	 * Denies the request, and restores the page from live.
+	 * This might cause draft modifications independent of this publication request
+	 * to be reverted as well, but thats a necessary evil.
+	 * 
+	 * @uses SiteTree->doRevertToLive()
+	 * 
+	 * @param Member $member The user denying the publication
+	 * @return boolean|WorkflowDeletionRequest
+	 */
+	public function denyPublication($author = NULL){
+		if(!$author && $author !== FALSE) $author = Member::currentUser();
+		
+		// if the author can't publish, he shouldn't be allowed to deny this action either
+		if(!$this->owner->canPublish($author)) {
+			return false;
+		}
+		
+		// get or create a publication request
+		$request = $this->owner->OpenWorkflowRequest();
+		if(!$request) return false;
+		
+		// revert page to live (which might undo independent changes by other authors)
+		$this->owner->doRevertToLive();
+		
+		// open the request and notify interested parties
+		$request->Status = 'Denied';
+		$request->write();
+		$request->notifyDenied();
 		
 		$this->owner->flushCache();
 		

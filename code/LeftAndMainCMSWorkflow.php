@@ -42,7 +42,7 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		$id = $urlParams['ID'];
 		$page = DataObject::get_by_id("SiteTree", $id);
 		
-		if(!$page->canCreateDeletionRequest()) {
+		if(!WorkflowDeletionRequest::can_create(null, $page)) {
 			return false;
 		}
 		
@@ -65,6 +65,31 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 			'good'
 		);
 		return FormResponse::respond();	
+	}
+	
+	public function cms_denypublication($urlParams, $form) {
+		$id = $urlParams['ID'];
+		$page = DataObject::get_by_id("SiteTree", $id);
+		
+		// request publication
+		$request = $page->denyPublication();
+		if(!$request) return false;
+		
+		// gather members for status output
+		$members = $page->PublisherMembers();
+		foreach($members as $member) {
+			$emails[] = $member->Email;
+		}
+		$strEmails = implode(", ", $emails);
+		
+		FormResponse::status_message(
+			sprintf(
+				_t('SiteTreeCMSWorkflow.DENYPUBLICATION_MESSAGE','Emailed %s d'), 
+				$strEmails
+			), 
+			'good'
+		);
+		return FormResponse::respond();
 	}
 
 }

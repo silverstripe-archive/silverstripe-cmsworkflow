@@ -30,6 +30,33 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 	 */
 	protected static $emailtemplate_awaitingedit = 'WorkflowGenericEmail';
 	
+	/**
+	 * @param Member $member
+	 * @param SiteTree $page
+	 * @return boolean
+	 */
+	public static function can_create($member = NULL, $page) {
+		if(!$member && $member !== FALSE) {
+			$member = Member::currentUser();
+		}
+
+		// if user can't edit page, he shouldn't be able to request publication
+		if(!$page->canEdit($member)) return false;
+
+		$request = $page->OpenWorkflowRequest();
+
+		// if a request from a different classname exists, we can't allow creation of a new one
+		if($request && $request->ClassName != 'WorkflowDeletionRequest') return false;
+
+		// if no request exists, allow creation of a new one (we can just have one open request at each point in time)
+		if(!$request || !$request->ID) return true;
+
+		// members can re-submit their own publication requests
+		if($member && $member->ID == $request->AuthorID) return true;
+
+		return false;
+	}
+	
 	function provideI18nEntities() {
 		$entities = array();
 		$entities["{$this->class}.EMAIL_SUBJECT_AWAITINGAPPROVAL"] = array(
