@@ -7,9 +7,11 @@ $lang['en_US']['MyWorkflowRequestsSideReport']['TITLE'] = 'Workflow: My requests
 $lang['en_US']['PublisherReviewSideReport']['TITLE'] = 'Workflow: Awaiting publication';
 $lang['en_US']['SiteTree']['EDITANYONE'] = 'Anyone who can log-in to the CMS';
 $lang['en_US']['SiteTree']['EDITONLYTHESE'] = 'Only these people (choose from list)';
+$lang['en_US']['SiteTreeCMSWorkflow']['BUTTONDENYPUBLICATION'] = 'Deny Publication';
 $lang['en_US']['SiteTreeCMSWorkflow']['BUTTONREQUESTPUBLICATION'] = 'Request Publication';
 $lang['en_US']['SiteTreeCMSWorkflow']['BUTTONREQUESTREMOVAL'] = 'Request Removal';
 $lang['en_US']['SiteTreeCMSWorkflow']['CLOSEDREQUESTSHEADER'] = 'Closed Requests';
+$lang['en_US']['SiteTreeCMSWorkflow']['DENYPUBLICATION_MESSAGE'] = 'Emailed %s d';
 $lang['en_US']['SiteTreeCMSWorkflow']['DIFFERENCESCOLUMN'] = 'Differences';
 $lang['en_US']['SiteTreeCMSWorkflow']['DIFFERENCESLINK'] = 'Show differences to live';
 $lang['en_US']['SiteTreeCMSWorkflow']['DIFFERENCESTHISCHANGECOLUMN'] = 'Differences in this change';
@@ -20,6 +22,7 @@ $lang['en_US']['SiteTreeCMSWorkflow']['FIELDLABEL_PUBLISHER'] = 'Publisher';
 $lang['en_US']['SiteTreeCMSWorkflow']['FIELDLABEL_PUBLISHERS'] = 'Publishers';
 $lang['en_US']['SiteTreeCMSWorkflow']['FIELDLABEL_STATUS'] = 'Status';
 $lang['en_US']['SiteTreeCMSWorkflow']['OPENREQUESTHEADER'] = 'Open Requests';
+$lang['en_US']['SiteTreeCMSWorkflow']['OPENREQUESTSNOFOUND'] = 'No open request found';
 $lang['en_US']['SiteTreeCMSWorkflow']['PUBLISHHEADER'] = 'Who can publish this inside the CMS?';
 $lang['en_US']['SiteTreeCMSWorkflow']['REQUEST_DELETEFROMLIVE_SUCCESS_MESSAGE'] = 'Emailed %s requesting deletion';
 $lang['en_US']['SiteTreeCMSWorkflow']['REQUEST_PUBLICATION_SUCCESS_MESSAGE'] = 'Emailed %s requesting publication';
@@ -45,7 +48,7 @@ $lang['en_US']['WorkflowDeletionRequest']['EMAIL_SUBJECT_AWAITINGEDIT'] = array(
 	50,
 	'Email subject with page title'
 );
-$lang['en_US']['WorkflowDeletionRequest']['EMAIL_SUBJECT_DECLINED'] = array(
+$lang['en_US']['WorkflowDeletionRequest']['EMAIL_SUBJECT_DENIED'] = array(
 	'Your deletion request for the "%s" page has been denied',
 	50,
 	'Email subject with page title'
@@ -65,7 +68,7 @@ $lang['en_US']['WorkflowPublicationRequest']['EMAIL_SUBJECT_AWAITINGEDIT'] = arr
 	50,
 	'Email subject with page title'
 );
-$lang['en_US']['WorkflowPublicationRequest']['EMAIL_SUBJECT_DECLINED'] = array(
+$lang['en_US']['WorkflowPublicationRequest']['EMAIL_SUBJECT_DENIED'] = array(
 	'Your publication request for the "%s" page has been denied',
 	50,
 	'Email subject with page title'

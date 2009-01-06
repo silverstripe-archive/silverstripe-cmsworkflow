@@ -41,9 +41,9 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	protected static $emailtemplate_approved = 'WorkflowGenericEmail';
 	
 	/**
-	 * @param string $emailtemplate_declined
+	 * @param string $emailtemplate_denied
 	 */
-	protected static $emailtemplate_declined = 'WorkflowGenericEmail';
+	protected static $emailtemplate_denied = 'WorkflowGenericEmail';
 	
 	/**
 	 * @param string $emailtemplate_awaitingedit
@@ -239,7 +239,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * @return boolean
 	 */
 	public function isOpen() {
-		return (!in_array($this->Status,array('Approved','Declined')));
+		return (!in_array($this->Status,array('Approved','DENIED')));
 	}
 	
 	/**

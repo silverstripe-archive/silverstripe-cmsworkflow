@@ -21,9 +21,9 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 	protected static $emailtemplate_approved = 'WorkflowGenericEmail';
 	
 	/**
-	 * @param string $emailtemplate_declined
+	 * @param string $emailtemplate_denied
 	 */
-	protected static $emailtemplate_declined = 'WorkflowGenericEmail';
+	protected static $emailtemplate_denied = 'WorkflowGenericEmail';
 	
 	/**
 	 * @param string $emailtemplate_awaitingedit
@@ -69,7 +69,7 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 			PR_MEDIUM,
 			'Email subject with page title'
 		);
-		$entities["{$this->class}.EMAIL_SUBJECT_DECLINED"] = array(
+		$entities["{$this->class}.EMAIL_SUBJECT_DENIED"] = array(
 			"Your deletion request for the \"%s\" page has been denied",
 			PR_MEDIUM,
 			'Email subject with page title'

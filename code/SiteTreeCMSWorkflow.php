@@ -219,7 +219,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		$this->componentCache = array();
 		
 		if($filter) $filter .= ' AND ';
-		$filter .= "Status NOT IN ('Approved','Declined')";
+		$filter .= "Status NOT IN ('Approved','Denied')";
 		return $this->owner->getComponents(
 			'WorkflowRequests',
 			$filter,
@@ -239,7 +239,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		$this->componentCache = array();
 		
 		if($filter) $filter .= ' AND ';
-		$filter .= "Status IN ('Approved','Declined')";
+		$filter .= "Status IN ('Approved','Denied')";
 		return $this->owner->getComponents(
 			'WorkflowRequests',
 			$filter,
