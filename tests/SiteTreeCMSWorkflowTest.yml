@@ -26,7 +26,7 @@ Member:
    customauthor2:
         Email: customauthor2@test.com
         Groups: =>Group.customauthorsgroup
-SiteTree:
+Page:
    defaultpublisherspage:
       Title: defaultpublisherspage
       CanPublishType: OnlyTheseUsers

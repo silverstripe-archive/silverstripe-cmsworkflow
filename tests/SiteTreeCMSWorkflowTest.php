@@ -23,7 +23,7 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 	
 	function testAlternateCanPublishLimitsToPublisherGroups() {
 		// Check for default record group assignments
-		$defaultpublisherspage = $this->objFromFixture('SiteTree', 'defaultpublisherspage');
+		$defaultpublisherspage = $this->objFromFixture('Page', 'defaultpublisherspage');
 		$defaultpublishersgroup = DataObject::get_one('Group', "Code = 'site-content-publishers'");
 		$defaultpublisher = $this->objFromFixture('Member', 'defaultpublisher');
 		
@@ -44,7 +44,7 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 		);
 		
 		// Check for custom page group assignments
-		$custompublisherspage = $this->objFromFixture('SiteTree', 'custompublisherpage');
+		$custompublisherspage = $this->objFromFixture('Page', 'custompublisherpage');
 		$custompublishersgroup = $this->objFromFixture('Group', 'custompublishergroup');
 		$custompublisher = $this->objFromFixture('Member', 'custompublisher');
 		$custompublisher->Groups()->add($custompublishersgroup);
@@ -55,7 +55,7 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 	}
 	
 	function testAccessTabOnlyDisplaysWithGrantAccessPermissions() {
-		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
+		$page = $this->objFromFixture('Page', 'custompublisherpage');
 		
 		$customauthor = $this->objFromFixture('Member', 'customauthor');
 		$this->session()->inst_set('loggedInAs', $customauthor->ID);
@@ -77,7 +77,7 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 	}
 	
 	function testCmsActionsLimited() {
-		$custompublisherspage = $this->objFromFixture('SiteTree', 'custompublisherpage');
+		$custompublisherspage = $this->objFromFixture('Page', 'custompublisherpage');
 		
 		$custompublishersgroup = $this->objFromFixture('Group', 'custompublishergroup');
 		$custompublisher = $this->objFromFixture('Member', 'custompublisher');
@@ -225,7 +225,12 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 		$this->assertContains(
 			'action_cms_requestdeletefromlive',
 			$changedOnStageRecord->getCMSActions()->column('Name'),
-			'Author can trigger request removal button if page has been changed on stage'
+			'Author cant trigger request removal button if page has been changed on stage but not deleted from stage'
+		);
+		$this->assertContains(
+			'action_cms_requestdeletefromlive',
+			$deletedFromStageRecord->getCMSActions()->column('Name'),
+			'Author can trigger request removal button if page has been deleted from stage'
 		);
 		
 		// test "request removal" action for publisher
