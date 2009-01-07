@@ -25,10 +25,49 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 	 */
 	protected static $emailtemplate_denied = 'WorkflowGenericEmail';
 	
-	/**
-	 * @param string $emailtemplate_awaitingedit
-	 */
-	protected static $emailtemplate_awaitingedit = 'WorkflowGenericEmail';
+	public static function create_for_page($page, $author = null, $publishers = null) {
+		if(!$author && $author !== FALSE) $author = Member::currentUser();
+		
+		if(!WorkflowDeletionRequest::can_create($author, $page)) {
+			return false;
+		}
+		
+		// take all members from the PublisherGroups relation on this record as a default
+		if(!$publishers) $publishers = $this->PublisherMembers();
+		
+		// if no publishers are set, the request will end up nowhere
+		if(!$publishers->Count()) {
+			return false;
+		}
+		
+		// get or create a publication request
+		$request = $page->OpenWorkflowRequest();
+		if(!$request || !$request->ID) {
+			$request = new WorkflowDeletionRequest();
+			$request->PageID = $page->ID;
+			$request->write();
+		}
+		
+		// @todo Check for correct workflow class (a "publication" request might be overwritten with a "deletion" request)
+		
+		// @todo reassign original author as a reviewer if present
+		$request->AuthorID = $author->ID;
+		$request->write();
+		
+		// assign publishers to this specific request
+		foreach($publishers as $publisher) {
+			$request->Publishers()->add($publisher);
+		}
+
+		// open the request and notify interested parties
+		$request->Status = 'AwaitingApproval';
+		$request->write();
+		$request->notifiyAwaitingApproval();
+		
+		$page->flushCache();
+		
+		return $request;
+	}
 	
 	/**
 	 * @param Member $member

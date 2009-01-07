@@ -18,7 +18,7 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		$page = DataObject::get_by_id("SiteTree", $id);
 		
 		// request publication
-		$request = $page->requestPublication();
+		$request = WorkflowPublicationRequest::create_for_page($page);
 		if(!$request) return false;
 		
 		// gather members for status output
@@ -47,7 +47,7 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		}
 		
 		// request publication
-		$request = $page->requestDeletion();
+		$request = WorkflowDeletionRequest::create_for_page($page);
 		if(!$request) return false;
 		
 		// gather members for status output

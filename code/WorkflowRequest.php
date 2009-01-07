@@ -46,14 +46,23 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	protected static $emailtemplate_denied = 'WorkflowGenericEmail';
 	
 	/**
-	 * @param string $emailtemplate_awaitingedit
+	 * Factory method setting up a new WorkflowRequest with associated
+	 * state. Sets relations to publishers and authors, 
+	 * 
+	 * @param SiteTree $page
+	 * @param Member $member The user requesting publication
+	 * @param DataObjectSet $publishers Publishers assigned to this request.
+	 * @return boolean|WorkflowPublicationRequest
 	 */
-	protected static $emailtemplate_awaitingedit = 'WorkflowGenericEmail';
+	public static function create_for_page($page, $author = null, $publishers = null) {
+		user_error('WorkflowRequest::create_for_page() - Abstract method, please implement in subclass', E_USER_ERROR);
+	}
 	
 	function onBeforeWrite() {
 		// if the request status has changed, we track it through a separate relation
 		$changedFields = $this->getChangedFields();
-		if((isset($changedFields['Status']) && $changedFields['Status'])) {
+		// only write if the status has changed, and wasn't previously NULL (in which case onAfterWrite() takes over)
+		if((isset($changedFields['Status']) && $changedFields['Status']['after'] && $changedFields['Status']['before'])) {
 			$change = $this->addNewChange();
 		}
 		

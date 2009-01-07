@@ -20,7 +20,7 @@ class WorkflowRequestTest extends FunctionalTest {
 		
 		// awaiting approval 
 		$this->session()->inst_set('loggedInAs', $customauthor->ID);
-		$page->requestPublication($customauthor, $page->PublisherMembers());
+		WorkflowPublicationRequest::create_for_page($page, $customauthor, $page->PublisherMembers());
 		$request1 = $page->OpenWorkflowRequest();
 		$this->assertEquals(
 			$request1->AuthorID,
@@ -64,7 +64,7 @@ class WorkflowRequestTest extends FunctionalTest {
 		
 		// awaiting approval emails
 		$this->session()->inst_set('loggedInAs', $customauthor->ID);
-		$page->requestPublication($customauthor, $page->PublisherMembers());
+		WorkflowPublicationRequest::create_for_page($page, $customauthor, $page->PublisherMembers());
 		$this->assertEmailSent(
 			$custompublisher->Email, // to
 			$customauthor->Email // from
@@ -95,11 +95,11 @@ class WorkflowRequestTest extends FunctionalTest {
 		$customauthor->Groups()->add($customauthorsgroup);
 		
 		$this->session()->inst_set('loggedInAs', $customauthor->ID);
-		$page->requestPublication($customauthor, $page->PublisherMembers());
+		WorkflowPublicationRequest::create_for_page($page, $customauthor, $page->PublisherMembers());
 		$request1 = $page->OpenWorkflowRequest();
 		
 		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
-		$page->requestPublication($customauthor, $page->PublisherMembers());
+		WorkflowPublicationRequest::create_for_page($page, $customauthor, $page->PublisherMembers());
 		$request2 = $page->OpenWorkflowRequest();
 		$this->assertEquals(
 			$request1->ID,
@@ -120,10 +120,10 @@ class WorkflowRequestTest extends FunctionalTest {
 		$customauthor2->Groups()->add($customauthorsgroup);
 		
 		// first request
-		$request1 = $page->requestPublication($customauthor, $page->PublisherMembers());
+		$request1 = WorkflowPublicationRequest::create_for_page($page, $customauthor, $page->PublisherMembers());
 		
 		// second request by original author
-		$request2 = $page->requestPublication($customauthor, $page->PublisherMembers());
+		$request2 = WorkflowPublicationRequest:.create_for_page($page, $customauthor, $page->PublisherMembers());
 		$this->assertEquals(
 			$request1->ID,
 			$request2->ID,
@@ -131,7 +131,7 @@ class WorkflowRequestTest extends FunctionalTest {
 		);
 		
 		// second request by other author
-		$request3 = $page->requestPublication($customauthor2, $page->PublisherMembers());
+		$request3 = WorkflowPublicationRequest($page, $customauthor2, $page->PublisherMembers());
 		$this->assertFalse(
 			$request3,
 			'If open request exists, a member who is not the author of the original request cant create a new request'
