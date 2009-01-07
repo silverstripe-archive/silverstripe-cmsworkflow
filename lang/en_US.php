@@ -11,7 +11,8 @@ $lang['en_US']['SiteTreeCMSWorkflow']['BUTTONDENYPUBLICATION'] = 'Deny Publicati
 $lang['en_US']['SiteTreeCMSWorkflow']['BUTTONREQUESTPUBLICATION'] = 'Request Publication';
 $lang['en_US']['SiteTreeCMSWorkflow']['BUTTONREQUESTREMOVAL'] = 'Request Removal';
 $lang['en_US']['SiteTreeCMSWorkflow']['CLOSEDREQUESTSHEADER'] = 'Closed Requests';
-$lang['en_US']['SiteTreeCMSWorkflow']['DENYPUBLICATION_MESSAGE'] = 'Emailed %s d';
+$lang['en_US']['SiteTreeCMSWorkflow']['DENYDELECTIONMESSAGE'] = 'Denied request and reset page to live version. Emailed %s d';
+$lang['en_US']['SiteTreeCMSWorkflow']['DENYPUBLICATION_MESSAGE'] = 'Denied request and reset page to live version. Emailed %s d';
 $lang['en_US']['SiteTreeCMSWorkflow']['DIFFERENCESCOLUMN'] = 'Differences';
 $lang['en_US']['SiteTreeCMSWorkflow']['DIFFERENCESLINK'] = 'Show differences to live';
 $lang['en_US']['SiteTreeCMSWorkflow']['DIFFERENCESTHISCHANGECOLUMN'] = 'Differences in this change';
@@ -54,7 +55,7 @@ $lang['en_US']['WorkflowDeletionRequest']['EMAIL_SUBJECT_DENIED'] = array(
 	'Email subject with page title'
 );
 $lang['en_US']['WorkflowPublicationRequest']['EMAIL_SUBJECT_APPROVED'] = array(
-	'Your publication request for the "%s" page has been denied',
+	'Your publication request for the "%s" page has been approved',
 	50,
 	'Email subject with page title'
 );
@@ -75,6 +76,8 @@ $lang['en_US']['WorkflowPublicationRequest']['EMAIL_SUBJECT_DENIED'] = array(
 );
 $lang['en_US']['WorkflowRequest']['COMPAREDRAFTLIVELINK'] = 'Compare changes between live and the changed draft';
 $lang['en_US']['WorkflowRequest']['EMAILCHANGEDSTATUS'] = '%s has changed the workflow status on';
+$lang['en_US']['WorkflowRequest']['EMAILDENIEDDELETION'] = '%s has denied your deletion request on ';
+$lang['en_US']['WorkflowRequest']['EMAILDENIEDPUBLICATION'] = '%s has denied your publication request on ';
 $lang['en_US']['WorkflowRequest']['EMAILGREETING'] = 'Hi %s';
 $lang['en_US']['WorkflowRequest']['EMAILHASBEENPUBLISHED'] = 'A page you wrote has now been published by %s';
 $lang['en_US']['WorkflowRequest']['EMAILRECENTLYUPDATED1'] = '%s has recently updated the page titled';
@@ -89,6 +92,11 @@ $lang['en_US']['WorkflowRequest']['EMAIL_SUBJECT_GENERIC'] = array(
 $lang['en_US']['WorkflowRequest']['REVIEWANDDELETEPAGELINK'] = 'Review and delete the page in the CMS';
 $lang['en_US']['WorkflowRequest']['REVIEWANDPUBLISHPAGELINK'] = 'Review and publish the page in the CMS';
 $lang['en_US']['WorkflowRequest']['REVIEWPAGELINK'] = 'Review the page in the CMS';
+$lang['en_US']['WorkflowRequest']['TITLE'] = array(
+	'Workflow Request',
+	50,
+	'Title for this request, shown e.g. in the workflow status overview for a page'
+);
 $lang['en_US']['WorkflowRequest']['VIEWCHANGEDDRAFTLINK'] = 'View the changed draft';
 $lang['en_US']['WorkflowRequest']['VIEWPUBLISHEDCHANGESLINK'] = 'Review published changes in the CMS';
 $lang['en_US']['WorkflowRequest']['VIEWPUBLISHEDLINK'] = 'View this page on your website';

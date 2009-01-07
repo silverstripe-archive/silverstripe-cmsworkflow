@@ -107,7 +107,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			$dataFields = $detailFields->dataFields();
 			if($dataFields) foreach($dataFields as $field) {
 				$name = $field->Name();
-				$field->setValue($openRequest->$name);
+				if($openRequest->$name) $field->setValue($openRequest->$name);
 			}
 			$detailFields->removeByName('Page');
 			$fields->merge($detailFields->makeReadonly());

@@ -23,7 +23,7 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 	/**
 	 * @param string $emailtemplate_denied
 	 */
-	protected static $emailtemplate_denied = 'WorkflowGenericEmail';
+	protected static $emailtemplate_denied = 'PublicationDeniedEmail';
 	
 	public static function create_for_page($page, $author = null, $publishers = null) {
 		if(!$author && $author !== FALSE) $author = Member::currentUser();
@@ -36,7 +36,7 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 			return false;
 		}
 
-		if(!WorkflowPublicationRequest::can_create($author, $page)) {
+		if(!self::can_create($author, $page)) {
 			return false;
 		}
 	
@@ -93,7 +93,7 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 					)
 				);
 				// don't allow creation of a second request by another author
-				if(!WorkflowPublicationRequest::can_create(null, $page)) {
+				if(!self::can_create(null, $page)) {
 					$actions->makeFieldReadonly($requestPublicationAction->Name());
 				}
 			}
@@ -181,7 +181,7 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 			'Email subject with page title'
 		);
 		$entities["{$this->class}.EMAIL_SUBJECT_APPROVED"] = array(
-			"Your publication request for the \"%s\" page has been denied",
+			"Your publication request for the \"%s\" page has been approved",
 			PR_MEDIUM,
 			'Email subject with page title'
 		);

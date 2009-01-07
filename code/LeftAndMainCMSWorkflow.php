@@ -4,7 +4,8 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 	public static $allowed_actions = array(
 		'cms_requestpublication',
 		'cms_requestdeletefromlive',
-		'cms_denypublication'
+		'cms_denypublication',
+		'cms_denydeletion'
 	);
 	
 	function init() {
@@ -76,6 +77,8 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		$request = $page->OpenWorkflowRequest();
 		if(!$request) return false;
 		
+		if(!($request instanceof WorkflowPublicationRequest)) return false;
+		
 		$success = $request->deny(Member::currentUser());
 		
 		// gather members for status output
@@ -87,7 +90,36 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		
 		FormResponse::status_message(
 			sprintf(
-				_t('SiteTreeCMSWorkflow.DENYPUBLICATION_MESSAGE','Emailed %s d'), 
+				_t('SiteTreeCMSWorkflow.DENYPUBLICATION_MESSAGE','Denied request and reset page to live version. Emailed %s d'), 
+				$strEmails
+			), 
+			'good'
+		);
+		return FormResponse::respond();
+	}
+	
+	public function cms_denydeletion($urlParams, $form) {
+		$id = $urlParams['ID'];
+		$page = DataObject::get_by_id("SiteTree", $id);
+		
+		// request publication
+		$request = $page->OpenWorkflowRequest();
+		if(!$request) return false;
+		
+		if(!($request instanceof WorkflowDeletionRequest)) return false;
+		
+		$success = $request->deny(Member::currentUser());
+		
+		// gather members for status output
+		$members = $page->PublisherMembers();
+		foreach($members as $member) {
+			$emails[] = $member->Email;
+		}
+		$strEmails = implode(", ", $emails);
+		
+		FormResponse::status_message(
+			sprintf(
+				_t('SiteTreeCMSWorkflow.DENYDELECTIONMESSAGE','Denied request and reset page to live version. Emailed %s d'), 
 				$strEmails
 			), 
 			'good'

@@ -183,18 +183,33 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	
 	function getCMSDetailFields() {
 		$fields = $this->getFrontEndFields();
-		
-		$fields->push(new LiteralField(
-			'ShowDifferencesLink',
-			sprintf(
-				'<p><a href="%s">%s</a></p>', 
-				$this->DiffLinkToLastPublished,
-				_t('SiteTreeCMSWorkflow.DIFFERENCESTOLIVECOLUMN', 'Differences to live')
+		$fields->insertBefore(
+			$titleField = new ReadonlyField(
+				'RequestTitleField',
+				$this->fieldLabel('Title'),
+				$this->getTitle()
+			),
+			'Status'
+		);
+		$fields->push(
+			$showDifferencesField = new ReadonlyField(
+				'ShowDifferencesLink',
+				false,
+				sprintf(
+					'<a href="%s">%s</a>', 
+					$this->DiffLinkToLastPublished,
+					_t('SiteTreeCMSWorkflow.DIFFERENCESTOLIVECOLUMN', 'Differences to live')
+				)
 			)
-		));
+		);
+		$showDifferencesField->dontEscape = true;
 		$fields->replaceField(
 			'Status',
-			new ReadonlyField('StatusDescription', $this->fieldLabel('Status'), $this->StatusDescription)
+			new ReadonlyField(
+				'StatusDescription', 
+				$this->fieldLabel('Status'), 
+				$this->StatusDescription
+			)
 		);
 		
 		return $fields;
@@ -391,6 +406,16 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	}
 	
 	/**
+	 * @return string
+	 */
+	public function getTitle() {
+		$title = _t("{$this->class}.TITLE");
+		if(!$title) $title = _t('WorkflowRequest.TITLE');
+		
+		return $title;
+	}
+	
+	/**
 	 * @return string Translated $Status property
 	 */
 	public function getStatusDescription() {
@@ -432,6 +457,11 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 			"The workflow status of the \"%s\" page has changed",
 			PR_MEDIUM,
 			'Email subject with page title'
+		);
+		$entities['WorkflowRequest.TITLE'] = array(
+			"Workflow Request",
+			PR_MEDIUM,
+			'Title for this request, shown e.g. in the workflow status overview for a page'
 		);
 		
 		return $entities;

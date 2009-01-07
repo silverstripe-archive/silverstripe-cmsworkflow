@@ -23,7 +23,7 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 	/**
 	 * @param string $emailtemplate_denied
 	 */
-	protected static $emailtemplate_denied = 'WorkflowGenericEmail';
+	protected static $emailtemplate_denied = 'DeletionDeniedEmail';
 	
 	public static function create_for_page($page, $author = null, $publishers = null) {
 		if(!$author && $author !== FALSE) $author = Member::currentUser();
@@ -33,7 +33,7 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 		}
 		
 		// take all members from the PublisherGroups relation on this record as a default
-		if(!$publishers) $publishers = $this->PublisherMembers();
+		if(!$publishers) $publishers = $page->PublisherMembers();
 		
 		// if no publishers are set, the request will end up nowhere
 		if(!$publishers->Count()) {
@@ -82,8 +82,9 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 			$actions->removeByName('action_deletefromlive');
 			if(
 				$page->canEdit() 
-				&& ($page->stagesDiffer('Stage', 'Live') || $page->DeletedFromStage)
-				&& $page->isPublished()
+				//&& $page->stagesDiffer('Stage', 'Live')
+				//&& $page->isPublished()
+				&& $page->DeletedFromStage
 			) { 
 				$actions->push(
 					$requestDeletionAction = new FormAction(
@@ -93,7 +94,7 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 				);
 				
 				// don't allow creation of a second request by another author
-				if(!WorkflowDeletionRequest::can_create(null, $page)) {
+				if(!self::can_create(null, $page)) {
 					$actions->makeFieldReadonly($requestDeletionAction->Name());
 				}
 			}
