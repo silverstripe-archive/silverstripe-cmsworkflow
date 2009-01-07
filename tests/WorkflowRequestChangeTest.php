@@ -7,7 +7,7 @@ class WorkflowRequestChangeTest extends FunctionalTest {
 	static $fixture_file = 'cmsworkflow/tests/SiteTreeCMSWorkflowTest.yml';
 	
 	function testChangesAreTracked() {
-		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
+		$page = $this->objFromFixture('Page', 'custompublisherpage');
 
 		$custompublishersgroup = $this->objFromFixture('Group', 'custompublishergroup');
 		$custompublisher = $this->objFromFixture('Member', 'custompublisher');
@@ -22,7 +22,7 @@ class WorkflowRequestChangeTest extends FunctionalTest {
 		$this->session()->inst_set('loggedInAs', $customauthor->ID);
 		$page->Content = 'edited';
 		$page->write();
-		$request = $page->requestPublication($customauthor, $page->PublisherMembers());
+		$request = WorkflowPublicationRequest::create_for_page($page);
 		$this->assertEquals(
 			$request->Changes()->Count(),
 			1,
