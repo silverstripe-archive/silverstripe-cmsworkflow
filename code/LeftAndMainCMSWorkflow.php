@@ -23,6 +23,8 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		$request = WorkflowPublicationRequest::create_for_page($page);
 		if(!$request) return false;
 		
+		FormResponse::get_page($id);
+		
 		// gather members for status output
 		$members = $page->PublisherMembers();
 		foreach($members as $member) {
@@ -51,6 +53,8 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		// request publication
 		$request = WorkflowDeletionRequest::create_for_page($page);
 		if(!$request) return false;
+		
+		FormResponse::get_page($id);
 		
 		// gather members for status output
 		$members = $page->PublisherMembers();
@@ -81,6 +85,8 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		
 		$success = $request->deny(Member::currentUser());
 		
+		FormResponse::get_page($id);
+		
 		// gather members for status output
 		$members = $page->PublisherMembers();
 		foreach($members as $member) {
@@ -109,6 +115,8 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		if(!($request instanceof WorkflowDeletionRequest)) return false;
 		
 		$success = $request->deny(Member::currentUser());
+		
+		FormResponse::get_page($id);
 		
 		// gather members for status output
 		$members = $page->PublisherMembers();
