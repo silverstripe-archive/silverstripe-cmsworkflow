@@ -84,6 +84,53 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	}
 	
 	/**
+	 * Approve this request, notify interested parties
+	 * and close it. Used by {@link LeftAndMainCMSWorkflow}
+	 * and {@link SiteTreeCMSWorkflow}.
+	 * 
+	 * @param Member $author
+	 * @return boolean
+	 */
+	public function approve($author) {
+		if(!$this->Page()->canPublish($author)) {
+			return false;
+		}
+		
+		$this->PublisherID = $author->ID;
+		$this->write();
+		// open the request and notify interested parties
+		$this->Status = 'Approved';
+		$this->write();
+		$this->notifyApproved();
+		
+		return true;
+	}
+	
+	/**
+	 * Deny this request, notify interested parties
+	 * and close it. Used by {@link LeftAndMainCMSWorkflow}
+	 * and {@link SiteTreeCMSWorkflow}.
+	 * 
+	 * @param Member $author
+	 * @return boolean
+	 */
+	public function deny($author) {
+		if(!$this->Page()->canPublish($author)) {
+			return false;
+		}
+		
+		// "publisher" in this sense means "deny-author"
+		$this->PublisherID = $author->ID;
+		$this->write();
+		// open the request and notify interested parties
+		$this->Status = 'Denied';
+		$this->write();
+		$this->notifyDenied();
+		
+		return true;
+	}
+	
+	/**
 	 * Create a new {@link WorkflowRequestChange} with the current
 	 * page status and versions, and link it to this object.
 	 *

@@ -4,6 +4,7 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 	public static $allowed_actions = array(
 		'cms_requestpublication',
 		'cms_requestdeletefromlive',
+		'cms_denypublication'
 	);
 	
 	function init() {
@@ -72,8 +73,10 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		$page = DataObject::get_by_id("SiteTree", $id);
 		
 		// request publication
-		$request = $page->denyPublication();
+		$request = $page->OpenWorkflowRequest();
 		if(!$request) return false;
+		
+		$success = $request->deny(Member::currentUser());
 		
 		// gather members for status output
 		$members = $page->PublisherMembers();
@@ -91,6 +94,9 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		);
 		return FormResponse::respond();
 	}
+	
+	// further actions like "save and publish" as well as "delete" are implicitly
+	// connected with the workflow through onBefore*() callbacks
 
 }
 ?>

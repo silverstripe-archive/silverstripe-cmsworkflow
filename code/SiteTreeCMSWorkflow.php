@@ -9,6 +9,42 @@
  * @package cmsworkflow
  */
 class SiteTreeCMSWorkflow extends DataObjectDecorator {
+	
+	/**
+	 * A registry of all allowed request classes.
+	 * 
+	 * @var Array $allowed_request_classes 
+	 */
+	protected static $allowed_request_classes = array();
+	
+	/**
+	 * @param string $requestClass
+	 * @return bool
+	 */
+	public static function register_request($requestClass) {
+		if(class_exists($requestClass) == false)
+			return false;
+
+		if(is_subclass_of($requestClass, 'WorkflowRequest') == false)
+			return false;
+
+		if(in_array($requestClass, self::$allowed_request_classes) == false) {
+			array_push(self::$allowed_request_classes, $requestClass);
+		}
+
+		return true;
+	}
+	
+	/**
+	 * @param string $requestClass
+	 * @return bool Returns TRUE on success, FALSE otherwise.
+	 */
+	public static function unregister_request($requestClass) {
+		if(in_array($requestClass, self::$authenticators)) {
+			unset(self::$allowed_request_classes[array_search($requestClass, self::$allowed_request_classes)]);
+		}
+	}
+	
 	function extraDBFields() {
 		return array(
 			'db' => array(
@@ -128,67 +164,9 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	 * @param FieldSet $actions
 	 */
 	public function updateCMSActions(&$actions) {
-		// if user doesn't have publish rights, exchange the behavior from
-		// "publish" to "request publish" etc.
-		if(!$this->owner->canPublish()) {
-
-			// authors shouldn't be able to revert, as this republishes the page.
-			// they should rather change the page and re-request publication
-			$actions->removeByName('action_revert');
-
-			// "request publication"
-			$actions->removeByName('action_publish');
-			if(
-				$this->owner->canEdit() 
-				&& $this->owner->stagesDiffer('Stage', 'Live')
-				&& $this->owner->Version > 1 // page has been saved at least once
-			) { 
-				$actions->push(
-					$requestPublicationAction = new FormAction(
-						'cms_requestpublication', 
-						_t('SiteTreeCMSWorkflow.BUTTONREQUESTPUBLICATION', 'Request Publication')
-					)
-				);
-				// don't allow creation of a second request by another author
-				if(!WorkflowPublicationRequest::can_create(null, $this->owner)) {
-					$actions->makeFieldReadonly($requestPublicationAction->Name());
-				}
-			}
-			
-			// "request removal"
-			$actions->removeByName('action_deletefromlive');
-			if(
-				$this->owner->canEdit() 
-				&& ($this->owner->stagesDiffer('Stage', 'Live') || $this->owner->DeletedFromStage)
-				&& $this->owner->isPublished()
-			) { 
-				$actions->push(
-					$requestDeletionAction = new FormAction(
-						'cms_requestdeletefromlive', 
-						_t('SiteTreeCMSWorkflow.BUTTONREQUESTREMOVAL', 'Request Removal')
-					)
-				);
-				
-				// don't allow creation of a second request by another author
-				if(!WorkflowDeletionRequest::can_create(null, $this->owner)) {
-					$actions->makeFieldReadonly($requestDeletionAction->Name());
-				}
-			}
-		}
-		
-		// "deny publication"
-		$openRequest = $this->owner->OpenWorkflowRequest();
-		if(
-			$this->owner->canPublish()
-			&& $openRequest
-			&& $openRequest instanceof WorkflowPublicationRequest
-		) {
-			$actions->push(
-				$requestDeletionAction = new FormAction(
-					'cms_denypublication',
-					_t('SiteTreeCMSWorkflow.BUTTONDENYPUBLICATION', 'Deny Publication')
-				)
-			);
+		if(self::$allowed_request_classes) foreach(self::$allowed_request_classes as $class) {
+			// @todo Workaround: calling static method as instance method to avoid eval()
+			singleton($class)->update_cms_actions($actions, $this->owner);
 		}
 	}
 	
@@ -342,12 +320,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		// this assumes that a publisher knows about the ongoing approval discussion
 		// which might not always be the case
 		if($request && $request->ID) {
-			$request->PublisherID = $currentPublisher->ID;
-			$request->write();
-			// open the request and notify interested parties
-			$request->Status = 'Approved';
-			$request->write();
-			$request->notifyApproved();
+			$request->approve($currentPublisher);
 		}
 	}
 	
@@ -359,49 +332,9 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		$request = $this->owner->OpenWorkflowRequest();
 		// this assumes that a publisher knows about the ongoing approval discussion
 		// which might not always be the case
-		if($request && $request->ID) {
-			$request->PublisherID = $currentPublisher->ID;
-			$request->write();
-			// open the request and notify interested parties
-			$request->Status = 'Approved';
-			$request->write();
-			$request->notifyApproved();
+		if($request && $request->ID && $request instanceof WorkflowDeletionRequest) {
+			$request->approve($currentPublisher);
 		}
-	}
-	
-	/**
-	 * Denies the request, and restores the page from live.
-	 * This might cause draft modifications independent of this publication request
-	 * to be reverted as well, but thats a necessary evil.
-	 * 
-	 * @uses SiteTree->doRevertToLive()
-	 * 
-	 * @param Member $member The user denying the publication
-	 * @return boolean|WorkflowDeletionRequest
-	 */
-	public function denyPublication($author = NULL){
-		if(!$author && $author !== FALSE) $author = Member::currentUser();
-		
-		// if the author can't publish, he shouldn't be allowed to deny this action either
-		if(!$this->owner->canPublish($author)) {
-			return false;
-		}
-		
-		// get or create a publication request
-		$request = $this->owner->OpenWorkflowRequest();
-		if(!$request) return false;
-		
-		// revert page to live (which might undo independent changes by other authors)
-		$this->owner->doRevertToLive();
-		
-		// open the request and notify interested parties
-		$request->Status = 'Denied';
-		$request->write();
-		$request->notifyDenied();
-		
-		$this->owner->flushCache();
-		
-		return $request;
 	}
 }
 ?>

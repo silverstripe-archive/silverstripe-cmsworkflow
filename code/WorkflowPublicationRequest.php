@@ -67,6 +67,77 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 	}
 	
 	/**
+	 * @param FieldSet $actions
+	 * @parma SiteTree $page
+	 */
+	public static function update_cms_actions(&$actions, $page) {
+		// if user doesn't have publish rights, exchange the behavior from
+		// "publish" to "request publish" etc.
+		if(!$page->canPublish()) {
+
+			// authors shouldn't be able to revert, as this republishes the page.
+			// they should rather change the page and re-request publication
+			$actions->removeByName('action_revert');
+
+			// "request publication"
+			$actions->removeByName('action_publish');
+			if(
+				$page->canEdit() 
+				&& $page->stagesDiffer('Stage', 'Live')
+				&& $page->Version > 1 // page has been saved at least once
+			) { 
+				$actions->push(
+					$requestPublicationAction = new FormAction(
+						'cms_requestpublication', 
+						_t('SiteTreeCMSWorkflow.BUTTONREQUESTPUBLICATION', 'Request Publication')
+					)
+				);
+				// don't allow creation of a second request by another author
+				if(!WorkflowPublicationRequest::can_create(null, $page)) {
+					$actions->makeFieldReadonly($requestPublicationAction->Name());
+				}
+			}
+		}
+		
+		// "deny publication"
+		$openRequest = $page->OpenWorkflowRequest();
+		if(
+			$page->canPublish()
+			&& $openRequest
+			&& $openRequest instanceof WorkflowPublicationRequest
+		) {
+			$actions->push(
+				$requestDeletionAction = new FormAction(
+					'cms_denypublication',
+					_t('SiteTreeCMSWorkflow.BUTTONDENYPUBLICATION', 'Deny Publication')
+				)
+			);
+		}
+	}
+	
+	/**
+	 * Denies the request, and restores the page from live.
+	 * This might cause draft modifications independent of this publication request
+	 * to be reverted as well, but thats a necessary evil.
+	 * 
+	 * @uses SiteTree->doRevertToLive()
+	 * 
+	 * @param Member $member The user denying the publication
+	 * @return boolean
+	 */
+	public function deny($author){
+		// if the author can't publish, he shouldn't be allowed to deny this action either
+		if(!$this->Page()->canPublish($author)) {
+			return false;
+		}
+		
+		// revert page to live (which might undo independent changes by other authors)
+		$this->Page()->doRevertToLive();
+		
+		return parent::deny($author);
+	}
+	
+	/**
 	 * @param Member $member
 	 * @param SiteTree $page
 	 * @return boolean
@@ -91,6 +162,15 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 		if($member && $member->ID == $request->AuthorID) return true;
 		
 		return false;
+	}
+	
+	public function onAfterPublish($page, $publisher) {
+		$this->PublisherID = $publisher->ID;
+		$this->write();
+		// open the request and notify interested parties
+		$this->Status = 'Approved';
+		$this->write();
+		$this->notifyApproved();
 	}
 	
 	function provideI18nEntities() {

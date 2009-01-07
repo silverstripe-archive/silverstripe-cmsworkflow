@@ -70,6 +70,39 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 	}
 	
 	/**
+	 * @param FieldSet $actions
+	 * @parma SiteTree $page
+	 */
+	public static function update_cms_actions(&$actions, $page) {
+		// if user doesn't have publish rights, exchange the behavior from
+		// "publish" to "request publish" etc.
+		if(!$page->canPublish()) {
+			
+			// "request removal"
+			$actions->removeByName('action_deletefromlive');
+			if(
+				$page->canEdit() 
+				&& ($page->stagesDiffer('Stage', 'Live') || $page->DeletedFromStage)
+				&& $page->isPublished()
+			) { 
+				$actions->push(
+					$requestDeletionAction = new FormAction(
+						'cms_requestdeletefromlive', 
+						_t('SiteTreeCMSWorkflow.BUTTONREQUESTREMOVAL', 'Request Removal')
+					)
+				);
+				
+				// don't allow creation of a second request by another author
+				if(!WorkflowDeletionRequest::can_create(null, $page)) {
+					$actions->makeFieldReadonly($requestDeletionAction->Name());
+				}
+			}
+		}
+		
+		// @todo deny deletion
+	}
+	
+	/**
 	 * @param Member $member
 	 * @param SiteTree $page
 	 * @return boolean
