@@ -123,7 +123,7 @@ class WorkflowRequestTest extends FunctionalTest {
 		$request1 = WorkflowPublicationRequest::create_for_page($page, $customauthor, $page->PublisherMembers());
 		
 		// second request by original author
-		$request2 = WorkflowPublicationRequest:.create_for_page($page, $customauthor, $page->PublisherMembers());
+		$request2 = WorkflowPublicationRequest::create_for_page($page, $customauthor, $page->PublisherMembers());
 		$this->assertEquals(
 			$request1->ID,
 			$request2->ID,
