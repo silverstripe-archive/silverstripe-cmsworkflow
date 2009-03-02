@@ -10,6 +10,7 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 	
 	function init() {
 		Requirements::javascript('cmsworkflow/javascript/LeftAndMainCMSWorkflow.js');
+		RSSFeed::linkToFeed(Director::absoluteURL('admin/cms/changes.rss'), 'All content changes');
 	}
 	
 	/**
