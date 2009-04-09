@@ -1,11 +1,37 @@
 <?php
 /**
- * A "workflow request" starts a review process for different
- * actions based on a single page.
- * Each request is related to one page.
- * Only one request can exist for each page at any given point in time.
- * Each change of the {@link $Status} property triggers the creation
- * of a new {@link WorkflowRequestChange} object to keep the history of a change request.
+ * A "workflow request" represents a full review process for one set of changes to a single page. 
+ * Only one workflow request can be active for any given page; however, a page may have a number 
+ * of historical, closed workflow requests.
+ * 
+ * The WorkflowRequest object shouldn't be directly edited.  Instead, you call "workflow step"
+ * methods on the object, that will update the object appropriately.
+ * 
+ * To create or retrieve a WorkflowRequest object, call {@link SiteTreeCMSWorkflow::openOrNewWorkflowRequest()}
+ * or {@link SiteTreeCMSWorkflow::openWorkflowRequest()} on the relevant {@link SiteTree} object.
+ *
+ * The following examples show how a workflow can be created.
+ *
+ * Request publication:
+ * <code>
+ * $wf = $page->openOrNewWorkflowRequest('WorkflowPublicationRequest')
+ * $wf->request("Can you please publish this page");
+ * </code>
+ * 
+ * Reject changes:
+ * <code>
+ * $wf = $page->openWorkflowRequest()
+ * $wf->deny("It's not acceptable.  Please correct the spelling.");
+ * </code>
+ * 
+ * Approve changes:
+ * <code>
+ * $wf = $page->openWorkflowRequest()
+ * $wf->approve("Thanks, looks good now");
+ * </code>
+ * 
+ * {@link WorkflowRequest::Changes()} will provide a list of the changes that the workflow has gone through,
+ * suitable for presentation as a discussion thread attached to the page.
  * 
  * @package cmsworkflow
  */
@@ -58,6 +84,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		user_error('WorkflowRequest::create_for_page() - Abstract method, please implement in subclass', E_USER_ERROR);
 	}
 	
+	/*
 	function onBeforeWrite() {
 		// if the request status has changed, we track it through a separate relation
 		$changedFields = $this->getChangedFields();
@@ -82,6 +109,27 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		
 		parent::onAfterWrite();
 	}
+	*/
+
+	/**
+	 * Approve this request, notify interested parties
+	 * and close it. Used by {@link LeftAndMainCMSWorkflow}
+	 * and {@link SiteTreeCMSWorkflow}.
+	 * 
+	 * @param Member $author
+	 * @return boolean
+	 */
+	public function request($comment, $member = null) {
+		if(!$member) $member = Member::currentUser();
+
+		$this->Status = 'AwaitingApproval';
+		$this->write();
+
+		$this->addNewChange($comment, $this->Status, $member);
+		$this->notifiyAwaitingApproval();
+		
+		return true;
+	}
 	
 	/**
 	 * Approve this request, notify interested parties
@@ -91,17 +139,57 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * @param Member $author
 	 * @return boolean
 	 */
-	public function approve($author) {
-		if(!$this->Page()->canPublish($author)) {
+	public function approve($comment, $member = null) {
+		if(!$member) $member = Member::currentUser();
+		if(!$this->Page()->canPublish($member)) {
 			return false;
 		}
 		
-		$this->PublisherID = $author->ID;
+		$this->PublisherID = $member->ID;
 		$this->write();
 		// open the request and notify interested parties
 		$this->Status = 'Approved';
 		$this->write();
+
+		$this->addNewChange($comment, $this->Status, $member);
 		$this->notifyApproved();
+		
+		return true;
+	}
+	
+	/**
+	 * Comment on a workflow item without changing the status
+	 */
+	public function comment($comment, $member = null) {
+		if(!$member) $member = Member::currentUser();
+		if(!$this->Page()->canEdit($member) && !$this->Page()->canPublish($member)) {
+			return false;
+		}
+		$this->addNewChange($comment, null, $member);
+		return true;
+	}
+
+	/**
+	 * Request an edit to this page before it can be published.
+	 * 
+	 * @param Member $author
+	 * @return boolean
+	 */
+	public function requestedit($comment, $member = null) {
+		if(!$member) $member = Member::currentUser();
+		if(!$this->Page()->canPublish($member)) {
+			return false;
+		}
+		
+		// "publisher" in this sense means "deny-author"
+		$this->PublisherID = $member->ID;
+		$this->write();
+		// open the request and notify interested parties
+		$this->Status = 'AwaitingEdit';
+		$this->write();
+
+		$this->addNewChange($comment, $this->Status, $member);
+		$this->notifyDenied();
 		
 		return true;
 	}
@@ -114,17 +202,23 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * @param Member $author
 	 * @return boolean
 	 */
-	public function deny($author) {
-		if(!$this->Page()->canPublish($author)) {
+	public function deny($comment, $member = null) {
+		if(!$member) $member = Member::currentUser();
+		if(!$this->Page()->canPublish($member)) {
 			return false;
 		}
 		
 		// "publisher" in this sense means "deny-author"
-		$this->PublisherID = $author->ID;
+		$this->PublisherID = $member->ID;
 		$this->write();
 		// open the request and notify interested parties
 		$this->Status = 'Denied';
 		$this->write();
+
+		// revert page to live (which might undo independent changes by other authors)
+		$this->Page()->doRevertToLive();
+
+		$this->addNewChange($comment, $this->Status, $member);
 		$this->notifyDenied();
 		
 		return true;
@@ -136,10 +230,12 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 *
 	 * @return WorkflowRequestChange
 	 */
-	protected function addNewChange() {
+	protected function addNewChange($comment, $status, $member) {
 		$change = new WorkflowRequestChange();
-		$change->AuthorID = Member::currentUserID();
-		$change->Status = $this->Status;
+		$change->AuthorID = $member->ID;
+		$change->Status = $status;
+		$change->Comment = $comment;
+		
 		$page = $this->Page();
 		$draftPage = Versioned::get_one_by_stage('SiteTree', 'Draft', "`SiteTree`.`ID` = $page->ID", false, "Created DESC");
 		// draftpage might not exist for pages "deleted from stage"
@@ -162,6 +258,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$tf->setFieldList(array(
 			'Created' => $this->fieldLabel('Created'), 
 			'Author.Title' => $this->fieldLabel('Author'), 
+			'Comment' => $this->fieldLabel('Comment'), 
 			'StatusDescription' => $this->fieldLabel('Status'), 
 			'DiffLinkToLastPublished' => _t('SiteTreeCMSWorkflow.DIFFERENCESTOLIVECOLUMN', 'Differences to live'),
 			'DiffLinkToPrevious' => _t('SiteTreeCMSWorkflow.DIFFERENCESTHISCHANGECOLUMN', 'Differences in this change'),
@@ -310,7 +407,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * @return boolean
 	 */
 	public function isOpen() {
-		return (!in_array($this->Status,array('Approved','DENIED')));
+		return (!in_array($this->Status,array('Approved','Denied')));
 	}
 	
 	/**
@@ -430,7 +527,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 				return _t('SiteTreeCMSWorkflow.STATUS_APPROVED', 'Approved');
 			case 'AwaitingApproval':
 				return _t('SiteTreeCMSWorkflow.STATUS_AWAITINGAPPROVAL', 'Awaiting Approval');
-			case 'AwaitingReview':
+			case 'AwaitingEdit':
 				return _t('SiteTreeCMSWorkflow.STATUS_AWAITINGEDIT', 'Awaiting Edit');
 			case 'Denied':
 				return _t('SiteTreeCMSWorkflow.STATUS_DENIED', 'Denied');
@@ -466,5 +563,30 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		
 		return $entities;
 	}
+	
+	/**
+	 * Return the actions that can be performed on this workflow request.
+	 * @return array The key is a LeftAndMainCMSWorkflow action, and the value is a label
+	 * for the buton.
+	 * @todo There's not a good separation between model and control in this stuff.
+	 */
+	function WorkflowActions() {
+		$actions = array();
+		
+		if($this->Status == 'AwaitingApproval' && $this->Page()->canPublish()) {
+			$actions['cms_approve'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_APPROVE", "Approve");
+			$actions['cms_requestedit'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_REQUESTEDIT", "Request edit");
+			
+		} else if($this->Status == 'AwaitingEdit' && $this->Page()->canEdit()) {
+			// @todo this couples this class to its subclasses. :-(
+			$requestAction = (get_class($this) == 'WorkflowDeletionRequest') ? 'cms_requestdeletefromlive' : 'cms_requestpublication';
+			$actions[$requestAction] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_RESUBMIT", "Re-submit");
+		}
+		
+		$actions['cms_comment'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_COMMENT", "Comment");
+		$actions['cms_deny'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_DENY","Deny/cancel");
+		return $actions;
+	}
+
 }
 ?>

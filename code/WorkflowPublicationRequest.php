@@ -5,7 +5,7 @@
  * requests it to be reviewed for publication.
  * Each request can have one or more "Publishers" which
  * should have permissions to publish the specific page.
- * 
+ *
  * @package cmsworkflow
  */
 class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityProvider {
@@ -33,11 +33,13 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 
 		// if no publishers are set, the request will end up nowhere
 		if(!$publishers->Count()) {
-			return false;
+			echo "No publishers selected\n";
+			return null;
 		}
 
 		if(!self::can_create($author, $page)) {
-			return false;
+			echo "No create permnission for $author->ID on $page->ID\n";
+			return null;
 		}
 	
 		// get or create a publication request
@@ -71,9 +73,11 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 	 * @parma SiteTree $page
 	 */
 	public static function update_cms_actions(&$actions, $page) {
+		$openRequest = $page->OpenWorkflowRequest();
+
 		// if user doesn't have publish rights, exchange the behavior from
 		// "publish" to "request publish" etc.
-		if(!$page->canPublish()) {
+		if(!$page->canPublish() || $openRequest) {
 
 			// authors shouldn't be able to revert, as this republishes the page.
 			// they should rather change the page and re-request publication
@@ -81,60 +85,37 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 
 			// "request publication"
 			$actions->removeByName('action_publish');
-			if(
-				$page->canEdit() 
-				&& $page->stagesDiffer('Stage', 'Live')
-				&& $page->Version > 1 // page has been saved at least once
-			) { 
-				$actions->push(
-					$requestPublicationAction = new FormAction(
-						'cms_requestpublication', 
-						_t('SiteTreeCMSWorkflow.BUTTONREQUESTPUBLICATION', 'Request Publication')
-					)
-				);
-				// don't allow creation of a second request by another author
-				if(!self::can_create(null, $page)) {
-					$actions->makeFieldReadonly($requestPublicationAction->Name());
-				}
-			}
 		}
 		
-		// "deny publication"
-		$openRequest = $page->OpenWorkflowRequest();
+		
 		if(
-			$page->canPublish()
-			&& $openRequest
-			&& $openRequest instanceof WorkflowPublicationRequest
-		) {
+			!$openRequest
+			&& $page->canEdit() 
+			&& $page->stagesDiffer('Stage', 'Live')
+			&& $page->Version > 1 // page has been saved at least once
+			&& !$page->IsDeletedFromStage
+		) { 
 			$actions->push(
-				$requestDeletionAction = new FormAction(
-					'cms_denypublication',
-					_t('SiteTreeCMSWorkflow.BUTTONDENYPUBLICATION', 'Deny Publication')
+				$requestPublicationAction = new FormAction(
+					'cms_requestpublication', 
+					_t('SiteTreeCMSWorkflow.BUTTONREQUESTPUBLICATION', 'Request Publication')
 				)
 			);
+			// don't allow creation of a second request by another author
+			if(!self::can_create(null, $page)) {
+				$actions->makeFieldReadonly($requestPublicationAction->Name());
+			}
 		}
 	}
-	
+
 	/**
-	 * Denies the request, and restores the page from live.
-	 * This might cause draft modifications independent of this publication request
-	 * to be reverted as well, but thats a necessary evil.
-	 * 
-	 * @uses SiteTree->doRevertToLive()
-	 * 
-	 * @param Member $member The user denying the publication
-	 * @return boolean
+	 * Approve a deletion request, deleting the page from the live site
 	 */
-	public function deny($author){
-		// if the author can't publish, he shouldn't be allowed to deny this action either
-		if(!$this->Page()->canPublish($author)) {
-			return false;
+	public function approve($comment, $member = null) {
+		if(parent::approve($comment, $member)) {
+			$this->Page()->doPublish();
+			return true;
 		}
-		
-		// revert page to live (which might undo independent changes by other authors)
-		$this->Page()->doRevertToLive();
-		
-		return parent::deny($author);
 	}
 	
 	/**
@@ -149,19 +130,16 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 		
 		// if user can't edit page, he shouldn't be able to request publication
 		if(!$page->canEdit($member)) return false;
-		
+
 		$request = $page->OpenWorkflowRequest();
-		
-		// if a request from a different classname exists, we can't allow creation of a new one
-		if($request && $request->ClassName != 'WorkflowPublicationRequest') return false;
 		
 		// if no request exists, allow creation of a new one (we can just have one open request at each point in time)
 		if(!$request || !$request->ID) return true;
 		
 		// members can re-submit their own publication requests
 		if($member && $member->ID == $request->AuthorID) return true;
-		
-		return false;
+
+		return true;
 	}
 	
 	public function onAfterPublish($page, $publisher) {

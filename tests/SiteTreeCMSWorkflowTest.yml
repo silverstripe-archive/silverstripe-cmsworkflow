@@ -26,7 +26,7 @@ Member:
    customauthor2:
         Email: customauthor2@test.com
         Groups: =>Group.customauthorsgroup
-Page:
+SiteTree:
    defaultpublisherspage:
       Title: defaultpublisherspage
       CanPublishType: OnlyTheseUsers
@@ -34,3 +34,16 @@ Page:
       Title: custompublisherpage
       CanPublishType: OnlyTheseUsers
       PublisherGroups: =>Group.custompublishergroup
+   openpublishworkflowpage:
+      Title: Open Publish Workflow
+   opendeleteworkflowpage:
+      Title: Open Delete Workflow
+      
+WorkflowPublicationRequest:
+   openpublishworkflow:
+      Page: =>SiteTree.openpublishworkflowpage
+
+WorkflowDeletionRequest:
+   opendeleteworkflow:
+      Page: =>SiteTree.opendeleteworkflowpage
+   

@@ -1,0 +1,14 @@
+#CMSWorkflowChanges li {
+	border: 1px #CCC solid;
+	padding: 3px;
+	margin: 10px 0;
+}
+#CMSWorkflowChanges li .workflowStatusChange {
+	font-weight: bold;
+	font-style: italic;
+	float: right;
+}
+#CMSWorkflowChanges li .workflowComment {
+	margin-top: 0.5em;
+	font-size: 1.2em;
+}

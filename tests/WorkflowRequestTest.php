@@ -10,18 +10,13 @@ class WorkflowRequestTest extends FunctionalTest {
 	function testWorkflowPublicationApprovalTransition() {
 		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
 
-		$custompublishersgroup = $this->objFromFixture('Group', 'custompublishergroup');
 		$custompublisher = $this->objFromFixture('Member', 'custompublisher');
-		$custompublisher->Groups()->add($custompublishersgroup);
-
-		$customauthorsgroup = $this->objFromFixture('Group', 'customauthorsgroup');
 		$customauthor = $this->objFromFixture('Member', 'customauthor');
-		$customauthor->Groups()->add($customauthorsgroup);
-		
+
 		// awaiting approval 
 		$this->session()->inst_set('loggedInAs', $customauthor->ID);
-		WorkflowPublicationRequest::create_for_page($page, $customauthor, $page->PublisherMembers());
-		$request1 = $page->OpenWorkflowRequest();
+		$request1 = $page->openOrNewWorkflowRequest('WorkflowPublicationRequest');
+		$this->assertNotNull($request1);
 		$this->assertEquals(
 			$request1->AuthorID,
 			$customauthor->ID,
@@ -34,9 +29,9 @@ class WorkflowRequestTest extends FunctionalTest {
 		);
 		
 		$this->session()->inst_set('loggedInAs', $custompublisher->ID);
-		$page->doPublish();
-		$page->flushCache();
-		$request1 = DataObject::get_by_id('WorkflowRequest', $request1->ID);
+
+		$request1->approve('Looks good');
+
 		$this->assertEquals(
 			$request1->Status,
 			'Approved',
@@ -54,17 +49,14 @@ class WorkflowRequestTest extends FunctionalTest {
 	function testNotificationEmails() {
 		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
 
-		$custompublishersgroup = $this->objFromFixture('Group', 'custompublishergroup');
 		$custompublisher = $this->objFromFixture('Member', 'custompublisher');
-		$custompublisher->Groups()->add($custompublishersgroup);
-
-		$customauthorsgroup = $this->objFromFixture('Group', 'customauthorsgroup');
 		$customauthor = $this->objFromFixture('Member', 'customauthor');
-		$customauthor->Groups()->add($customauthorsgroup);
 		
 		// awaiting approval emails
 		$this->session()->inst_set('loggedInAs', $customauthor->ID);
-		WorkflowPublicationRequest::create_for_page($page, $customauthor, $page->PublisherMembers());
+		$wf = $page->openOrNewWorkflowRequest('WorkflowPublicationRequest');
+		$this->assertNotNull($wf);
+		$wf->request("Can you publish this please?");
 		$this->assertEmailSent(
 			$custompublisher->Email, // to
 			$customauthor->Email // from
@@ -74,7 +66,8 @@ class WorkflowRequestTest extends FunctionalTest {
 		$this->session()->inst_set('loggedInAs', $custompublisher->ID);
 		// doesn't work because onAfterWrite() is not called
 		//$page->publish('Stage','Live');
-		$page->doPublish();
+		
+		$wf->approve('Looks good');
 		$this->assertEmailSent(
 			$customauthor->Email, // to
 			$custompublisher->Email // from
@@ -86,21 +79,15 @@ class WorkflowRequestTest extends FunctionalTest {
 	function testEachPageCanHaveOnlyOpenOpenRequest() {
 		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
 		
-		$custompublishersgroup = $this->objFromFixture('Group', 'custompublishergroup');
 		$custompublisher = $this->objFromFixture('Member', 'custompublisher');
-		$custompublisher->Groups()->add($custompublishersgroup);
-
-		$customauthorsgroup = $this->objFromFixture('Group', 'customauthorsgroup');
 		$customauthor = $this->objFromFixture('Member', 'customauthor');
-		$customauthor->Groups()->add($customauthorsgroup);
 		
 		$this->session()->inst_set('loggedInAs', $customauthor->ID);
-		WorkflowPublicationRequest::create_for_page($page, $customauthor, $page->PublisherMembers());
-		$request1 = $page->OpenWorkflowRequest();
 		
+		$request1 = $page->openOrNewWorkflowRequest('WorkflowPublicationRequest');
 		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
-		WorkflowPublicationRequest::create_for_page($page, $customauthor, $page->PublisherMembers());
-		$request2 = $page->OpenWorkflowRequest();
+		$request2 = $page->openOrNewWorkflowRequest('WorkflowPublicationRequest');
+		$this->assertNotNull($request1);
 		$this->assertEquals(
 			$request1->ID,
 			$request2->ID,
@@ -110,6 +97,8 @@ class WorkflowRequestTest extends FunctionalTest {
 		$this->session()->inst_set('loggedInAs', null);
 	}
 	
+	// Commenting this out, is this really a necessary limitation?
+	/*
 	function testSecondRequestOpeningDeniedIfDifferentAuthor() {
 		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
 
@@ -119,11 +108,13 @@ class WorkflowRequestTest extends FunctionalTest {
 		$customauthor2 = $this->objFromFixture('Member', 'customauthor2');
 		$customauthor2->Groups()->add($customauthorsgroup);
 		
+		$this->session()->inst_set('loggedInAs', $customauthor->ID);
+
 		// first request
-		$request1 = WorkflowPublicationRequest::create_for_page($page, $customauthor, $page->PublisherMembers());
-		
+		$request1 = $page->openOrNewWorkflowRequest('WorkflowPublicationRequest');
 		// second request by original author
-		$request2 = WorkflowPublicationRequest::create_for_page($page, $customauthor, $page->PublisherMembers());
+		$request2 = $page->openOrNewWorkflowRequest('WorkflowPublicationRequest');
+
 		$this->assertEquals(
 			$request1->ID,
 			$request2->ID,
@@ -131,13 +122,74 @@ class WorkflowRequestTest extends FunctionalTest {
 		);
 		
 		// second request by other author
-		$request3 = WorkflowPublicationRequest($page, $customauthor2, $page->PublisherMembers());
+		$this->session()->inst_set('loggedInAs', $customauthor2->ID);
+		$request3 = $page->openOrNewWorkflowRequest('WorkflowPublicationRequest');
 		$this->assertFalse(
 			$request3,
 			'If open request exists, a member who is not the author of the original request cant create a new request'
 		);
 		
 		$this->session()->inst_set('loggedInAs', null);
+	}
+	*/
+	
+	/**
+	 * Test that openWorklow() and openOrNewWorkflow() function.
+	 */
+	function testOpenWorkflowRequest() {
+		// Check a page that has an existing publication workflow
+		$page = $this->objFromFixture('SiteTree', 'openpublishworkflowpage');
+		$existingWorkflow = $this->objFromFixture('WorkflowPublicationRequest', 'openpublishworkflow');
+
+		$this->assertEquals($existingWorkflow->ID, $page->openWorkflowRequest('WorkflowPublicationRequest')->ID);
+		$this->assertEquals($existingWorkflow->ID, $page->openOrNewWorkflowRequest('WorkflowPublicationRequest')->ID);
+		$this->assertNull($page->openWorkflowRequest('WorkflowDeletionRequest'));
+	}
+	
+	/**
+	 * Confirm that an array of comments is created on a workflow
+	 */
+	function testCommentThread() {
+		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
+		$page->doPublish();
+
+		$custompublisher = $this->objFromFixture('Member', 'custompublisher');
+		$customauthor = $this->objFromFixture('Member', 'customauthor');
+		
+		$customauthor->logIn();
+		$wf = $page->openOrNewWorkflowRequest('WorkflowPublicationRequest');
+		$wf->request("Can you please publish this?");
+		
+		$custompublisher->logIn();
+		$wf->deny("No, you've got a spelling mistake.");
+
+		$customauthor->logIn();
+		$wf->request("Is it better now?");
+		
+		$custompublisher->logIn();
+		$wf->approve("Yes, looks good now.");
+		
+		$this->session()->inst_set('loggedInAs', null);
+		
+		$changes = $wf->Changes();
+		$this->assertEquals(array(
+			"Can you please publish this?",
+			"No, you've got a spelling mistake.",
+			"Is it better now?",
+			"Yes, looks good now.",
+		), $changes->column('Comment'));
+		$this->assertEquals(array(
+			$customauthor->ID,
+			$custompublisher->ID,
+			$customauthor->ID,
+			$custompublisher->ID,
+		), $changes->column('AuthorID'));
+		$this->assertEquals(array(
+			'AwaitingApproval',
+			'Denied',
+			'AwaitingApproval',
+			'Approved',
+		), $changes->column('Status'));
 	}
 }
 ?>

@@ -81,8 +81,15 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			$fields->replaceField('CanPublishType', $publishTypeField->performReadonlyTransformation());
 			$fields->replaceField('PublisherGroups', $publisherGroupsField->performReadonlyTransformation());
 		}
+
+		if($wf = $this->openWorkflowRequest()) {
+			$verb = ($wf->class == "WorkflowDeletionRequest") ? "Removal " : "Change ";
+			$fields->fieldByName('Root')->insertBefore(new Tab($verb . $wf->StatusDescription,
+				new LiteralField("WorkflowInfo", $this->owner->renderWith("SiteTreeCMSWorkflow_workflowtab"))
+			), "Content");
+		}
 		
-		$fields->findOrMakeTab('Root.Workflow', _t('SiteTreeCMSWorkflow.WORKFLOWTABTITLE', 'Workflow'));
+		//$fields->findOrMakeTab('Root.Workflow', _t('SiteTreeCMSWorkflow.WORKFLOWTABTITLE', 'Workflow'));
 		$fields->addFieldsToTab('Root.Workflow', $this->getWorkflowCMSFields());
 	}
 	
@@ -93,38 +100,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		$fields = new FieldSet();
 		
 		$diffLinkTitle = _t('SiteTreeCMSWorkflow.DIFFERENCESLINK', 'Show differences to live');
-		
-		// list all open requests
-		$fields->push(new HeaderField(
-			'WorkflowOpenRequestHeader', 
-			_t('SiteTreeCMSWorkflow.OPENREQUESTHEADER', 'Open Requests')
-		));
-		// @todo more inline view
-		$openRequest = $this->OpenWorkflowRequest();
-		if($openRequest) {
-			$detailFields = $openRequest->getCMSDetailFields();
-			// poor man's Form->loadDataFrom()
-			$dataFields = $detailFields->dataFields();
-			if($dataFields) foreach($dataFields as $field) {
-				$name = $field->Name();
-				if($openRequest->$name) $field->setValue($openRequest->$name);
-			}
-			$detailFields->removeByName('Page');
-			$fields->merge($detailFields->makeReadonly());
-		} else {
-			$fields->push(new LiteralField(
-				'NoOpenRequestsNote',
-				sprintf(
-					'<p>%s</p>',
-					_t(
-						'SiteTreeCMSWorkflow.OPENREQUESTSNOFOUND', 
-						'No open request found'
-					)
-				)
-			));
-		}
-		
-		
+
 		// list all closed requests
 		$fields->push(new HeaderField(
 			'WorkflowClosedRequestsHeader', 
@@ -171,6 +147,23 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	}
 	
 	/**
+	 * Returns actions for the worfklow tab.
+	 * @todo This is a pretty clear example of user-interface logic baked into the model.  We 
+	 * should solve this at a Sapphire-framework level, somehow.
+	 */
+	public function WorkflowActions() {
+		$actions = $this->openWorkflowRequest()->WorkflowActions();
+		$output = new DataObjectSet();
+		foreach($actions as $code => $title) {
+			$output->push(new ArrayData(array(
+				'Action' => "action_$code",
+				'Title' => Convert::raw2xml($title),
+			)));			
+		}
+		return $output;
+	}
+	
+	/**
 	 * Returns a DataObjectSet of all the members that can publish this page
 	 */
 	public function PublisherMembers() {
@@ -193,6 +186,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	 * 
 	 * @return WorkflowRequest
 	 */
+	/*
 	public function OpenWorkflowRequest($filter = "", $sort = "", $join = "", $limit = "") {
 		$this->componentCache = array();
 		
@@ -206,6 +200,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			$limit
 		)->First();
 	}
+	*.
 
 	/**
 	 * Return a workflow request which has not already been
@@ -225,6 +220,29 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			$join,
 			$limit
 		);
+	}
+
+	public function openWorkflowRequest($workflowClass = 'WorkflowRequest') {
+		if(is_subclass_of($workflowClass, 'WorkflowRequest') || $workflowClass == 'WorkflowRequest') {
+			if((int)$this->owner->ID) {
+				$wf = DataObject::get_one($workflowClass, "PageID = " . (int)$this->owner->ID . " AND Status NOT IN ('Approved','Denied')");
+				if($wf) return $wf;
+				else return null;
+			}
+		} else {
+			user_error("SiteTreeCMSWorkflow::openWorkflowRequest(): Bad workflow class '$workflowClass'", E_USER_WARNING);
+		}
+	}
+	
+	public function openOrNewWorkflowRequest($workflowClass) {
+		if($wf = $this->openWorkflowRequest($workflowClass)) {
+			return $wf;
+		} else if(is_subclass_of($workflowClass, 'WorkflowRequest')) {
+			// TODO: How to avoid eval() here?
+			return eval("return $workflowClass::create_for_page(\$this->owner);");
+		} else {
+			user_error("SiteTreeCMSWorkflow::openOrNewWorkflowRequest(): Bad workflow class '$workflowClass'", E_USER_WARNING);
+		}
 	}
 
 	/**
@@ -311,16 +329,17 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		}
 	}
 	
+	// Event handlers for the built-in actions will tidy up any open workflow that's leftover.
+	// If a workflow action is calling publish/delete/etc, the workflow object should be cleaned up
+	// *before* the action is called.
+	
 	/**
 	 * After publishing remove from the report of items needing publication 
 	 */
 	function onAfterPublish() {
-		$currentPublisher = Member::currentUser();
-		$request = $this->owner->OpenWorkflowRequest();
-		// this assumes that a publisher knows about the ongoing approval discussion
-		// which might not always be the case
-		if($request && $request->ID) {
-			$request->approve($currentPublisher);
+		if($wf = $this->openWorkflowRequest()) {
+			if(get_class($wf) == 'WorkflowPublicationRequest') $wf->approve("(automatically approved)");
+			else $wf->deny("(automatically denied when the page was published)");
 		}
 	}
 	
@@ -328,13 +347,17 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	 * 
 	 */
 	function onAfterDelete() {
-		$currentPublisher = Member::currentUser();
-		$request = $this->owner->OpenWorkflowRequest();
-		// this assumes that a publisher knows about the ongoing approval discussion
-		// which might not always be the case
-		if($request && $request->ID && $request instanceof WorkflowDeletionRequest) {
-			$request->approve($currentPublisher);
+		if($wf = $this->openWorkflowRequest()) {
+			if(get_class($wf) == 'WorkflowDeletionRequest') $wf->approve("(automatically approved)");
+			else $wf->deny("(automatically denied when the page was deleted)");
 		}
 	}
+	
+	function onAfterRevertToLive() {
+		if($wf = $this->openWorkflowRequest()) {
+			$wf->deny("(automatically denied)");
+		}
+	}
+
 }
 ?>

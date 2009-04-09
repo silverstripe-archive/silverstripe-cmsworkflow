@@ -11,6 +11,7 @@ class WorkflowRequestChange extends DataObject {
 		'Status' => 'Varchar', // @see WorkflowRequest->Status
 		'PageDraftVersion' => 'Int', // version of the page at draft stage
 		'PageLiveVersion' => 'Int', // version of the page at live/published stage
+		'Comment' => 'Text',
 	);
 	
 	static $has_one = array(
@@ -20,7 +21,8 @@ class WorkflowRequestChange extends DataObject {
 	
 	static $summary_fields = array(
 		'Status',
-		'Author.Title'
+		'Author.Title',
+		'Comment',
 	);
 	
 	static $sort = 'Created ASC';

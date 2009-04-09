@@ -29,7 +29,7 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 		if(!$author && $author !== FALSE) $author = Member::currentUser();
 		
 		if(!WorkflowDeletionRequest::can_create($author, $page)) {
-			return false;
+			return null;
 		}
 		
 		// take all members from the PublisherGroups relation on this record as a default
@@ -37,7 +37,7 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 		
 		// if no publishers are set, the request will end up nowhere
 		if(!$publishers->Count()) {
-			return false;
+			return null;
 		}
 		
 		// get or create a publication request
@@ -60,9 +60,6 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 		}
 
 		// open the request and notify interested parties
-		$request->Status = 'AwaitingApproval';
-		$request->write();
-		$request->notifiyAwaitingApproval();
 		
 		$page->flushCache();
 		
@@ -74,33 +71,59 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 	 * @parma SiteTree $page
 	 */
 	public static function update_cms_actions(&$actions, $page) {
+		$openRequest = $page->OpenWorkflowRequest();
+
 		// if user doesn't have publish rights, exchange the behavior from
 		// "publish" to "request publish" etc.
-		if(!$page->canPublish()) {
+		if(!$page->canPublish() || $openRequest) {
 			
 			// "request removal"
 			$actions->removeByName('action_deletefromlive');
-			if(
-				$page->canEdit() 
-				//&& $page->stagesDiffer('Stage', 'Live')
-				//&& $page->isPublished()
-				&& $page->DeletedFromStage
-			) { 
-				$actions->push(
-					$requestDeletionAction = new FormAction(
-						'cms_requestdeletefromlive', 
-						_t('SiteTreeCMSWorkflow.BUTTONREQUESTREMOVAL', 'Request Removal')
-					)
-				);
-				
-				// don't allow creation of a second request by another author
-				if(!self::can_create(null, $page)) {
-					$actions->makeFieldReadonly($requestDeletionAction->Name());
-				}
+		}
+		
+		if(
+			!$openRequest
+			&& $page->canEdit() 
+			//&& $page->stagesDiffer('Stage', 'Live')
+			//&& $page->isPublished()
+			&& $page->IsDeletedFromStage
+		) { 
+			$actions->push(
+				$requestDeletionAction = new FormAction(
+					'cms_requestdeletefromlive', 
+					_t('SiteTreeCMSWorkflow.BUTTONREQUESTREMOVAL', 'Request Removal')
+				)
+			);
+			
+			// don't allow creation of a second request by another author
+			if(!self::can_create(null, $page)) {
+				$actions->makeFieldReadonly($requestDeletionAction->Name());
 			}
 		}
 		
 		// @todo deny deletion
+	}
+	
+	/**
+	 * Approve a deletion request, deleting the page from the live site
+	 */
+	public function approve($comment, $member = null) {
+		if(parent::approve($comment, $member)) {
+			$page = $this->Page();
+			$page->deleteFromStage('Live');
+			// @todo Coupling to UI :-(
+			FormResponse::add(LeftAndMain::deleteTreeNodeJS($page));
+			return true;
+		}
+	}
+	
+	/**
+	 * Return the page for a deletion request.  This is a little tricky because it's not in the stage site
+	 */
+	public function Page() {
+		$page = Versioned::get_latest_version('SiteTree', $this->PageID);
+		$page->ID = $page->RecordID;
+		return $page;
 	}
 	
 	/**
