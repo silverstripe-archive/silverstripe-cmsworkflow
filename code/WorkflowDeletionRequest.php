@@ -76,7 +76,6 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 		// if user doesn't have publish rights, exchange the behavior from
 		// "publish" to "request publish" etc.
 		if(!$page->canPublish() || $openRequest) {
-			
 			// "request removal"
 			$actions->removeByName('action_deletefromlive');
 		}

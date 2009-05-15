@@ -7,7 +7,7 @@ class WorkflowRequestChangeTest extends FunctionalTest {
 	static $fixture_file = 'cmsworkflow/tests/SiteTreeCMSWorkflowTest.yml';
 	
 	function testChangesAreTracked() {
-		$page = $this->objFromFixture('Page', 'custompublisherpage');
+		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
 
 		$custompublishersgroup = $this->objFromFixture('Group', 'custompublishergroup');
 		$custompublisher = $this->objFromFixture('Member', 'custompublisher');
@@ -22,16 +22,19 @@ class WorkflowRequestChangeTest extends FunctionalTest {
 		$this->session()->inst_set('loggedInAs', $customauthor->ID);
 		$page->Content = 'edited';
 		$page->write();
+		
 		$request = WorkflowPublicationRequest::create_for_page($page);
+		$request->request("Please publish this"); 
+		
 		$this->assertEquals(
-			$request->Changes()->Count(),
 			1,
+			$request->Changes()->Count(),
 			'Change has been tracked for initial publication request'
 		);
 		$page->write();
 		$this->assertEquals(
-			$request->Changes()->Count(),
 			1,
+			$request->Changes()->Count(),
 			'Changes arent tracked twice without a Status change'
 		);
 		$change = $request->Changes()->First();
@@ -50,8 +53,8 @@ class WorkflowRequestChangeTest extends FunctionalTest {
 		$page->doPublish();
 		$request->flushCache();
 		$this->assertEquals(
-			$request->Changes()->Count(),
 			2,
+			$request->Changes()->Count(),
 			'Change has been tracked for the publication step'
 		);
 		$change = $request->Changes()->Last();
@@ -61,8 +64,8 @@ class WorkflowRequestChangeTest extends FunctionalTest {
 			"Change has the correct author assigned"
 		);
 		$this->assertEquals(
-			$change->PageLiveVersion,
 			$page->Version,
+			$change->PageLiveVersion,
 			"Change has the corrent draft version"
 		);
 		

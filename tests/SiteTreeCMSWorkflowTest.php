@@ -93,22 +93,22 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 		
 		$publishedRecord = new Page();
 		$publishedRecord->write();
-		$publishedRecord->publish('Stage', 'Live');
+		$publishedRecord->doPublish();
 		$publishedRecord->PublisherGroups()->add($custompublishersgroup);
 		
 		$deletedFromLiveRecord = new Page();
 		$deletedFromLiveRecord->write();
-		$deletedFromLiveRecord->publish('Stage', 'Live');
+		$deletedFromLiveRecord->doPublish();
 		$deletedFromLiveRecord->deleteFromStage('Live');
 		$deletedFromLiveRecord->PublisherGroups()->add($custompublishersgroup);
 		
 		$deletedFromStageRecord = new Page();
 		$deletedFromStageRecord->write();
-		$deletedFromStageRecord->publish('Stage', 'Live');
-		$deletedFromStageRecord->deleteFromStage('Stage');
-		// @todo Workaround for datamodel flags not being set in the right places
-		$deletedFromStageRecord->DeletedFromStage = true;
 		$deletedFromStageRecord->PublisherGroups()->add($custompublishersgroup);
+		$deletedFromStageRecord->doPublish();
+		$deletedFromStageRecordID = $deletedFromStageRecord->ID;
+		$deletedFromStageRecord->deleteFromStage('Stage');
+		$deletedFromStageRecord = Versioned::get_one_by_stage("SiteTree", "Live", "`SiteTree`.`ID` = $deletedFromStageRecordID");
 		
 		$changedOnStageRecord = new Page();
 		$changedOnStageRecord->write();
@@ -154,11 +154,6 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 		);
 		$this->assertContains(
 			'action_publish',
-			$deletedFromLiveRecord->getCMSActions()->column('Name'),
-			'Publisher can trigger publish button on published pages'
-		);
-		$this->assertContains(
-			'action_publish',
 			$changedOnStageRecord->getCMSActions()->column('Name'),
 			'Publisher can trigger publish button on published pages'
 		);
@@ -179,19 +174,6 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 			'action_cms_requestpublication',
 			$changedOnStageRecord->getCMSActions()->column('Name'),
 			'Author can trigger request publication button if page has been changed on stage'
-		);
-		
-		// test "request publication" action for publisher
-		$this->session()->inst_set('loggedInAs', $custompublisher->ID);
-		$this->assertNotContains(
-			'action_cms_requestpublication',
-			$unpublishedRecord->getCMSActions()->column('Name'),
-			'Publisher doesnt need request publication button'
-		);
-		$this->assertNotContains(
-			'action_cms_requestpublication',
-			$changedOnStageRecord->getCMSActions()->column('Name'),
-			'Publisher doesnt need request publication button'
 		);
 		
 		// test "delete from live" action for author
@@ -222,7 +204,7 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 			$publishedRecord->getCMSActions()->column('Name'),
 			'Author cant trigger request removal button if page has been published but not altered on stage'
 		);
-		$this->assertContains(
+		$this->assertNotContains(
 			'action_cms_requestdeletefromlive',
 			$changedOnStageRecord->getCMSActions()->column('Name'),
 			'Author cant trigger request removal button if page has been changed on stage but not deleted from stage'

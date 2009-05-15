@@ -29,9 +29,11 @@ Member:
 SiteTree:
    defaultpublisherspage:
       Title: defaultpublisherspage
+      CanEditType: LoggedInUsers
       CanPublishType: OnlyTheseUsers
    custompublisherpage:
       Title: custompublisherpage
+      CanEditType: LoggedInUsers
       CanPublishType: OnlyTheseUsers
       PublisherGroups: =>Group.custompublishergroup
    openpublishworkflowpage:
