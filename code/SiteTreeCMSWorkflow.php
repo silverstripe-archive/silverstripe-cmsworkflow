@@ -45,7 +45,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		}
 	}
 	
-	function extraDBFields() {
+	function extraStatics() {
 		return array(
 			'db' => array(
 				"CanPublishType" =>"Enum('LoggedInUsers, OnlyTheseUsers', 'OnlyTheseUsers')", 
