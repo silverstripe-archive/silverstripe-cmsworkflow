@@ -1,4 +1,5 @@
 #CMSWorkflowChanges li {
+	background:#E9E9E9;
 	border: 1px #CCC solid;
 	padding: 3px;
 	margin: 10px 0;
@@ -11,4 +12,21 @@
 #CMSWorkflowChanges li .workflowComment {
 	margin-top: 0.5em;
 	font-size: 1.2em;
+}
+
+#CMSWorkflowDiff dt {
+	color: #666;
+	font-size: 11px;
+	font-weight: normal;
+	margin-top: 6px;
+}
+
+#CMSWorkflowDiff dd {
+	background:#E9E9E9;
+	border: 1px #CCC solid;
+	padding: 3px;
+}
+
+#CMSWorkflowTab h2 {
+	margin-bottom: -10px;
 }

@@ -399,6 +399,29 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	}
 	
 	/**
+	 * Returns a {@link DataDifferencer} object representing the changes.
+	 */
+	public function Diff() {
+		$diff = new DataDifferencer($this->fromRecord(), $this->toRecord());
+		$diff->ignoreFields('AuthorID', 'LastEdited', 'Status');
+		return $diff;
+	}
+	
+	/**
+	 * Returns the old record that will be replaced by this publication.
+	 */
+	public function fromRecord() {
+		return Versioned::get_one_by_stage('SiteTree', 'Live', "`SiteTree_Live`.ID = {$this->PageID}", true, "Created DESC");
+	}
+	
+	/**
+	 * Returns the new record for which publication is being requested.
+	 */
+	public function toRecord() {
+		return $this->Page();
+	}
+	
+	/**
 	 * Is the workflow request still pending.
 	 * Important for creation of new workflow requests
 	 * as there should be only one open request

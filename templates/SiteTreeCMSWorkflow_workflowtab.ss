@@ -1,9 +1,16 @@
 <% require themedCSS(CMSWorkflow) %>
+<div id="CMSWorkflowTab">
 <% control OpenWorkflowRequest %>
 <h1>Change $StatusDescription</h1>
 <p>$Author.FirstName $Author.Surname has requested that a change to the site be published.</p>
 
-<p><i>To do... put a summary of the changes made here.</i></p>
+<h2>Changes</h2>
+<dl id="CMSWorkflowDiff">
+<% control Diff.ChangedFields %>
+	<dt>$Title</dt>
+	<dd>$Diff</dd>
+<% end_control %>
+</dl>
 
 <h2>Discussion</h2>
 
@@ -30,3 +37,4 @@
 	<input id="Form_EditForm_$Action" name="$Action" type="submit" value="$Title" />
 <% end_control %>
 </p>
+</div>
