@@ -9,11 +9,18 @@ class MyPublicationRequestsSideReport extends SideReport {
 		return _t('PublisherReviewSideReport.TITLE',"Workflow: Awaiting publication");
 	}
 	function records() {
-		return WorkflowRequest::get_by_publisher(
-			'WorkflowPublicationRequest',
-			Member::currentUser(),
-			array('AwaitingApproval')
-		);
+		if(Permission::check("ADMIN")) {
+			return WorkflowRequest::get(
+				'WorkflowPublicationRequest',
+				array('AwaitingApproval')
+			);
+		} else {
+			return WorkflowRequest::get_by_publisher(
+				'WorkflowPublicationRequest',
+				Member::currentUser(),
+				array('AwaitingApproval')
+			);
+		}
 	}
 	function fieldsToShow() {
 		return array(

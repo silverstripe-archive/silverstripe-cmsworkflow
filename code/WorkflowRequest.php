@@ -526,6 +526,33 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	}
 	
 	/**
+	 * Get publication requests from all users
+	 * @param string $class WorkflowRequest subclass
+	 * @param array $status One or more stati from the $Status property
+	 * @return DataObjectSet
+	 */
+	public static function get($class, $status = null) {
+		if($status) $statusStr = implode(',', $status);
+
+		$classes = (array)ClassInfo::subclassesFor($class);
+		$classes[] = $class;
+		$classesSQL = implode("','", $classes);
+		
+		// build filter
+		$filter = "`WorkflowRequest`.ClassName IN ('$classesSQL')";
+		if($status) {
+			$filter .= "AND `WorkflowRequest`.Status IN ('" . Convert::raw2sql($statusStr) . "')";
+		} 
+		
+		return DataObject::get(
+			"SiteTree", 
+			$filter, 
+			"`SiteTree`.`LastEdited` DESC",
+			"LEFT JOIN `WorkflowRequest` ON `WorkflowRequest`.PageID = `SiteTree`.ID"
+		);
+	}
+	
+	/**
 	 * @return string
 	 */
 	public function getTitle() {
