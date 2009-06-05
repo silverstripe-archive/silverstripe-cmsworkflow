@@ -201,9 +201,16 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 		if($this->owner->CanPublishType == 'OnlyTheseUsers'){
 			$groups = $this->owner->PublisherGroups();
 			$members = new DataObjectSet();
-			foreach($groups as $group) {
+			if($groups) foreach($groups as $group) {
 				$members->merge($group->Members());
 			}
+			
+			// Default to ADMINs, if something goes wrong
+			if(!$members->Count()) {
+				$group = Permission::get_groups_by_permission('ADMIN')->first();
+				$members = $group->Members();
+			}
+			
 			return $members;
 		} else {
 			$group = Permission::get_groups_by_permission('ADMIN')->first();
