@@ -100,13 +100,12 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 		if(Permission::check("EDIT_CONTENT_REVIEW_FIELDS")) {
 			$fields->addFieldsToTab("Root.Access", array(
 				new HeaderField(_t('SiteTreeCMSWorkflow.REVIEWHEADER', "Content review"), 2),
-				new DropdownField("OwnerID", _t("SiteTreeCMSWorkflow.PAGEOWNER", "Page owner (will be "
-					. "responsible for reviews)"), $cmsUsers->map('ID', 'Title', '(no owner)')),
+				new DropdownField("OwnerID", _t("SiteTreeCMSWorkflow.PAGEOWNER", 
+					"Page owner (will be responsible for reviews)"), $cmsUsers->map('ID', 'Title', '(no owner)')),
 				new CalendarDateField("NextReviewDate", _t("SiteTreeCMSWorkflow.NEXTREVIEWDATE",
 					"Next review date (leave blank for no review)")),
 				new DropdownField("ReviewPeriodDays", _t("SiteTreeCMSWorkflow.REVIEWFREQUENCY", 
-					"Review frequency (the review date will be set to this far in the future whenever "
-					. "the page is published.)"), array(
+					"Review frequency (the review date will be set to this far in the future whenever the page is published.)"), array(
 					0 => "No automatic review date",
 					1 => "1 day",
 					7 => "1 week",

@@ -3,16 +3,18 @@
 global $lang;
 
 $lang['en_US']['DeletionRequestSideReport']['TITLE'] = 'Workflow: Awaiting deletion';
+$lang['en_US']['LeftAndMain']['CHANGEDURL'] = '  Changed URL to \'%s\'';
+$lang['en_US']['LeftAndMain']['SAVEDUP'] = 'Saved';
+$lang['en_US']['LeftAndMain']['STATUSTO'] = '  Status changed to \'%s\'';
 $lang['en_US']['MyWorkflowRequestsSideReport']['TITLE'] = 'Workflow: My requests pending review';
 $lang['en_US']['PublisherReviewSideReport']['TITLE'] = 'Workflow: Awaiting publication';
 $lang['en_US']['SiteTree']['EDITANYONE'] = 'Anyone who can log-in to the CMS';
 $lang['en_US']['SiteTree']['EDITONLYTHESE'] = 'Only these people (choose from list)';
-$lang['en_US']['SiteTreeCMSWorkflow']['BUTTONDENYPUBLICATION'] = 'Deny Publication';
 $lang['en_US']['SiteTreeCMSWorkflow']['BUTTONREQUESTPUBLICATION'] = 'Request Publication';
 $lang['en_US']['SiteTreeCMSWorkflow']['BUTTONREQUESTREMOVAL'] = 'Request Removal';
 $lang['en_US']['SiteTreeCMSWorkflow']['CLOSEDREQUESTSHEADER'] = 'Closed Requests';
-$lang['en_US']['SiteTreeCMSWorkflow']['DENYDELECTIONMESSAGE'] = 'Denied request and reset page to live version. Emailed %s d';
-$lang['en_US']['SiteTreeCMSWorkflow']['DENYPUBLICATION_MESSAGE'] = 'Denied request and reset page to live version. Emailed %s d';
+$lang['en_US']['SiteTreeCMSWorkflow']['COMMENT_MESSAGE'] = 'Commented on this workflow request. Emailed %s.';
+$lang['en_US']['SiteTreeCMSWorkflow']['DENYPUBLICATION_MESSAGE'] = 'Denied workflow request, and reset content. Emailed %s';
 $lang['en_US']['SiteTreeCMSWorkflow']['DIFFERENCESCOLUMN'] = 'Differences';
 $lang['en_US']['SiteTreeCMSWorkflow']['DIFFERENCESLINK'] = 'Show differences to live';
 $lang['en_US']['SiteTreeCMSWorkflow']['DIFFERENCESTHISCHANGECOLUMN'] = 'Differences in this change';
@@ -22,85 +24,142 @@ $lang['en_US']['SiteTreeCMSWorkflow']['FIELDLABEL_PAGE'] = 'Page';
 $lang['en_US']['SiteTreeCMSWorkflow']['FIELDLABEL_PUBLISHER'] = 'Publisher';
 $lang['en_US']['SiteTreeCMSWorkflow']['FIELDLABEL_PUBLISHERS'] = 'Publishers';
 $lang['en_US']['SiteTreeCMSWorkflow']['FIELDLABEL_STATUS'] = 'Status';
-$lang['en_US']['SiteTreeCMSWorkflow']['OPENREQUESTHEADER'] = 'Open Requests';
-$lang['en_US']['SiteTreeCMSWorkflow']['OPENREQUESTSNOFOUND'] = 'No open request found';
+$lang['en_US']['SiteTreeCMSWorkflow']['NEXTREVIEWDATE'] = 'Next review date (leave blank for no review)';
+$lang['en_US']['SiteTreeCMSWorkflow']['PAGEOWNER'] = 'Page owner (will be responsible for reviews)';
 $lang['en_US']['SiteTreeCMSWorkflow']['PUBLISHHEADER'] = 'Who can publish this inside the CMS?';
+$lang['en_US']['SiteTreeCMSWorkflow']['PUBLISHMESSAGE'] = 'Approved request and published changes to live version. Emailed %s.';
 $lang['en_US']['SiteTreeCMSWorkflow']['REQUEST_DELETEFROMLIVE_SUCCESS_MESSAGE'] = 'Emailed %s requesting deletion';
 $lang['en_US']['SiteTreeCMSWorkflow']['REQUEST_PUBLICATION_SUCCESS_MESSAGE'] = 'Emailed %s requesting publication';
+$lang['en_US']['SiteTreeCMSWorkflow']['REVIEWFREQUENCY'] = 'Review frequency (the review date will be set to this far in the future whenever the page is published.)';
+$lang['en_US']['SiteTreeCMSWorkflow']['REVIEWHEADER'] = 'Content review';
 $lang['en_US']['SiteTreeCMSWorkflow']['STATUS_APPROVED'] = 'Approved';
 $lang['en_US']['SiteTreeCMSWorkflow']['STATUS_AWAITINGAPPROVAL'] = 'Awaiting Approval';
 $lang['en_US']['SiteTreeCMSWorkflow']['STATUS_AWAITINGEDIT'] = 'Awaiting Edit';
 $lang['en_US']['SiteTreeCMSWorkflow']['STATUS_DENIED'] = 'Denied';
 $lang['en_US']['SiteTreeCMSWorkflow']['STATUS_OPEN'] = 'Open';
 $lang['en_US']['SiteTreeCMSWorkflow']['STATUS_UNKNOWN'] = 'Unknown';
-$lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOWTABTITLE'] = 'Workflow';
+$lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOWACTION_APPROVE'] = 'Approve';
+$lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOWACTION_REQUESTEDIT'] = 'Request edit';
+$lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOW_ACTION_COMMENT'] = 'Comment';
+$lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOW_ACTION_DENY'] = 'Deny/cancel';
+$lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOW_ACTION_FAILED'] = 'There was an error when processing your workflow request.';
+$lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOW_ACTION_RESUBMIT'] = 'Re-submit';
+$lang['en_US']['WorkflowDeletionRequest']['EMAIL_PARA_APPROVED'] = array(
+	'%s has approved your request to delete the "%s" page and deleted it from the published site.',
+	50,
+	'Intro paragraph for workflow email, with a name and a page title'
+);
+$lang['en_US']['WorkflowDeletionRequest']['EMAIL_PARA_AWAITINGAPPROVAL'] = array(
+	'%s has asked that you delete the "%s" page',
+	50,
+	'Intro paragraph for workflow email, with a name and a page title'
+);
+$lang['en_US']['WorkflowDeletionRequest']['EMAIL_PARA_AWAITINGEDIT'] = array(
+	'%s asked you to revise your request to delete the "%s" page.',
+	50,
+	'Intro paragraph for workflow email, with a name and a page title'
+);
+$lang['en_US']['WorkflowDeletionRequest']['EMAIL_PARA_COMMENT'] = array(
+	'%s commented on the request to delete the "%s" page.',
+	50,
+	'Intro paragraph for workflow email, with a name and a page title'
+);
+$lang['en_US']['WorkflowDeletionRequest']['EMAIL_PARA_DENIED'] = array(
+	'%s has rejected your request to dele the "%s" page.',
+	50,
+	'Intro paragraph for workflow email, with a name and a page title'
+);
 $lang['en_US']['WorkflowDeletionRequest']['EMAIL_SUBJECT_APPROVED'] = array(
-	'Your deletion request for the "%s" page has been approved',
+	'Page deleted from published site: "%s"',
 	50,
 	'Email subject with page title'
 );
 $lang['en_US']['WorkflowDeletionRequest']['EMAIL_SUBJECT_AWAITINGAPPROVAL'] = array(
-	'Please review and delete the "%s" page on your site',
+	'Page deletion requested: %s',
 	50,
 	'Email subject with page title'
 );
 $lang['en_US']['WorkflowDeletionRequest']['EMAIL_SUBJECT_AWAITINGEDIT'] = array(
-	'You are requested to review the "%s" page',
+	'Revision requested: "%s"',
+	50,
+	'Email subject with page title'
+);
+$lang['en_US']['WorkflowDeletionRequest']['EMAIL_SUBJECT_COMMENT'] = array(
+	'Comment on deletion request: "%s"',
 	50,
 	'Email subject with page title'
 );
 $lang['en_US']['WorkflowDeletionRequest']['EMAIL_SUBJECT_DENIED'] = array(
-	'Your deletion request for the "%s" page has been denied',
+	'Deletion rejected: "%s"',
 	50,
 	'Email subject with page title'
 );
+$lang['en_US']['WorkflowPublicationRequest']['EMAIL_PARA_APPROVED'] = array(
+	'%s has approved and published your changes to the "%s" page.',
+	50,
+	'Intro paragraph for workflow email, with a name and a page title'
+);
+$lang['en_US']['WorkflowPublicationRequest']['EMAIL_PARA_AWAITINGAPPROVAL'] = array(
+	'%s has asked that you review and publish following change to the "%s" page',
+	50,
+	'Intro paragraph for workflow email, with a name and a page title'
+);
+$lang['en_US']['WorkflowPublicationRequest']['EMAIL_PARA_AWAITINGEDIT'] = array(
+	'%s asked you to revise your changes to the "%s" page.',
+	50,
+	'Intro paragraph for workflow email, with a name and a page title'
+);
+$lang['en_US']['WorkflowPublicationRequest']['EMAIL_PARA_COMMENT'] = array(
+	'%s commented on the requested change to the "%s" page.',
+	50,
+	'Intro paragraph for workflow email, with a name and a page title'
+);
+$lang['en_US']['WorkflowPublicationRequest']['EMAIL_PARA_DENIED'] = array(
+	'%s has rejected your changes to the "%s" page.',
+	50,
+	'Intro paragraph for workflow email, with a name and a page title'
+);
 $lang['en_US']['WorkflowPublicationRequest']['EMAIL_SUBJECT_APPROVED'] = array(
-	'Your publication request for the "%s" page has been approved',
+	'Change published: "%s"',
 	50,
 	'Email subject with page title'
 );
 $lang['en_US']['WorkflowPublicationRequest']['EMAIL_SUBJECT_AWAITINGAPPROVAL'] = array(
-	'Please review and publish the "%s" page on your site',
+	'Publication of change requested: %s',
 	50,
 	'Email subject with page title'
 );
 $lang['en_US']['WorkflowPublicationRequest']['EMAIL_SUBJECT_AWAITINGEDIT'] = array(
-	'You are requested to review the "%s" page',
+	'Revision requested: "%s"',
+	50,
+	'Email subject with page title'
+);
+$lang['en_US']['WorkflowPublicationRequest']['EMAIL_SUBJECT_COMMENT'] = array(
+	'Comment on publication request: "%s"',
 	50,
 	'Email subject with page title'
 );
 $lang['en_US']['WorkflowPublicationRequest']['EMAIL_SUBJECT_DENIED'] = array(
-	'Your publication request for the "%s" page has been denied',
+	'Change rejected: "%s"',
 	50,
 	'Email subject with page title'
 );
-$lang['en_US']['WorkflowRequest']['COMPAREDRAFTLIVELINK'] = 'Compare changes between live and the changed draft';
-$lang['en_US']['WorkflowRequest']['EMAILCHANGEDSTATUS'] = '%s has changed the workflow status on';
-$lang['en_US']['WorkflowRequest']['EMAILDENIEDDELETION'] = '%s has denied your deletion request on ';
-$lang['en_US']['WorkflowRequest']['EMAILDENIEDPUBLICATION'] = '%s has denied your publication request on ';
+$lang['en_US']['WorkflowRequest']['CHANGES_HEADING'] = 'Changes';
+$lang['en_US']['WorkflowRequest']['COMMENT_HEADING'] = 'Comment';
 $lang['en_US']['WorkflowRequest']['EMAILGREETING'] = 'Hi %s';
-$lang['en_US']['WorkflowRequest']['EMAILHASBEENPUBLISHED'] = 'A page you wrote has now been published by %s';
-$lang['en_US']['WorkflowRequest']['EMAILRECENTLYUPDATED1'] = '%s has recently updated the page titled';
-$lang['en_US']['WorkflowRequest']['EMAILRECENTLYUPDATED2'] = 'and would like to have the changes published.';
-$lang['en_US']['WorkflowRequest']['EMAILREQUESTREMOVE'] = '%s wants to remove the page titled';
 $lang['en_US']['WorkflowRequest']['EMAILTHANKS'] = 'Thanks.';
 $lang['en_US']['WorkflowRequest']['EMAIL_SUBJECT_GENERIC'] = array(
 	'The workflow status of the "%s" page has changed',
 	50,
 	'Email subject with page title'
 );
-$lang['en_US']['WorkflowRequest']['REVIEWANDDELETEPAGELINK'] = 'Review and delete the page in the CMS';
-$lang['en_US']['WorkflowRequest']['REVIEWANDPUBLISHPAGELINK'] = 'Review and publish the page in the CMS';
 $lang['en_US']['WorkflowRequest']['REVIEWPAGELINK'] = 'Review the page in the CMS';
 $lang['en_US']['WorkflowRequest']['TITLE'] = array(
 	'Workflow Request',
 	50,
 	'Title for this request, shown e.g. in the workflow status overview for a page'
 );
-$lang['en_US']['WorkflowRequest']['VIEWCHANGEDDRAFTLINK'] = 'View the changed draft';
-$lang['en_US']['WorkflowRequest']['VIEWPUBLISHEDCHANGESLINK'] = 'Review published changes in the CMS';
 $lang['en_US']['WorkflowRequest']['VIEWPUBLISHEDLINK'] = 'View this page on your website';
-$lang['en_US']['WorkflowRequest']['VIEWUNPUBLISHEDCHANGESLINK'] = 'Compare unpublished changes in the CMS';
 $lang['en_US']['WorkflowRequestChange']['PLURALNAME'] = array(
 	'Workflow Request Changs',
 	50,

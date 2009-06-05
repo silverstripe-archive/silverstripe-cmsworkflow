@@ -10,21 +10,6 @@
  */
 class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvider {
 	
-	/**
-	 * @param string $emailtemplate_creation
-	 */
-	protected static $emailtemplate_awaitingapproval = 'DeletionAwaitingApprovalEmail';
-	
-	/**
-	 * @param string $emailtemplate_approved
-	 */
-	protected static $emailtemplate_approved = 'WorkflowGenericEmail';
-	
-	/**
-	 * @param string $emailtemplate_denied
-	 */
-	protected static $emailtemplate_denied = 'DeletionDeniedEmail';
-	
 	public static function create_for_page($page, $author = null, $publishers = null) {
 		if(!$author && $author !== FALSE) $author = Member::currentUser();
 		
@@ -58,8 +43,6 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 		foreach($publishers as $publisher) {
 			$request->Publishers()->add($publisher);
 		}
-
-		// open the request and notify interested parties
 		
 		$page->flushCache();
 		
@@ -155,26 +138,60 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 	function provideI18nEntities() {
 		$entities = array();
 		$entities["{$this->class}.EMAIL_SUBJECT_AWAITINGAPPROVAL"] = array(
-			"Please review and delete the \"%s\" page on your site",
+			"Page deletion requested: %s",
 			PR_MEDIUM,
 			'Email subject with page title'
 		);
+		$entities["{$this->class}.EMAIL_PARA_AWAITINGAPPROVAL"] = array(
+			"%s has asked that you delete the \"%s\" page",
+			PR_MEDIUM,
+			'Intro paragraph for workflow email, with a name and a page title'
+		);
+
 		$entities["{$this->class}.EMAIL_SUBJECT_APPROVED"] = array(
-			"Your deletion request for the \"%s\" page has been approved",
+			"Page deleted from published site: \"%s\"",
 			PR_MEDIUM,
 			'Email subject with page title'
 		);
+		$entities["{$this->class}.EMAIL_PARA_APPROVED"] = array(
+			"%s has approved your request to delete the \"%s\" page and deleted it from the published site.",
+			PR_MEDIUM,
+			'Intro paragraph for workflow email, with a name and a page title'
+		);
+
 		$entities["{$this->class}.EMAIL_SUBJECT_DENIED"] = array(
-			"Your deletion request for the \"%s\" page has been denied",
+			"Deletion rejected: \"%s\"",
 			PR_MEDIUM,
 			'Email subject with page title'
 		);
+		$entities["{$this->class}.EMAIL_PARA_DENIED"] = array(
+			"%s has rejected your request to dele the \"%s\" page.",
+			PR_MEDIUM,
+			'Intro paragraph for workflow email, with a name and a page title'
+		);
+
 		$entities["{$this->class}.EMAIL_SUBJECT_AWAITINGEDIT"] = array(
-			"You are requested to review the \"%s\" page",
+			"Revision requested: \"%s\"",
 			PR_MEDIUM,
 			'Email subject with page title'
 		);
-		
+		$entities["{$this->class}.EMAIL_PARA_AWAITINGEDIT"] = array(
+			"%s asked you to revise your request to delete the \"%s\" page.",
+			PR_MEDIUM,
+			'Intro paragraph for workflow email, with a name and a page title'
+		);
+
+		$entities["{$this->class}.EMAIL_SUBJECT_COMMENT"] = array(
+			"Comment on deletion request: \"%s\"",
+			PR_MEDIUM,
+			'Email subject with page title'
+		);
+		$entities["{$this->class}.EMAIL_PARA_COMMENT"] = array(
+			"%s commented on the request to delete the \"%s\" page.",
+			PR_MEDIUM,
+			'Intro paragraph for workflow email, with a name and a page title'
+		);
+
 		return $entities;
 	}
 }

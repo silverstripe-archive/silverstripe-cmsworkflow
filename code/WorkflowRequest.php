@@ -57,21 +57,6 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	);
 	
 	/**
-	 * @param string $emailtemplate_creation
-	 */
-	protected static $emailtemplate_awaitingapproval = 'WorkflowGenericEmail';
-	
-	/**
-	 * @param string $emailtemplate_approved
-	 */
-	protected static $emailtemplate_approved = 'WorkflowGenericEmail';
-	
-	/**
-	 * @param string $emailtemplate_denied
-	 */
-	protected static $emailtemplate_denied = 'WorkflowGenericEmail';
-	
-	/**
 	 * Factory method setting up a new WorkflowRequest with associated
 	 * state. Sets relations to publishers and authors, 
 	 * 
@@ -126,7 +111,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$this->write();
 
 		$this->addNewChange($comment, $this->Status, $member);
-		$this->notifiyAwaitingApproval();
+		$this->notifyAwaitingApproval($comment);
 		
 		return true;
 	}
@@ -152,7 +137,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$this->write();
 
 		$this->addNewChange($comment, $this->Status, $member);
-		if($notify) $this->notifyApproved();
+		if($notify) $this->notifyApproved($comment);
 		
 		return true;
 	}
@@ -160,12 +145,13 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	/**
 	 * Comment on a workflow item without changing the status
 	 */
-	public function comment($comment, $member = null) {
+	public function comment($comment, $member = null, $notify = true) {
 		if(!$member) $member = Member::currentUser();
 		if(!$this->Page()->canEdit($member) && !$this->Page()->canPublish($member)) {
 			return false;
 		}
 		$this->addNewChange($comment, null, $member);
+		if($notify) $this->notifyComment($comment);
 		return true;
 	}
 
@@ -189,7 +175,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$this->write();
 
 		$this->addNewChange($comment, $this->Status, $member);
-		if($notify) $this->notifyDenied();
+		if($notify) $this->notifyAwaitingEdit($comment);
 		
 		return true;
 	}
@@ -219,7 +205,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$this->Page()->doRevertToLive();
 
 		$this->addNewChange($comment, $this->Status, $member);
-		if($notify) $this->notifyDenied();
+		if($notify) $this->notifyDenied($comment);
 		
 		return true;
 	}
@@ -316,20 +302,18 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * Notify any publishers assigned to this page when a new request
 	 * is lodged.
 	 */
-	public function notifiyAwaitingApproval() {
+	public function notifyAwaitingApproval($comment) {
 		$publishers = $this->Page()->PublisherMembers();
 		$author = $this->Author();
-		$subject = sprintf(
-			_t("{$this->class}.EMAIL_SUBJECT_AWAITINGAPPROVAL"),
-			$this->Page()->Title
-		);
-		$template = $this->stat('emailtemplate_awaitingapproval');
+
 		foreach($publishers as $publisher){
 			$this->sendNotificationEmail(
 				$author, // sender
 				$publisher, // recipient
-				$subject,
-				$template
+				_t("{$this->class}.EMAIL_SUBJECT_AWAITINGAPPROVAL"),
+				_t("{$this->class}.EMAIL_PARA_AWAITINGAPPROVAL"),
+				$comment,
+				'WorkflowGenericEmail'
 			);
 		}
 	}
@@ -337,49 +321,86 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	/**
 	 * Notify the author of a request once a page has been approved (=published).
 	 */
-	public function notifyApproved() {
+	public function notifyApproved($comment) {
 		$publisher = Member::currentUser();
 		$author = $this->Author();
 		$subject = sprintf(
 			_t("{$this->class}.EMAIL_SUBJECT_APPROVED"),
 			$this->Page()->Title
 		);
-		$template = self::$emailtemplate_approved;
+
 		$this->sendNotificationEmail(
 			$publisher, // sender
 			$author, // recipient
-			$subject,
-			$template
+			_t("{$this->class}.EMAIL_SUBJECT_APPROVED"),
+			_t("{$this->class}.EMAIL_PARA_APPROVED"),
+			$comment,
+			'WorkflowGenericEmail'
 		);
 	}
 	
-	function notifyDenied() {
+	function notifyDenied($comment) {
 		$publisher = Member::currentUser();
 		$author = $this->Author();
-		$subject = sprintf(
-			_t("{$this->class}.EMAIL_SUBJECT_APPROVED"),
-			$this->Page()->Title
-		);
-		$template = self::$emailtemplate_approved;
+
 		$this->sendNotificationEmail(
 			$publisher, // sender
 			$author, // recipient
-			$subject,
-			$template
+			_t("{$this->class}.EMAIL_SUBJECT_DENIED"),
+			_t("{$this->class}.EMAIL_PARA_DENIED"),
+			$comment,
+			'WorkflowGenericEmail'
 		);
 	}
+
+	function notifyAwaitingEdit($comment) {
+		$publisher = Member::currentUser();
+		$author = $this->Author();
+
+		$this->sendNotificationEmail(
+			$publisher, // sender
+			$author, // recipient
+			_t("{$this->class}.EMAIL_SUBJECT_AWAITINGEDIT"),
+			_t("{$this->class}.EMAIL_PARA_AWAITINGEDIT"),
+			$comment,
+			'WorkflowGenericEmail'
+		);
+	}
+
+
+	function notifyComment($comment) {
+		// Comment recipients cover everyone except the person making the comment
+		$commentRecipients = array();
+		if(Member::currentUserID() != $this->Author()->ID) $commentRecipients[] = $this->Author();
+		$publishers = $this->Page()->PublisherMembers();
+		foreach($publishers as $publisher){
+			if(Member::currentUserID() != $publisher->ID) $commentRecipients[] = $publisher;
+		}
+
+		foreach($commentRecipients as $recipient) {
+			$this->sendNotificationEmail(
+				Member::currentUser(), // sender
+				$recipient, // recipient
+				_t("{$this->class}.EMAIL_SUBJECT_COMMENT"),
+				_t("{$this->class}.EMAIL_PARA_COMMENT"),
+				$comment,
+				'WorkflowGenericEmail'
+			);
+		}
+	}
 	
-	protected function sendNotificationEmail($sender, $recipient, $subject = null, $template = null) {
+	protected function sendNotificationEmail($sender, $recipient, $subjectTemplate, $paragraphTemplate, $comment, $template = null) {
 		if(!$template) {
 			$template = 'WorkflowGenericEmail';
 		}
 		
-		if(!$subject) {
-			$subject = sprintf(
-				_t('WorkflowRequest.EMAIL_SUBJECT_GENERIC'),
-				$this->Page()->Title
-			);
-		}
+		
+		$subject = sprintf($subjectTemplate, 
+				$this->Page()->Title);
+
+		$paragraph = sprintf($paragraphTemplate, 
+				$sender->FirstName . ' ' . $sender->Surname,
+				$this->Page()->Title);
 		
 		$email = new Email();
 		$email->setTo($recipient->Email);
@@ -393,7 +414,9 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 			"Page" => $this->Page(),
 			"StageSiteLink"	=> $this->Page()->Link()."?stage=stage",
 			"LiveSiteLink"	=> $this->Page()->Link()."?stage=live",
-			"DiffLink" => $this->DiffLinkToLastPublished
+			"Workflow" => $this,
+			"Comment" => $comment,
+			"Paragraph" => $paragraph,
 		));
 		return $email->send();
 	}
