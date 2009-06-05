@@ -8,7 +8,7 @@
  *
  * @package cmsworkflow
  */
-class SiteTreeCMSWorkflow extends DataObjectDecorator {
+class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvider {
 	
 	/**
 	 * A registry of all allowed request classes.
@@ -97,27 +97,29 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		// Review fields
 		$cmsUsers = Permission::get_members_by_permission(array("CMS_ACCESS_CMSMain", "ADMIN"));
 		
-		$fields->addFieldsToTab("Root.Access", array(
-			new HeaderField(_t('SiteTreeCMSWorkflow.REVIEWHEADER', "Content review"), 2),
-			new DropdownField("OwnerID", _t("SiteTreeCMSWorkflow.PAGEOWNER", "Page owner (will be "
-				. "responsible for reviews)"), $cmsUsers->map('ID', 'Title', '(no owner)')),
-			new CalendarDateField("NextReviewDate", _t("SiteTreeCMSWorkflow.NEXTREVIEWDATE",
-				"Next review date (leave blank for no review)")),
-			new DropdownField("ReviewPeriodDays", _t("SiteTreeCMSWorkflow.REVIEWFREQUENCY", 
-				"Review frequency (the review date will be set to this far in the future whenever "
-				. "the page is published.)"), array(
-				0 => "No automatic review date",
-				1 => "1 day",
-				7 => "1 week",
-				30 => "1 month",
-				60 => "2 months",
-				91 => "3 months",
-				121 => "4 months",
-				152 => "5 months",
-				183 => "6 months",
-				365 => "12 months",
-			)),
-		));
+		if(Permission::check("EDIT_CONTENT_REVIEW_FIELDS")) {
+			$fields->addFieldsToTab("Root.Access", array(
+				new HeaderField(_t('SiteTreeCMSWorkflow.REVIEWHEADER', "Content review"), 2),
+				new DropdownField("OwnerID", _t("SiteTreeCMSWorkflow.PAGEOWNER", "Page owner (will be "
+					. "responsible for reviews)"), $cmsUsers->map('ID', 'Title', '(no owner)')),
+				new CalendarDateField("NextReviewDate", _t("SiteTreeCMSWorkflow.NEXTREVIEWDATE",
+					"Next review date (leave blank for no review)")),
+				new DropdownField("ReviewPeriodDays", _t("SiteTreeCMSWorkflow.REVIEWFREQUENCY", 
+					"Review frequency (the review date will be set to this far in the future whenever "
+					. "the page is published.)"), array(
+					0 => "No automatic review date",
+					1 => "1 day",
+					7 => "1 week",
+					30 => "1 month",
+					60 => "2 months",
+					91 => "3 months",
+					121 => "4 months",
+					152 => "5 months",
+					183 => "6 months",
+					365 => "12 months",
+				)),
+			));
+		}
 		
 		$fields->addFieldsToTab('Root.Workflow', $this->getWorkflowCMSFields());
 	}
@@ -386,6 +388,12 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		if($wf = $this->openWorkflowRequest()) {
 			$wf->deny("(automatically denied)");
 		}
+	}
+	
+	function providePermissions() {
+		return array(
+			"EDIT_CONTENT_REVIEW_FIELDS" => "Can edit the 'Content review' fields on each page",
+		);
 	}
 
 }
