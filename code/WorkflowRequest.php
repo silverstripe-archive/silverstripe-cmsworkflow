@@ -139,7 +139,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * @param Member $author
 	 * @return boolean
 	 */
-	public function approve($comment, $member = null) {
+	public function approve($comment, $member = null, $notify = true) {
 		if(!$member) $member = Member::currentUser();
 		if(!$this->Page()->canPublish($member)) {
 			return false;
@@ -152,7 +152,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$this->write();
 
 		$this->addNewChange($comment, $this->Status, $member);
-		$this->notifyApproved();
+		if($notify) $this->notifyApproved();
 		
 		return true;
 	}
@@ -175,7 +175,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * @param Member $author
 	 * @return boolean
 	 */
-	public function requestedit($comment, $member = null) {
+	public function requestedit($comment, $member = null, $notify = true) {
 		if(!$member) $member = Member::currentUser();
 		if(!$this->Page()->canPublish($member)) {
 			return false;
@@ -189,7 +189,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$this->write();
 
 		$this->addNewChange($comment, $this->Status, $member);
-		$this->notifyDenied();
+		if($notify) $this->notifyDenied();
 		
 		return true;
 	}
@@ -202,7 +202,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * @param Member $author
 	 * @return boolean
 	 */
-	public function deny($comment, $member = null) {
+	public function deny($comment, $member = null, $notify = true) {
 		if(!$member) $member = Member::currentUser();
 		if(!$this->Page()->canPublish($member)) {
 			return false;
@@ -219,7 +219,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$this->Page()->doRevertToLive();
 
 		$this->addNewChange($comment, $this->Status, $member);
-		$this->notifyDenied();
+		if($notify) $this->notifyDenied();
 		
 		return true;
 	}

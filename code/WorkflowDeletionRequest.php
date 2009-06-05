@@ -106,8 +106,8 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 	/**
 	 * Approve a deletion request, deleting the page from the live site
 	 */
-	public function approve($comment, $member = null) {
-		if(parent::approve($comment, $member)) {
+	public function approve($comment, $member = null, $notify = true) {
+		if(parent::approve($comment, $member, $notify)) {
 			$page = $this->Page();
 			$page->deleteFromStage('Live');
 			// @todo Coupling to UI :-(

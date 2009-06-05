@@ -80,13 +80,20 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 			return new HTTPResponse("Bad ID", 400);
 		}
 		
-		if($request = $page->openOrNewWorkflowRequest($workflowClass)) {
-			if($request->$actionName($comment)) {
+		// If we are creating and approving a workflow in one step, then don't bother emailing
+		$notify = !($actionName == 'approve' && !$page->openWorkflowRequest($workflowClass));
+		
+		if($request = $page->openOrNewWorkflowRequest($workflowClass, $notify)) {
+			if($request->$actionName($comment, null, $notify)) {
 				FormResponse::get_page($id);
 		
 				// gather members for status output
-				$emails = $page->PublisherMembers()->column('Email');
-				FormResponse::status_message(sprintf($successMessage, implode(", ", $emails)), 'good');
+				if($notify) {
+					$emails = implode(", ", $page->PublisherMembers()->column('Email'));
+				} else {
+					$emails = "no-one";
+				}
+				FormResponse::status_message(sprintf($successMessage, $emails), 'good');
 				return FormResponse::respond();
 			}
 		}

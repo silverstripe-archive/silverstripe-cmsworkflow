@@ -272,12 +272,16 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 		}
 	}
 	
-	public function openOrNewWorkflowRequest($workflowClass) {
+	/**
+	 * @param $workflowClass The class of the workflow object to create
+	 * @param $notify Should I sent out emails notifying people of workflow activities?
+	 */
+	public function openOrNewWorkflowRequest($workflowClass, $notify = true) {
 		if($wf = $this->openWorkflowRequest($workflowClass)) {
 			return $wf;
 		} else if(is_subclass_of($workflowClass, 'WorkflowRequest')) {
 			// TODO: How to avoid eval() here?
-			return eval("return $workflowClass::create_for_page(\$this->owner);");
+			return eval("return $workflowClass::create_for_page(\$this->owner, null, null, \$notify);");
 		} else {
 			user_error("SiteTreeCMSWorkflow::openOrNewWorkflowRequest(): Bad workflow class '$workflowClass'", E_USER_WARNING);
 		}

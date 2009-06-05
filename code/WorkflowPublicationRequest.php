@@ -25,7 +25,7 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 	 */
 	protected static $emailtemplate_denied = 'PublicationDeniedEmail';
 	
-	public static function create_for_page($page, $author = null, $publishers = null) {
+	public static function create_for_page($page, $author = null, $publishers = null, $notify = true) {
 		if(!$author && $author !== FALSE) $author = Member::currentUser();
 	
 		// take all members from the PublisherGroups relation on this record as a default
@@ -63,7 +63,7 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 		// open the request and notify interested parties
 		$request->Status = 'AwaitingApproval';
 		$request->write();
-		$request->notifiyAwaitingApproval();
+		if($notify) $request->notifiyAwaitingApproval();
 	
 		return $request;
 	}
@@ -111,8 +111,8 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 	/**
 	 * Approve a deletion request, deleting the page from the live site
 	 */
-	public function approve($comment, $member = null) {
-		if(parent::approve($comment, $member)) {
+	public function approve($comment, $member = null, $notify = true) {
+		if(parent::approve($comment, $member, $notify)) {
 			$this->Page()->doPublish();
 			return true;
 		}
