@@ -77,6 +77,9 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 	}
 	
 	function testCmsActionsLimited() {
+		// For 2.3 and 2.4 compatibility
+		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+
 		$custompublisherspage = $this->objFromFixture('SiteTree', 'custompublisherpage');
 		
 		$custompublishersgroup = $this->objFromFixture('Group', 'custompublishergroup');
@@ -108,7 +111,7 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 		$deletedFromStageRecord->doPublish();
 		$deletedFromStageRecordID = $deletedFromStageRecord->ID;
 		$deletedFromStageRecord->deleteFromStage('Stage');
-		$deletedFromStageRecord = Versioned::get_one_by_stage("SiteTree", "Live", "SiteTree.ID = $deletedFromStageRecordID");
+		$deletedFromStageRecord = Versioned::get_one_by_stage("SiteTree", "Live", "{$bt}SiteTree{$bt}.{$bt}ID{$bt} = $deletedFromStageRecordID");
 		
 		$changedOnStageRecord = new Page();
 		$changedOnStageRecord->write();
