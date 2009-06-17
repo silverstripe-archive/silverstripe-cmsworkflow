@@ -9,6 +9,9 @@ class CMSChangeTracker extends Controller {
 	);
 	
 	function index($request) {
+		// For 2.3 and 2.4 compatibility
+		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+
 		BasicAuth::enable();
 		BasicAuth::requireLogin("CMS RSS feed access.  Use your CMS login", "CMS_ACCESS_CMSMain");
 		$member = $this->getBasicAuthMember();
@@ -25,7 +28,7 @@ class CMSChangeTracker extends Controller {
 			
 			case 'page':
 				if((int)$params['PageID']) {
-					$changes = $this->changes("`SiteTree`.ID = " . (int)$params['PageID']);
+					$changes = $this->changes("{$bt}SiteTree{$bt}.ID = " . (int)$params['PageID']);
 				} else {
 					return new HTTPResponse("<h1>Bad Page ID</h1><p>Bad page ID when getting RSS feed of changes to a page.</p>", 400);
 				}
@@ -99,6 +102,9 @@ HTML;
 	 * @todo This should be part of the model layer.  Migrate this into the Versioned system in SilverStripe 2.4.
 	 */
 	function changes($SQL_filter = null, $limit = 10) {
+		// For 2.3 and 2.4 compatibility
+		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+		
 		// Build the query by  replacing `SiteTree` with `SiteTree_versions` in a regular query.
 		// Note that this should *really* be handled by a more full-featured data mapper; as it stands
 		// this is a bit of a hack.
@@ -108,16 +114,16 @@ HTML;
 		Versioned::reading_stage($origStage);
 
 		if($SQL_filter) $versionedQuery->where[] = $SQL_filter;
-		$versionedQuery->select[] = "`SiteTree`.RecordID AS ID";
+		$versionedQuery->select[] = "{$bt}SiteTree{$bt}.RecordID AS ID";
 
 		foreach($versionedQuery->from as $k => $v) {
 			$versionedQuery->renameTable($k, $k . '_versions');
 		}
 		
 		$versionedQuery->groupby = null;
-		$versionedQuery->orderby = '`LastEdited` DESC, `SiteTree_versions`.`WasPublished`';
+		$versionedQuery->orderby = "{$bt}LastEdited{$bt} DESC, {$bt}SiteTree_versions{$bt}.{$bt}WasPublished{$bt}";
 		$versionedQuery->limit = $limit;
-
+		
 		return singleton('Dataobject')->buildDataObjectSet($versionedQuery->execute());
 	}
 

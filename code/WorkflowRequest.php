@@ -217,16 +217,18 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * @return WorkflowRequestChange
 	 */
 	protected function addNewChange($comment, $status, $member) {
+		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+		
 		$change = new WorkflowRequestChange();
 		$change->AuthorID = $member->ID;
 		$change->Status = $status;
 		$change->Comment = $comment;
 		
 		$page = $this->Page();
-		$draftPage = Versioned::get_one_by_stage('SiteTree', 'Draft', "`SiteTree`.`ID` = $page->ID", false, "Created DESC");
+		$draftPage = Versioned::get_one_by_stage('SiteTree', 'Draft', "{$bt}SiteTree{$bt}.{$bt}ID{$bt} = $page->ID", false, "Created DESC");
 		// draftpage might not exist for pages "deleted from stage"
 		if($draftPage) $change->PageDraftVersion = $draftPage->Version;
-		$livePage = Versioned::get_one_by_stage('SiteTree', 'Live', "`SiteTree`.`ID` = $page->ID", false, "Created DESC");
+		$livePage = Versioned::get_one_by_stage('SiteTree', 'Live', "{$bt}SiteTree{$bt}.{$bt}ID{$bt} = $page->ID", false, "Created DESC");
 		// livepage might not exist for pages which have never been published
 		if($livePage) $change->PageLiveVersion = $livePage->Version;
 		$change->write();
@@ -434,7 +436,8 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * Returns the old record that will be replaced by this publication.
 	 */
 	public function fromRecord() {
-		return Versioned::get_one_by_stage('SiteTree', 'Live', "`SiteTree_Live`.ID = {$this->PageID}", true, "Created DESC");
+		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+		return Versioned::get_one_by_stage('SiteTree', 'Live', "{$bt}SiteTree_Live{$bt}.ID = {$this->PageID}", true, "Created DESC");
 	}
 	
 	/**
@@ -462,9 +465,10 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * @return string URL
 	 */
 	protected function getDiffLinkToLastPublished() {
+		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
 		$page = $this->Page();
 		$fromVersion = $page->Version;
-		$latestPublished = Versioned::get_one_by_stage($page->class, 'Live', "`SiteTree_Live`.ID = {$page->ID}", true, "Created DESC");
+		$latestPublished = Versioned::get_one_by_stage($page->class, 'Live', "{$bt}SiteTree_Live{$bt}.ID = {$page->ID}", true, "Created DESC");
 		if(!$latestPublished) return false;
 		
 		return "admin/compareversions/$page->ID/?From={$fromVersion}&To={$latestPublished->Version}";
@@ -493,6 +497,9 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * @return DataObjectSet
 	 */
 	public static function get_by_author($class, $author, $status = null) {
+		// To ensure 2.3 and 2.4 compatibility
+		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+		
 		if($status) $statusStr = implode(',', $status);
 
 		$classes = (array)ClassInfo::subclassesFor($class);
@@ -500,19 +507,19 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$classesSQL = implode("','", $classes);
 		
 		// build filter
-		$filter = "`Member`.ID = {$author->ID}  
-			AND `WorkflowRequest`.ClassName IN ('$classesSQL')
+		$filter = "{$bt}Member{$bt}.ID = {$author->ID}  
+			AND {$bt}WorkflowRequest{$bt}.ClassName IN ('$classesSQL')
 		";
 		if($status) {
-			$filter .= "AND `WorkflowRequest`.Status IN ('" . Convert::raw2sql($statusStr) . "')";
+			$filter .= "AND {$bt}WorkflowRequest{$bt}.Status IN ('" . Convert::raw2sql($statusStr) . "')";
 		}
 		
 		return DataObject::get(
 			"SiteTree", 
 			$filter, 
-			"`SiteTree`.`LastEdited` DESC",
-			"LEFT JOIN `WorkflowRequest` ON `WorkflowRequest`.PageID = `SiteTree`.ID " .
-			"LEFT JOIN `Member` ON `Member`.ID = `WorkflowRequest`.AuthorID"
+			"{$bt}SiteTree{$bt}.{$bt}LastEdited{$bt} DESC",
+			"LEFT JOIN {$bt}WorkflowRequest{$bt} ON {$bt}WorkflowRequest{$bt}.PageID = {$bt}SiteTree{$bt}.ID " .
+			"LEFT JOIN {$bt}Member{$bt} ON {$bt}Member{$bt}.ID = {$bt}WorkflowRequest{$bt}.AuthorID"
 		);
 	}
 	
@@ -525,6 +532,9 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * @return DataObjectSet
 	 */
 	public static function get_by_publisher($class, $publisher, $status = null) {
+		// To ensure 2.3 and 2.4 compatibility
+		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+
 		if($status) $statusStr = implode(',', $status);
 
 		$classes = (array)ClassInfo::subclassesFor($class);
@@ -532,19 +542,19 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$classesSQL = implode("','", $classes);
 		
 		// build filter
-		$filter = "`WorkflowRequest_Publishers`.MemberID = {$publisher->ID} 
-			AND `WorkflowRequest`.ClassName IN ('$classesSQL')
+		$filter = "{$bt}WorkflowRequest_Publishers{$bt}.MemberID = {$publisher->ID} 
+			AND {$bt}WorkflowRequest{$bt}.ClassName IN ('$classesSQL')
 		";
 		if($status) {
-			$filter .= "AND `WorkflowRequest`.Status IN ('" . Convert::raw2sql($statusStr) . "')";
+			$filter .= "AND {$bt}WorkflowRequest{$bt}.Status IN ('" . Convert::raw2sql($statusStr) . "')";
 		} 
 		
 		return DataObject::get(
 			"SiteTree", 
 			$filter, 
-			"`SiteTree`.`LastEdited` DESC",
-			"LEFT JOIN `WorkflowRequest` ON `WorkflowRequest`.PageID = `SiteTree`.ID " .
-			"LEFT JOIN `WorkflowRequest_Publishers` ON `WorkflowRequest`.ID = `WorkflowRequest_Publishers`.WorkflowRequestID"
+			"{$bt}SiteTree{$bt}.{$bt}LastEdited{$bt} DESC",
+			"LEFT JOIN {$bt}WorkflowRequest{$bt} ON {$bt}WorkflowRequest{$bt}.PageID = {$bt}SiteTree{$bt}.ID " .
+			"LEFT JOIN {$bt}WorkflowRequest_Publishers{$bt} ON {$bt}WorkflowRequest{$bt}.ID = {$bt}WorkflowRequest_Publishers{$bt}.WorkflowRequestID"
 		);
 	}
 	
@@ -555,6 +565,9 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * @return DataObjectSet
 	 */
 	public static function get($class, $status = null) {
+		// To ensure 2.3 and 2.4 compatibility
+		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+
 		if($status) $statusStr = implode(',', $status);
 
 		$classes = (array)ClassInfo::subclassesFor($class);
@@ -562,16 +575,16 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$classesSQL = implode("','", $classes);
 		
 		// build filter
-		$filter = "`WorkflowRequest`.ClassName IN ('$classesSQL')";
+		$filter = "{$bt}WorkflowRequest{$bt}.ClassName IN ('$classesSQL')";
 		if($status) {
-			$filter .= "AND `WorkflowRequest`.Status IN ('" . Convert::raw2sql($statusStr) . "')";
+			$filter .= "AND {$bt}WorkflowRequest{$bt}.Status IN ('" . Convert::raw2sql($statusStr) . "')";
 		} 
 		
 		return DataObject::get(
 			"SiteTree", 
 			$filter, 
-			"`SiteTree`.`LastEdited` DESC",
-			"LEFT JOIN `WorkflowRequest` ON `WorkflowRequest`.PageID = `SiteTree`.ID"
+			"{$bt}SiteTree{$bt}.{$bt}LastEdited{$bt} DESC",
+			"LEFT JOIN {$bt}WorkflowRequest{$bt} ON {$bt}WorkflowRequest{$bt}.PageID = {$bt}SiteTree{$bt}.ID"
 		);
 	}
 	

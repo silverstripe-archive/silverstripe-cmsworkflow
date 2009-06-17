@@ -89,9 +89,12 @@ class WorkflowRequestChange extends DataObject {
 	 * @return string Relative URL into the CMS
 	 */
 	function getDiffLinkOriginalToLastPublished() {
+		// For 2.3 and 2.4 compatibility
+		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+
 		$page = $this->WorkflowRequest()->Page();
 		$fromVersion = $page->Version;
-		$latestPublished = Versioned::get_one_by_stage($page->class, 'Live', "`SiteTree_Live`.ID = {$page->ID}", true, "Created DESC");
+		$latestPublished = Versioned::get_one_by_stage($page->class, 'Live', "{$bt}SiteTree_Live{$bt}.ID = {$page->ID}", true, "Created DESC");
 		if(!$latestPublished) return false;
 		$toVersion = $latestPublished->Version;
 		
@@ -104,9 +107,12 @@ class WorkflowRequestChange extends DataObject {
 	 * @return string Relative URL into the CMS
 	 */
 	function getDiffLinkToLastPublished() {
+		// For 2.3 and 2.4 compatibility
+		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+
 		$page = $this->WorkflowRequest()->Page();
 		$fromVersion = $this->PageDraftVersion;
-		$latestPublished = Versioned::get_one_by_stage($page->class, 'Live', "`SiteTree_Live`.ID = {$page->ID}", true, "Created DESC");
+		$latestPublished = Versioned::get_one_by_stage($page->class, 'Live', "{$bt}SiteTree_Live{$bt}.ID = {$page->ID}", true, "Created DESC");
 		if(!$latestPublished) return false;
 		$toVersion = $latestPublished->Version;
 		

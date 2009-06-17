@@ -349,7 +349,11 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 	}
 
 	function augmentDefaultRecords() {
-		if(!DB::query("SELECT * FROM `Group` WHERE `Group`.`Code` = 'site-content-authors'")->value()){
+		// For 2.3 and 2.4 compatibility
+		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+		
+		$query = "SELECT * FROM {$bt}Group{$bt} WHERE {$bt}Group{$bt}.{$bt}Code{$bt} = 'site-content-authors'";
+		if(!DB::query($query)->value()){
 			$authorGroup = Object::create('Group');
 			$authorGroup->Title = 'Site Content Authors';
 			$authorGroup->Code = "site-content-authors";
@@ -359,7 +363,8 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 			Database::alteration_message("Added site content author group","created");
 		}
 
-		if(!DB::query("SELECT * FROM `Group` WHERE `Group`.`Code` = 'site-content-publishers'")->value()){
+		$query = "SELECT * FROM {$bt}Group{$bt} WHERE {$bt}Group{$bt}.{$bt}Code{$bt} = 'site-content-publishers'";
+		if(!DB::query($query)->value()){
 			$publishersGroup = Object::create('Group');
 			$publishersGroup->Title = 'Site Content Publishers';
 			$publishersGroup->Code = "site-content-publishers";

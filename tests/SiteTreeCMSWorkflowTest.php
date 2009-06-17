@@ -108,7 +108,7 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 		$deletedFromStageRecord->doPublish();
 		$deletedFromStageRecordID = $deletedFromStageRecord->ID;
 		$deletedFromStageRecord->deleteFromStage('Stage');
-		$deletedFromStageRecord = Versioned::get_one_by_stage("SiteTree", "Live", "`SiteTree`.`ID` = $deletedFromStageRecordID");
+		$deletedFromStageRecord = Versioned::get_one_by_stage("SiteTree", "Live", "SiteTree.ID = $deletedFromStageRecordID");
 		
 		$changedOnStageRecord = new Page();
 		$changedOnStageRecord->write();

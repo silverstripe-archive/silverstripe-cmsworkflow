@@ -51,7 +51,8 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 
 		$SQL_id = Convert::raw2sql($data['ID']);
 		if(is_numeric($SQL_id)) {
-			$record = DataObject::get_one($className, "`$className`.ID = {$SQL_id}");
+			$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+			$record = DataObject::get_one($className, "{$bt}$className{$bt}.ID = {$SQL_id}");
 			if($record && !$record->canEdit()) return Security::permissionFailure($this);
 		} else {
 			return new HTTPReponse('Bad ID', 400);
@@ -217,8 +218,11 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 	 */
 	function workflowAction($workflowClass,  $actionName, $id, $comment, $successMessage) {
 		if(is_numeric($id)) {
+			// For 2.3 and 2.4 compatibility
+			$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+
 			$page = DataObject::get_by_id("SiteTree", $id);
-			if(!$page) $page = Versioned::get_one_by_stage("SiteTree", "Live", "`SiteTree`.ID = $id");
+			if(!$page) $page = Versioned::get_one_by_stage("SiteTree", "Live", "{$bt}SiteTree{$bt}.ID = $id");
 			if(!$page) return new HTTPResponse("Can't find Page #$id", 400);
 		} else {
 			return new HTTPResponse("Bad ID", 400);
