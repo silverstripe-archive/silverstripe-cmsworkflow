@@ -385,7 +385,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 	function onAfterPublish() {
 		if($wf = $this->openWorkflowRequest()) {
 			if(get_class($wf) == 'WorkflowPublicationRequest') $wf->approve("(automatically approved)");
-			else $wf->deny("(automatically denied when the page was published)");
+			else $wf->deny(_t("SiteTreeCMSWorkflow.AUTO_DENIED_PUBLISHED", "(automatically denied when the page was published)"));
 		}
 	}
 	
@@ -395,7 +395,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 	function onAfterDelete() {
 		if($wf = $this->openWorkflowRequest()) {
 			if(get_class($wf) == 'WorkflowDeletionRequest') $wf->approve("(automatically approved)");
-			else $wf->deny("(automatically denied when the page was deleted)");
+			else $wf->deny(_t("SiteTreeCMSWorkflow.AUTO_DENIED_DELETED", "(automatically denied when the page was deleted)"));
 		}
 	}
 	

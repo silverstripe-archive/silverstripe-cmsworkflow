@@ -124,7 +124,7 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 				foreach($deleted as $page) {
 					if($page->ID != $record->ID) $result .= $this->deleteTreeNodeJS($page);
 				}
-			}
+			}			
 			if($changed = DataObjectLog::getChanged('SiteTree')) {
 				foreach($changed as $page) {
 					if($page->ID != $record->ID) {
@@ -234,6 +234,9 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		if($request = $page->openOrNewWorkflowRequest($workflowClass, $notify)) {
 			if($request->$actionName($comment, null, $notify)) {
 				FormResponse::get_page($id);
+
+				$title = Convert::raw2js($page->TreeTitle());
+				FormResponse::add("$('sitetree').setNodeTitle($id, \"$title\");");
 		
 				// gather members for status output
 				if($notify) {

@@ -324,15 +324,27 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * Notify the author of a request once a page has been approved (=published).
 	 */
 	public function notifyApproved($comment) {
-		$publisher = Member::currentUser();
 		$author = $this->Author();
 		$subject = sprintf(
 			_t("{$this->class}.EMAIL_SUBJECT_APPROVED"),
 			$this->Page()->Title
 		);
+		
+		$publishers = $this->Page()->PublisherMembers();
+		foreach($publishers as $publisher){
+			logItBro("Publisher: {$publisher->Email}");
+			$this->sendNotificationEmail(
+				Member::currentUser(), // sender
+				$publisher, // recipient
+				_t("{$this->class}.EMAIL_SUBJECT_APPROVED"),
+				_t("{$this->class}.EMAIL_PARA_APPROVED"),
+				$comment,
+				'WorkflowGenericEmail'
+			);
+		}
 
 		$this->sendNotificationEmail(
-			$publisher, // sender
+			Member::currentUser(), // sender
 			$author, // recipient
 			_t("{$this->class}.EMAIL_SUBJECT_APPROVED"),
 			_t("{$this->class}.EMAIL_PARA_APPROVED"),
@@ -395,7 +407,6 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		if(!$template) {
 			$template = 'WorkflowGenericEmail';
 		}
-		
 		
 		$subject = sprintf($subjectTemplate, 
 				$this->Page()->Title);
