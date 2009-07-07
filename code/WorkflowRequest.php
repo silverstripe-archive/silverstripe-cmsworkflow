@@ -332,7 +332,6 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		
 		$publishers = $this->Page()->PublisherMembers();
 		foreach($publishers as $publisher){
-			logItBro("Publisher: {$publisher->Email}");
 			$this->sendNotificationEmail(
 				Member::currentUser(), // sender
 				$publisher, // recipient
