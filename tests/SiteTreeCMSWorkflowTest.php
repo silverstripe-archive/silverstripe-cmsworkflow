@@ -17,8 +17,9 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 		// default records are not created in TestRunner by default
 		singleton('SiteTreeCMSWorkflow')->augmentDefaultRecords();
 		$fixtureFile = 'cmsworkflow/tests/SiteTreeCMSWorkflowTest.yml';
-		$this->fixture = new YamlFixture($fixtureFile);
-		$this->fixture->saveIntoDatabase();
+		$fixture = new YamlFixture($fixtureFile);
+		$fixture->saveIntoDatabase();
+		$this->fixtures[] = $fixture;
 	} 
 	
 	function testAlternateCanPublishLimitsToPublisherGroups() {
