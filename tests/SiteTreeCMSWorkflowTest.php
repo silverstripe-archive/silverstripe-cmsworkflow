@@ -19,7 +19,9 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 		$fixtureFile = 'cmsworkflow/tests/SiteTreeCMSWorkflowTest.yml';
 		$fixture = new YamlFixture($fixtureFile);
 		$fixture->saveIntoDatabase();
-		$this->fixtures[] = $fixture;
+		// Duplicated to be compatible with 2.3 and 2.4
+		$this->fixtures = array($fixture);
+		$this->fixture = $fixture;
 	} 
 	
 	function testAlternateCanPublishLimitsToPublisherGroups() {
