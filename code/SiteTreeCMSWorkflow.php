@@ -48,7 +48,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 	function extraStatics() {
 		return array(
 			'db' => array(
-				"CanPublishType" =>"Enum('LoggedInUsers, OnlyTheseUsers', 'OnlyTheseUsers')", 
+				"CanPublishType" =>"Enum('LoggedInUsers, OnlyTheseUsers, Inherit', 'OnlyTheseUsers')", 
 				"ReviewPeriodDays" => "Int",
 				"NextReviewDate" => "Date",
 			),
@@ -75,10 +75,11 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 				"CanPublishType", 
 				"",
 				array(
+					"Inherit" => _t('SiteTree.EDITINHERIT', "Inherit from parent page"),
 					"LoggedInUsers" => _t('SiteTree.EDITANYONE', "Anyone who can log-in to the CMS"),
 					"OnlyTheseUsers" => _t('SiteTree.EDITONLYTHESE', "Only these people (choose from list)")
 				),
-				"OnlyTheseUsers"
+				"Inherit"
 			),
 			$publisherGroupsField = new TreeMultiselectField("PublisherGroups", $this->owner->fieldLabel('PublisherGroups'))
 		));
@@ -211,6 +212,10 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 			}
 			
 			return $members;
+		} elseif($this->owner->CanPublishType == 'Inherit') {
+			if ($this->owner->ParentID) {
+				return $this->owner->Parent()->PublisherMembers();
+			} else { return new DataObjectSet(); }
 		} else {
 			$group = Permission::get_groups_by_permission('ADMIN')->first();
 			return $group->Members();
@@ -279,7 +284,8 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 		if($wf = $this->openWorkflowRequest($workflowClass)) {
 			return $wf;
 		} else if(is_subclass_of($workflowClass, 'WorkflowRequest')) {
-			// TODO: How to avoid eval() here?
+			// TODO: How to avoid eval() here? (Tom R:) below should do it.
+			// return call_user_func(array($workflowClass, 'create_for_page'), $this->owner, null, null, $nofify);
 			return eval("return $workflowClass::create_for_page(\$this->owner, null, null, \$notify);");
 		} else {
 			user_error("SiteTreeCMSWorkflow::openOrNewWorkflowRequest(): Bad workflow class '$workflowClass'", E_USER_WARNING);
@@ -287,13 +293,13 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 	}
 
 	/**
-	 * This function should return true if the current user can view this
+	 * This function should return true if the current user can publish this
 	 * page.
 	 *
 	 * It can be overloaded to customise the security model for an
 	 * application.
 	 *
-	 * @return boolean True if the current user can view this page.
+	 * @return boolean True if the current user can publish this page.
 	 */
 	public function canPublish($member = null) {
 		if(!$member && $member !== FALSE) $member = Member::currentUser();
@@ -307,19 +313,18 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 		// check for empty spec
 		if(!$this->owner->CanPublishType || $this->owner->CanPublishType == 'Anyone') return true;
 
+		// check against parent page (default to FALSE if there is no parent page)
+		if($this->owner->CanPublishType == 'Inherit') {
+			if ($this->owner->Parent()->exists()) {
+				if (!$this->owner->Parent()->getExtensionInstance('SiteTreeCMSWorkflow')->canPublish($member)) return false;
+			} else { return false; }
+		}
+		
 		// check for any logged-in users
 		if($this->owner->CanPublishType == 'LoggedInUsers' && !Permission::checkMember($member, 'CMS_ACCESS_CMSMain')) return false;
 
 		// check for specific groups
-		if(
-			$this->owner->CanPublishType == 'OnlyTheseUsers' 
-			&& (
-				!$member
-				|| !$member->inGroups($this->owner->PublisherGroups())
-			)
-		) {
-			return false;
-		}
+		if($this->owner->CanPublishType == 'OnlyTheseUsers' && (!$member || !$member->inGroups($this->owner->PublisherGroups()))) return false;
 
 		return true;
 	}
