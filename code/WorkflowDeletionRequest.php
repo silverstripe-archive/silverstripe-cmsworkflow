@@ -10,7 +10,7 @@
  */
 class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvider {
 	
-	public static function create_for_page($page, $author = null, $publishers = null) {
+	public static function create_for_page($page, $author = null, $approvers = null) {
 		if(!$author && $author !== FALSE) $author = Member::currentUser();
 		
 		if(!WorkflowDeletionRequest::can_create($author, $page)) {
@@ -18,10 +18,10 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 		}
 		
 		// take all members from the PublisherGroups relation on this record as a default
-		if(!$publishers) $publishers = $page->PublisherMembers();
+		if(!$approvers) $approvers = $page->whoCanApprove();
 		
 		// if no publishers are set, the request will end up nowhere
-		if(!$publishers->Count()) {
+		if(!$approvers->Count()) {
 			return null;
 		}
 		
@@ -40,8 +40,8 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 		$request->write();
 		
 		// assign publishers to this specific request
-		foreach($publishers as $publisher) {
-			$request->Publishers()->add($publisher);
+		foreach($approvers as $approver) {
+			$request->Approvers()->add($approver);
 		}
 		
 		$page->flushCache();
@@ -62,7 +62,7 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 			// "request removal"
 			$actions->removeByName('action_deletefromlive');
 		}
-		
+
 		if(
 			!$openRequest
 			&& $page->canEdit() 
@@ -86,17 +86,22 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 		// @todo deny deletion
 	}
 	
-	/**
-	 * Approve a deletion request, deleting the page from the live site
-	 */
-	public function approve($comment, $member = null, $notify = true) {
-		if(parent::approve($comment, $member, $notify)) {
-			$page = $this->Page();
-			$page->deleteFromStage('Live');
-			// @todo Coupling to UI :-(
-			FormResponse::add(LeftAndMain::deleteTreeNodeJS($page));
-			return true;
-		}
+	public function publish($comment, $member, $notify) {
+		if(!$member) $member = Member::currentUser();
+		
+		// We have to mark as completed now, or we'll get
+		// recursion from SiteTreeCMSWorkflow::onAfterPublish.
+		$this->Status = 'Completed';
+		$this->PublisherID = $member->ID;
+		$this->write();
+
+		$page = $this->Page();
+		$page->deleteFromStage('Live');
+
+		// @todo Coupling to UI :-(
+		FormResponse::add(LeftAndMain::deleteTreeNodeJS($page));
+		
+		return true;
 	}
 	
 	/**

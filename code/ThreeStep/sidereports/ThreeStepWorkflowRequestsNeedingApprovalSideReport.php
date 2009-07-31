@@ -1,15 +1,13 @@
 <?php
 /**
- * Adds a new "sidereport" in the CMS listing all pages a specific author has requested to be changed.
- * 
  * @package cmsworkflow
  */
-class MyWorkflowRequestsSideReport extends SideReport {
+class ThreeStepWorkflowRequestsNeedingApprovalSideReport extends SideReport {
 	function title() {
-		return _t('MyWorkflowRequestsSideReport.TITLE',"Workflow: My requests pending review");
+		return _t('MyWorkflowRequestsSideReport.TITLE',"Workflow: requests I need to approve");
 	}
 	function records() {
-		return WorkflowRequest::get_by_author(
+		return WorkflowThreeStepRequest::get_by_approver(
 			'WorkflowRequest',
 			Member::currentUser(),
 			array('AwaitingApproval')

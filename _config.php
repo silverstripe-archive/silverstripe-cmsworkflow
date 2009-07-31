@@ -14,4 +14,5 @@ Director::addRules(200, array(
 	//'admin/cms/subtree-of/$PageID/changes.rss' => array('Controller' => 'CMSChangeTracker', 'Data' => 'subtree'),
 	//'admin/cms/children-of/$PageID/changes.rss' => array('Controller' => 'CMSChangeTracker', 'Data' => 'children'),
 ));
+
 ?>

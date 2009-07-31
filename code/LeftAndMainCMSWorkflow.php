@@ -41,21 +41,17 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 			_t('SiteTreeCMSWorkflow.PUBLISHMESSAGE','Approved request and published to the live version. Emailed %s.')
 		);
 	}
-	public function cms_publishwithcomment($data, $form) {
-		// TODO: This is all copied and pasted form LeftAndMain::save(), basically so that we don't 
-		// need to patch core to get the cmsworkflow module working.  but it should be refactored to
-		// a common place.
-		
+	public function cms_publishwithcomment($urlParams, $form) {
 		$className = 'SiteTree';
 		$result = '';
 
-		$SQL_id = Convert::raw2sql($data['ID']);
-		if(is_numeric($SQL_id)) {
-			$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
-			$record = DataObject::get_one($className, "{$bt}$className{$bt}.ID = {$SQL_id}");
+		$SQL_id = Convert::raw2sql($_REQUEST['ID']);
+		if(substr($SQL_id,0,3) != 'new') {
+			$record = DataObject::get_one($className, "\"$className\".\"ID\" = {$SQL_id}");
 			if($record && !$record->canEdit()) return Security::permissionFailure($this);
 		} else {
-			return new HTTPReponse('Bad ID', 400);
+			if(!singleton($this->stat('tree_class'))->canCreate()) return Security::permissionFailure($this);
+			$record = $this->getNewItem($SQL_id, false);
 		}
 
 		// We don't want to save a new version if there are no changes
@@ -124,7 +120,7 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 				foreach($deleted as $page) {
 					if($page->ID != $record->ID) $result .= $this->deleteTreeNodeJS($page);
 				}
-			}			
+			}
 			if($changed = DataObjectLog::getChanged('SiteTree')) {
 				foreach($changed as $page) {
 					if($page->ID != $record->ID) {
@@ -145,45 +141,70 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 				$record->setClassName($originalClass);
 				// Replace $record with a new instance
 				$record = $record->newClassInstance($newClassName);
-
+				
 				// update the tree icon
 				FormResponse::add("if(\$('sitetree').setNodeIcon) \$('sitetree').setNodeIcon($record->ID, '$originalClass', '$record->ClassName');");
 			}
 
-			FormResponse::add("$('Form_EditForm').getPageFromServer($record->ID);");
+			// HACK: This should be turned into somethign more general
+			if( ($record->class == 'VirtualPage' && $originalURLSegment != $record->URLSegment) ||
+				($originalClass != $record->ClassName) || LeftAndMain::$ForceReload == true) {
+				FormResponse::add("$('Form_EditForm').getPageFromServer($record->ID);");
+			}
 
 			// After reloading action
 			if($originalStatus != $record->Status) {
 				$message .= sprintf(_t('LeftAndMain.STATUSTO',"  Status changed to '%s'"),$record->Status);
 			}
-
+			
 			if($originalParentID != $record->ParentID) {
 				FormResponse::add("if(\$('sitetree').setNodeParentID) \$('sitetree').setNodeParentID($record->ID, $record->ParentID);");
 			}
 
 			$record->write();
-
+			
+			// if changed to a single_instance_only page type
+			if ($record->stat('single_instance_only')) {
+				FormResponse::add("jQuery('#sitetree li.{$record->ClassName}').addClass('{$record->stat('single_instance_only_css_class')}');");
+				FormResponse::add($this->hideSingleInstanceOnlyFromCreateFieldJS($record));
+			}
+			else {
+				FormResponse::add("jQuery('#sitetree li.{$record->ClassName}').removeClass('{$record->stat('single_instance_only_css_class')}');");
+			}
+			// if chnaged from a single_instance_only page type
+			$sampleOriginalClassObject = new $originalClass();
+			if($sampleOriginalClassObject->stat('single_instance_only')) {
+				FormResponse::add($this->showSingleInstanceOnlyInCreateFieldJS($sampleOriginalClassObject));
+			}
+			
 			if( ($record->class != 'VirtualPage') && $originalURLSegment != $record->URLSegment) {
 				$message .= sprintf(_t('LeftAndMain.CHANGEDURL',"  Changed URL to '%s'"),$record->URLSegment);
 				FormResponse::add("\$('Form_EditForm').elements.URLSegment.value = \"$record->URLSegment\";");
 				FormResponse::add("\$('Form_EditForm_StageURLSegment').value = \"{$record->URLSegment}\";");
 			}
-			
-			// *** THIS IS THE ONLY PART THAT'S NOT COPIED FROM LEFTANDMAIN ***
-			$this->workflowAction('WorkflowPublicationRequest', 'approve', $data['ID'], $data['WorkflowComment'],
-				_t('SiteTreeCMSWorkflow.PUBLISHMESSAGE','Approved request and published changes to live version. Emailed %s.')
-			);
-			// *** END ***
 
 			// Update classname with original and get new instance (see above for explanation)
 			$record->setClassName($originalClass);
 			$publishedRecord = $record->newClassInstance($record->ClassName);
-
-			// This will also include the FormResponse stuff that workflowAction() adds.
-			return $this->owner->tellBrowserAboutPublicationChange(
-				$publishedRecord, 
-				null
+			
+			return $this->workflowAction('WorkflowPublicationRequest', 'saveAndPublish', $urlParams['ID'], $urlParams['WorkflowComment'],
+				_t('SiteTreeCMSWorkflow.PUBLISHMESSAGE','Approved request and published changes to live version. Emailed %s.')
 			);
+			
+			
+
+			// return $this->owner->tellBrowserAboutPublicationChange(
+			// 	$publishedRecord, 
+			// 	sprintf(
+			// 		_t(
+			// 			'LeftAndMain.STATUSPUBLISHEDSUCCESS', 
+			// 			"Published '%s' successfully",
+			// 			PR_MEDIUM,
+			// 			'Status message after publishing a page, showing the page title'
+			// 		),
+			// 		$record->Title
+			// 	)
+			// );
 		}
 	}
 
@@ -229,7 +250,7 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		}
 		
 		// If we are creating and approving a workflow in one step, then don't bother emailing
-		$notify = !($actionName == 'approve' && !$page->openWorkflowRequest($workflowClass));
+		$notify = !($actionName == 'action' && !$page->openWorkflowRequest($workflowClass));
 		
 		if($request = $page->openOrNewWorkflowRequest($workflowClass, $notify)) {
 			if($request->$actionName($comment, null, $notify)) {
@@ -240,12 +261,24 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		
 				// gather members for status output
 				if($notify) {
-					$emails = implode(", ", $page->PublisherMembers()->column('Email'));
+					$peeps = $request->getMembersEmailed();
+					if ($peeps && $peeps->Count()) {
+						$emails = '';
+						foreach($peeps as $peep) {
+							if ($peep->Email) $emails .= $peep->Email.', ';
+						}
+						$emails = trim($emails, ', ');
+					} else { $emails = 'no-one'; }
 				} else {
 					$emails = "no-one";
 				}
-				FormResponse::status_message(sprintf($successMessage, $emails), 'good');
-				return FormResponse::respond();
+				
+				if ($successMessage) {
+					FormResponse::status_message(sprintf($successMessage, $emails), 'good');
+					return FormResponse::respond();
+				} else {
+					return;
+				}
 			}
 		}
 

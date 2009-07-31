@@ -10,14 +10,14 @@
  */
 class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityProvider {
 	
-	public static function create_for_page($page, $author = null, $publishers = null, $notify = true) {
+	public static function create_for_page($page, $author = null, $approvers = null, $notify = true) {
 		if(!$author && $author !== FALSE) $author = Member::currentUser();
 	
 		// take all members from the PublisherGroups relation on this record as a default
-		if(!$publishers) $publishers = $page->PublisherMembers();
+		if(!$approvers) $approvers = $page->whoCanApprove();
 
 		// if no publishers are set, the request will end up nowhere
-		if(!$publishers->Count()) {
+		if(!$approvers->Count()) {
 			echo "No publishers selected\n";
 			return null;
 		}
@@ -41,8 +41,8 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 		$request->write();
 
 		// assign publishers to this specific request
-		foreach($publishers as $publisher) {
-			$request->Publishers()->add($publisher);
+		foreach($approvers as $approver) {
+			$request->Approvers()->add($approver);
 		}
 
 		// open the request and notify interested parties
@@ -59,15 +59,15 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 	public static function update_cms_actions(&$actions, $page) {
 		$openRequest = $page->OpenWorkflowRequest();
 
-		// if user doesn't have publish rights, exchange the behavior from
-		// "publish" to "request publish" etc.
+		// if user doesn't have publish rights
 		if(!$page->canPublish() || $openRequest) {
-
 			// authors shouldn't be able to revert, as this republishes the page.
 			// they should rather change the page and re-request publication
 			$actions->removeByName('action_revert');
-
-			// "request publication"
+		}
+		
+		// Remove the one click publish if they are not an admin/workflow admin.
+		if(!Permission::checkMember(Member::currentUser(), 'IS_WORKFLOW_ADMIN')) {
 			$actions->removeByName('action_publish');
 		}
 		
@@ -91,15 +91,24 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 			}
 		}
 	}
+	
+	public function publish($comment, $member, $notify) {
+		if(!$member) $member = Member::currentUser();
+		
+		// We have to mark as completed now, or we'll get
+		// recursion from SiteTreeCMSWorkflow::onAfterPublish.
+		$this->Status = 'Completed';
+		$this->PublisherID = $member->ID;
+		$this->write();
 
-	/**
-	 * Approve a deletion request, deleting the page from the live site
-	 */
-	public function approve($comment, $member = null, $notify = true) {
-		if(parent::approve($comment, $member, $notify)) {
-			$this->Page()->doPublish();
-			return true;
-		}
+		$page = $this->Page();
+		$page->doPublish();
+
+		// @todo Coupling to UI :-(
+		$title = Convert::raw2js($page->TreeTitle());
+		FormResponse::add("$('sitetree').setNodeTitle($page->ID, \"$title\");");
+		
+		return true;
 	}
 	
 	/**
@@ -126,8 +135,8 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 		return true;
 	}
 	
-	public function onAfterPublish($page, $publisher) {
-		$this->PublisherID = $publisher->ID;
+	public function onAfterPublish($page, $member) {
+		$this->ApproverID = $member->ID;
 		$this->write();
 		// open the request and notify interested parties
 		$this->Status = 'Approved';

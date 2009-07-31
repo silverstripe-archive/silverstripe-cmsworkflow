@@ -29,6 +29,12 @@
  * $wf = $page->openWorkflowRequest()
  * $wf->approve("Thanks, looks good now");
  * </code>
+ *
+ * Make the changes 'go live' changes:
+ * <code>
+ * $wf = $page->openWorkflowRequest()
+ * $wf->action();
+ * </code>
  * 
  * {@link WorkflowRequest::Changes()} will provide a list of the changes that the workflow has gone through,
  * suitable for presentation as a discussion thread attached to the page.
@@ -36,66 +42,40 @@
  * @package cmsworkflow
  */
 class WorkflowRequest extends DataObject implements i18nEntityProvider {
-	
 	static $db = array(
 		// @todo AwaitingReview
-		'Status' => "Enum('AwaitingApproval,Approved,Denied,AwaitingEdit','AwaitingApproval')"
+		'Status' => "Enum('AwaitingApproval,Approved,Completed,Denied,AwaitingEdit','AwaitingApproval')",
+		// actioned is true/false whether the change has actually happened on live
 	);
 	
 	static $has_one = array(
 		'Author' => 'Member',
-		'Publisher' => 'Member', // see SiteTreeCMSWorkflow->onBeforeWrite()
+		'Approver' => 'Member',
+		'Publisher' => 'Member',
 		'Page' => 'SiteTree'
 	);
 	
 	static $has_many = array(
-		'Changes' => 'WorkflowRequestChange', // see WorkflowRequest->onBeforeWrite()
+		'Changes' => 'WorkflowRequestChange',
 	);
 	
 	static $many_many = array(
-		'Publishers' => 'Member'
+		'Approvers' => 'Member'
 	);
-	
+
 	/**
 	 * Factory method setting up a new WorkflowRequest with associated
 	 * state. Sets relations to publishers and authors, 
 	 * 
 	 * @param SiteTree $page
 	 * @param Member $member The user requesting publication
-	 * @param DataObjectSet $publishers Publishers assigned to this request.
+	 * @param DataObjectSet $approvers Approvers assigned to this request.
 	 * @return boolean|WorkflowPublicationRequest
 	 */
-	public static function create_for_page($page, $author = null, $publishers = null) {
+	public static function create_for_page($page, $author = null, $approvers = null) {
 		user_error('WorkflowRequest::create_for_page() - Abstract method, please implement in subclass', E_USER_ERROR);
 	}
 	
-	/*
-	function onBeforeWrite() {
-		// if the request status has changed, we track it through a separate relation
-		$changedFields = $this->getChangedFields();
-		// only write if the status has changed, and wasn't previously NULL (in which case onAfterWrite() takes over)
-		if((isset($changedFields['Status']) && $changedFields['Status']['after'] && $changedFields['Status']['before'])) {
-			$change = $this->addNewChange();
-		}
-		
-		// see onAfterWrite() for creation of the first change when the request is initiated
-		
-		parent::onBeforeWrite();
-	}
-	
-	function onAfterWrite() {
-		// if request has no changes (= was just created),
-		// add a new change. this is necessary because we don't
-		// have the required WorkflowRequestID in the first call
-		// to onBeforeWrite()
-		if(!$this->Changes()->Count()) {
-			$change = $this->addNewChange();
-		}
-		
-		parent::onAfterWrite();
-	}
-	*/
-
 	/**
 	 * Approve this request, notify interested parties
 	 * and close it. Used by {@link LeftAndMainCMSWorkflow}
@@ -112,32 +92,6 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 
 		$this->addNewChange($comment, $this->Status, $member);
 		$this->notifyAwaitingApproval($comment);
-		
-		return true;
-	}
-	
-	/**
-	 * Approve this request, notify interested parties
-	 * and close it. Used by {@link LeftAndMainCMSWorkflow}
-	 * and {@link SiteTreeCMSWorkflow}.
-	 * 
-	 * @param Member $author
-	 * @return boolean
-	 */
-	public function approve($comment, $member = null, $notify = true) {
-		if(!$member) $member = Member::currentUser();
-		if(!$this->Page()->canPublish($member)) {
-			return false;
-		}
-		
-		$this->PublisherID = $member->ID;
-		$this->write();
-		// open the request and notify interested parties
-		$this->Status = 'Approved';
-		$this->write();
-
-		$this->addNewChange($comment, $this->Status, $member);
-		if($notify) $this->notifyApproved($comment);
 		
 		return true;
 	}
@@ -163,7 +117,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 */
 	public function requestedit($comment, $member = null, $notify = true) {
 		if(!$member) $member = Member::currentUser();
-		if(!$this->Page()->canPublish($member)) {
+		if(!$this->Page()->canRequestEdit($member)) {
 			return false;
 		}
 		
@@ -190,13 +144,16 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 */
 	public function deny($comment, $member = null, $notify = true) {
 		if(!$member) $member = Member::currentUser();
-		if(!$this->Page()->canPublish($member)) {
+		if(!$this->Page()->canDenyRequests($member)) {
 			return false;
 		}
 		
 		// "publisher" in this sense means "deny-author"
-		$this->PublisherID = $member->ID;
+		$this->ApproverID = $member->ID;
+		$this->ActionerID = $member->ID;
+		$this->Actioned = true;
 		$this->write();
+		
 		// open the request and notify interested parties
 		$this->Status = 'Denied';
 		$this->write();
@@ -216,7 +173,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 *
 	 * @return WorkflowRequestChange
 	 */
-	protected function addNewChange($comment, $status, $member) {
+	public function addNewChange($comment, $status, $member) {
 		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
 		
 		$change = new WorkflowRequestChange();
@@ -301,48 +258,18 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	}
 	
 	/**
-	 * Notify any publishers assigned to this page when a new request
-	 * is lodged.
-	 */
-	public function notifyAwaitingApproval($comment) {
-		$publishers = $this->Page()->PublisherMembers();
-		$author = $this->Author();
-
-		foreach($publishers as $publisher){
-			$this->sendNotificationEmail(
-				$author, // sender
-				$publisher, // recipient
-				_t("{$this->class}.EMAIL_SUBJECT_AWAITINGAPPROVAL"),
-				_t("{$this->class}.EMAIL_PARA_AWAITINGAPPROVAL"),
-				$comment,
-				'WorkflowGenericEmail'
-			);
-		}
-	}
-	
-	/**
-	 * Notify the author of a request once a page has been approved (=published).
+	 * Notify the author of a request once a page has been approved.
+	 * Whether this means the reuqest has been actioned depends on
+	 * the approval path.
 	 */
 	public function notifyApproved($comment) {
 		$author = $this->Author();
 		$subject = sprintf(
 			_t("{$this->class}.EMAIL_SUBJECT_APPROVED"),
-			$this->Page()->Title
+			$this->owner->Page()->Title
 		);
-		
-		$publishers = $this->Page()->PublisherMembers();
-		foreach($publishers as $publisher){
-			$this->sendNotificationEmail(
-				Member::currentUser(), // sender
-				$publisher, // recipient
-				_t("{$this->class}.EMAIL_SUBJECT_APPROVED"),
-				_t("{$this->class}.EMAIL_PARA_APPROVED"),
-				$comment,
-				'WorkflowGenericEmail'
-			);
-		}
 
-		$this->sendNotificationEmail(
+		$this->owner->sendNotificationEmail(
 			Member::currentUser(), // sender
 			$author, // recipient
 			_t("{$this->class}.EMAIL_SUBJECT_APPROVED"),
@@ -367,11 +294,11 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	}
 
 	function notifyAwaitingEdit($comment) {
-		$publisher = Member::currentUser();
+		$sender = Member::currentUser();
 		$author = $this->Author();
 
 		$this->sendNotificationEmail(
-			$publisher, // sender
+			$sender, // sender
 			$author, // recipient
 			_t("{$this->class}.EMAIL_SUBJECT_AWAITINGEDIT"),
 			_t("{$this->class}.EMAIL_PARA_AWAITINGEDIT"),
@@ -380,29 +307,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		);
 	}
 
-
-	function notifyComment($comment) {
-		// Comment recipients cover everyone except the person making the comment
-		$commentRecipients = array();
-		if(Member::currentUserID() != $this->Author()->ID) $commentRecipients[] = $this->Author();
-		$publishers = $this->Page()->PublisherMembers();
-		foreach($publishers as $publisher){
-			if(Member::currentUserID() != $publisher->ID) $commentRecipients[] = $publisher;
-		}
-
-		foreach($commentRecipients as $recipient) {
-			$this->sendNotificationEmail(
-				Member::currentUser(), // sender
-				$recipient, // recipient
-				_t("{$this->class}.EMAIL_SUBJECT_COMMENT"),
-				_t("{$this->class}.EMAIL_PARA_COMMENT"),
-				$comment,
-				'WorkflowGenericEmail'
-			);
-		}
-	}
-	
-	protected function sendNotificationEmail($sender, $recipient, $subjectTemplate, $paragraphTemplate, $comment, $template = null) {
+	public function sendNotificationEmail($sender, $recipient, $subjectTemplate, $paragraphTemplate, $comment, $template = null) {
 		if(!$template) {
 			$template = 'WorkflowGenericEmail';
 		}
@@ -510,7 +415,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		// To ensure 2.3 and 2.4 compatibility
 		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
 		
-		if($status) $statusStr = implode(',', $status);
+		if($status) $statusStr = "'".implode("','", $status)."'";
 
 		$classes = (array)ClassInfo::subclassesFor($class);
 		$classes[] = $class;
@@ -521,7 +426,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 			AND {$bt}WorkflowRequest{$bt}.ClassName IN ('$classesSQL')
 		";
 		if($status) {
-			$filter .= "AND {$bt}WorkflowRequest{$bt}.Status IN ('" . Convert::raw2sql($statusStr) . "')";
+			$filter .= "AND {$bt}WorkflowRequest{$bt}.Status IN (" . $statusStr . ")";
 		}
 		
 		return DataObject::get(
@@ -545,7 +450,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		// To ensure 2.3 and 2.4 compatibility
 		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
 
-		if($status) $statusStr = implode(',', $status);
+		if($status) $statusStr = "'".implode("','", $status)."'";
 
 		$classes = (array)ClassInfo::subclassesFor($class);
 		$classes[] = $class;
@@ -556,7 +461,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 			AND {$bt}WorkflowRequest{$bt}.ClassName IN ('$classesSQL')
 		";
 		if($status) {
-			$filter .= "AND {$bt}WorkflowRequest{$bt}.Status IN ('" . Convert::raw2sql($statusStr) . "')";
+			$filter .= "AND {$bt}WorkflowRequest{$bt}.Status IN (" . $statusStr . ")";
 		} 
 		
 		return DataObject::get(
@@ -659,30 +564,5 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		
 		return $entities;
 	}
-	
-	/**
-	 * Return the actions that can be performed on this workflow request.
-	 * @return array The key is a LeftAndMainCMSWorkflow action, and the value is a label
-	 * for the buton.
-	 * @todo There's not a good separation between model and control in this stuff.
-	 */
-	function WorkflowActions() {
-		$actions = array();
-		
-		if($this->Status == 'AwaitingApproval' && $this->Page()->canPublish()) {
-			$actions['cms_approve'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_APPROVE", "Approve");
-			$actions['cms_requestedit'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_REQUESTEDIT", "Request edit");
-			
-		} else if($this->Status == 'AwaitingEdit' && $this->Page()->canEdit()) {
-			// @todo this couples this class to its subclasses. :-(
-			$requestAction = (get_class($this) == 'WorkflowDeletionRequest') ? 'cms_requestdeletefromlive' : 'cms_requestpublication';
-			$actions[$requestAction] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_RESUBMIT", "Re-submit");
-		}
-		
-		$actions['cms_comment'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_COMMENT", "Comment");
-		$actions['cms_deny'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_DENY","Deny/cancel");
-		return $actions;
-	}
-
 }
 ?>

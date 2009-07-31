@@ -6,6 +6,8 @@ Maintainer Contact
 -----------------------------------------------
 Sam Minnee (Nickname: sminnee)
 <sam (at) silverstripe (dot) com>
+Tom Rix (Nickname: trix)
+<tom (at) silverstripe (dot) com>
 
 Requirements
 -----------------------------------------------
@@ -20,3 +22,20 @@ Installation Instructions
 
 Usage Overview
 -----------------------------------------------
+You need to choose an 'approval path'. This details
+the actual process a request goes through before it
+gets published to the live site. You also need to
+delete the _mainfest_exclude file in the sidereports
+and batchactions directory of the path you choose.
+Otherwise, you will not get any reports or batch
+actions. There are two approval paths supplied:
+
+TwoStep
+	Author submits a request. Publisher approves it
+	change is pushed live immediately.
+ThreeStep
+	Author submits a request. Approver approves it.
+	Publisher publishes it at a later date.
+	
+Please also see the respective READMEs in each
+directory. TwoStep is the default.

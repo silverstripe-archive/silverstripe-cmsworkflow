@@ -48,7 +48,6 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 	function extraStatics() {
 		return array(
 			'db' => array(
-				"CanPublishType" =>"Enum('LoggedInUsers, OnlyTheseUsers, Inherit', 'OnlyTheseUsers')", 
 				"ReviewPeriodDays" => "Int",
 				"NextReviewDate" => "Date",
 			),
@@ -60,34 +59,13 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 				'WorkflowRequests' => 'WorkflowRequest', 
 			),
 			'many_many' => array(
-				"PublisherGroups" => "Group",
 			),
 			'defaults' => array(
-				"CanPublishType" => "OnlyTheseUsers",
 			),
 		);
 	}
 	
 	public function updateCMSFields(&$fields) {
-		$fields->addFieldsToTab("Root.Access", array(
-			new HeaderField(_t('SiteTreeCMSWorkflow.PUBLISHHEADER', "Who can publish this inside the CMS?"), 2),
-			$publishTypeField = new OptionsetField(
-				"CanPublishType", 
-				"",
-				array(
-					"Inherit" => _t('SiteTree.EDITINHERIT', "Inherit from parent page"),
-					"LoggedInUsers" => _t('SiteTree.EDITANYONE', "Anyone who can log-in to the CMS"),
-					"OnlyTheseUsers" => _t('SiteTree.EDITONLYTHESE', "Only these people (choose from list)")
-				),
-				"Inherit"
-			),
-			$publisherGroupsField = new TreeMultiselectField("PublisherGroups", $this->owner->fieldLabel('PublisherGroups'))
-		));
-		if(!$this->owner->canPublish() || !Permission::check('SITETREE_GRANT_ACCESS')) {
-			$fields->replaceField('CanPublishType', $publishTypeField->performReadonlyTransformation());
-			$fields->replaceField('PublisherGroups', $publisherGroupsField->performReadonlyTransformation());
-		}
-
 		if($wf = $this->openWorkflowRequest()) {
 			$verb = ($wf->class == "WorkflowDeletionRequest") ? "Removal " : "Change ";
 			$fields->fieldByName('Root')->insertBefore(new Tab($verb . $wf->StatusDescription,
@@ -193,60 +171,9 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 		}
 		return $output;
 	}
-	
-	/**
-	 * Returns a DataObjectSet of all the members that can publish this page
-	 */
-	public function PublisherMembers() {
-		if($this->owner->CanPublishType == 'OnlyTheseUsers'){
-			$groups = $this->owner->PublisherGroups();
-			$members = new DataObjectSet();
-			if($groups) foreach($groups as $group) {
-				$members->merge($group->Members());
-			}
-			
-			// Default to ADMINs, if something goes wrong
-			if(!$members->Count()) {
-				$group = Permission::get_groups_by_permission('ADMIN')->first();
-				$members = $group->Members();
-			}
-			
-			return $members;
-		} elseif($this->owner->CanPublishType == 'Inherit') {
-			if ($this->owner->ParentID) {
-				return $this->owner->Parent()->PublisherMembers();
-			} else { return new DataObjectSet(); }
-		} else {
-			$group = Permission::get_groups_by_permission('ADMIN')->first();
-			return $group->Members();
-		}
-	}
-	
-	/**
-	 * Return a workflow request which has not already been
-	 * approved or declined.
-	 * 
-	 * @return WorkflowRequest
-	 */
-	/*
-	public function OpenWorkflowRequest($filter = "", $sort = "", $join = "", $limit = "") {
-		$this->componentCache = array();
-		
-		if($filter) $filter .= ' AND ';
-		$filter .= "Status NOT IN ('Approved','Denied')";
-		return $this->owner->getComponents(
-			'WorkflowRequests',
-			$filter,
-			$sort,
-			$join,
-			$limit
-		)->First();
-	}
-	*.
 
 	/**
-	 * Return a workflow request which has not already been
-	 * approved or declined.
+	 * Return a DataObjectSet of Closed workflow requests.
 	 * 
 	 * @return DataObjectSet Set of WorkflowRequest objects
 	 */
@@ -267,7 +194,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 	public function openWorkflowRequest($workflowClass = 'WorkflowRequest') {
 		if(is_subclass_of($workflowClass, 'WorkflowRequest') || $workflowClass == 'WorkflowRequest') {
 			if((int)$this->owner->ID) {
-				$wf = DataObject::get_one($workflowClass, "PageID = " . (int)$this->owner->ID . " AND Status NOT IN ('Approved','Denied')");
+				$wf = $this->owner->getOpenRequest($workflowClass);
 				if($wf) return $wf;
 				else return null;
 			}
@@ -289,94 +216,6 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 			return eval("return $workflowClass::create_for_page(\$this->owner, null, null, \$notify);");
 		} else {
 			user_error("SiteTreeCMSWorkflow::openOrNewWorkflowRequest(): Bad workflow class '$workflowClass'", E_USER_WARNING);
-		}
-	}
-
-	/**
-	 * This function should return true if the current user can publish this
-	 * page.
-	 *
-	 * It can be overloaded to customise the security model for an
-	 * application.
-	 *
-	 * @return boolean True if the current user can publish this page.
-	 */
-	public function canPublish($member = null) {
-		if(!$member && $member !== FALSE) $member = Member::currentUser();
-
-		// check for admin permission
-		if(Permission::checkMember($member, 'ADMIN')) return true;
-		
-		// check for missing cmsmain permission
-		if(!Permission::checkMember($member, 'CMS_ACCESS_CMSMain')) return false;
-
-		// check for empty spec
-		if(!$this->owner->CanPublishType || $this->owner->CanPublishType == 'Anyone') return true;
-
-		// check against parent page (default to FALSE if there is no parent page)
-		if($this->owner->CanPublishType == 'Inherit') {
-			if ($this->owner->Parent()->exists()) {
-				if (!$this->owner->Parent()->getExtensionInstance('SiteTreeCMSWorkflow')->canPublish($member)) return false;
-			} else { return false; }
-		}
-		
-		// check for any logged-in users
-		if($this->owner->CanPublishType == 'LoggedInUsers' && !Permission::checkMember($member, 'CMS_ACCESS_CMSMain')) return false;
-
-		// check for specific groups
-		if($this->owner->CanPublishType == 'OnlyTheseUsers' && (!$member || !$member->inGroups($this->owner->PublisherGroups()))) return false;
-
-		return true;
-	}
-	
-	/**
-	 * Adds mappings of the default groups created.
-	 * @todo Also re-adds default groups if all existing custom groups
-	 * are deselected from a record - is this desired behaviour?
-	 */
-	function onAfterWrite() {
-		if(!$this->owner->EditorGroups()->Count()) {
-			$SQL_group = Convert::raw2sql('site-content-authors');
-			$groupCheckObj = DataObject::get_one('Group', "Code = '{$SQL_group}'");
-			if($groupCheckObj) $this->owner->EditorGroups()->add($groupCheckObj);
-			
-			$SQL_group = Convert::raw2sql('site-content-publishers');
-			$groupCheckObj = DataObject::get_one('Group', "Code = '{$SQL_group}'");
-			if($groupCheckObj) $this->owner->EditorGroups()->add($groupCheckObj);
-		}
-		
-		if(!$this->owner->PublisherGroups()->Count()) {
-			$SQL_group = Convert::raw2sql('site-content-publishers');
-			$groupCheckObj = DataObject::get_one('Group', "Code = '{$SQL_group}'");
-			if($groupCheckObj) $this->owner->PublisherGroups()->add($groupCheckObj);
-		}
-
-	}
-
-	function augmentDefaultRecords() {
-		// For 2.3 and 2.4 compatibility
-		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
-		
-		$query = "SELECT * FROM {$bt}Group{$bt} WHERE {$bt}Group{$bt}.{$bt}Code{$bt} = 'site-content-authors'";
-		if(!DB::query($query)->value()){
-			$authorGroup = Object::create('Group');
-			$authorGroup->Title = 'Site Content Authors';
-			$authorGroup->Code = "site-content-authors";
-			$authorGroup->write();
-			Permission::grant($authorGroup->ID, "CMS_ACCESS_CMSMain");
-			Permission::grant($authorGroup->ID, "CMS_ACCESS_AssetAdmin");
-			Database::alteration_message("Added site content author group","created");
-		}
-
-		$query = "SELECT * FROM {$bt}Group{$bt} WHERE {$bt}Group{$bt}.{$bt}Code{$bt} = 'site-content-publishers'";
-		if(!DB::query($query)->value()){
-			$publishersGroup = Object::create('Group');
-			$publishersGroup->Title = 'Site Content Publishers';
-			$publishersGroup->Code = "site-content-publishers";
-			$publishersGroup->write();
-			Permission::grant($publishersGroup->ID, "CMS_ACCESS_CMSMain");
-			Permission::grant($publishersGroup->ID, "CMS_ACCESS_AssetAdmin");
-			Database::alteration_message("Added site content publisher group","created");
 		}
 	}
 	
@@ -415,6 +254,5 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 			"EDIT_CONTENT_REVIEW_FIELDS" => "Can edit the 'Content review' fields on each page",
 		);
 	}
-
 }
 ?>

@@ -4,18 +4,18 @@
  * 
  * @package cmsworkflow
  */
-class MyPublicationRequestsSideReport extends SideReport {
+class MyTwoStepPublicationRequestsSideReport extends SideReport {
 	function title() {
 		return _t('PublisherReviewSideReport.TITLE',"Workflow: Awaiting publication");
 	}
 	function records() {
 		if(Permission::check("ADMIN")) {
-			return WorkflowRequest::get(
+			return WorkflowTwoStepRequest::get(
 				'WorkflowPublicationRequest',
 				array('AwaitingApproval')
 			);
 		} else {
-			return WorkflowRequest::get_by_publisher(
+			return WorkflowTwoStepRequest::get_by_publisher(
 				'WorkflowPublicationRequest',
 				Member::currentUser(),
 				array('AwaitingApproval')

@@ -4,12 +4,12 @@
  * 
  * @package cmsworkflow
  */
-class MyDeletionRequestsSideReport extends SideReport {
+class MyTwoStepDeletionRequestsSideReport extends SideReport {
 	function title() {
 		return _t('DeletionRequestSideReport.TITLE',"Workflow: Awaiting deletion");
 	}
 	function records() {
-		return WorkflowRequest::get_by_publisher(
+		return WorkflowTwoStepRequest::get_by_publisher(
 			'WorkflowDeletionRequest',
 			Member::currentUser(),
 			array('AwaitingApproval')
