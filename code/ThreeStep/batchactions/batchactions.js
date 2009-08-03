@@ -1,9 +1,11 @@
 jQuery(document).ready(function() {
 	var el = jQuery('.checkboxAboveTree:first').get(0);
-	var html = '<div><input id="show_only_pages_awaiting_approval" type="checkbox"/><label for="show_only_pages_awaiting_approval">Show only pages awaiting approval</label></div>';
-	el.innerHTML = el.innerHTML+html;
-	var html = '<div><input id="show_only_pages_awaiting_publish" type="checkbox"/><label for="show_only_pages_awaiting_publish">Show only pages needing publishing</label></div>';
-	el.innerHTML = el.innerHTML+html;
+	if (el) {
+		var html = '<div><input id="show_only_pages_awaiting_approval" type="checkbox"/><label for="show_only_pages_awaiting_approval">Show only pages awaiting approval</label></div>';
+		el.innerHTML = el.innerHTML+html;
+		var html = '<div><input id="show_only_pages_awaiting_publish" type="checkbox"/><label for="show_only_pages_awaiting_publish">Show only pages needing publishing</label></div>';
+		el.innerHTML = el.innerHTML+html;
+	}
 
 	ShowPagesAwaitingApproval = Class.create();
 	ShowPagesAwaitingApproval.applyTo('#show_only_pages_awaiting_approval');
