@@ -14,3 +14,5 @@ class BatchPublishPages extends CMSBatchAction {
 		);
 	}
 }
+
+
