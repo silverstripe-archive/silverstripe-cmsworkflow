@@ -14,13 +14,7 @@ CMSWorkflow = {
 	 * Prompt for input from the user and then submit the given form via ajax.
 	 */
 	submitWithPromptedMessage : function(form, button, msgVar, msgPrompt) {
-		var message = prompt(msgPrompt);
-
-	
-		var messageEl = document.createElement("input");
-		messageEl.type = "hidden";
-		messageEl.name = msgVar;
-		messageEl.value = message;
+		var messageEl = CMSWorkflow.createPromptElement(msgVar, msgPrompt);
 		form.appendChild(messageEl);
 
 		Ajax.SubmitForm(form, button, {
@@ -30,6 +24,15 @@ CMSWorkflow = {
 		
 		// Once Ajax.SubmitForm has been calld, this element is no longer necessary		
 		form.removeChild(messageEl);
+	},
+	
+	createPromptElement: function(varName, promptText) {
+		var message = prompt(promptText);
+		var messageEl = document.createElement("input");
+		messageEl.type = "hidden";
+		messageEl.name = varName;
+		messageEl.value = message;
+		return messageEl;
 	},
 	
 	/**
@@ -51,6 +54,7 @@ Behaviour.register({
 	'#Form_EditForm_action_cms_approve' : CMSWorkflow.WorkflowButton,
 	'#Form_EditForm_action_cms_deny' : CMSWorkflow.WorkflowButton,
 	'#Form_EditForm_action_cms_comment' : CMSWorkflow.WorkflowButton,
+	'#Form_EditForm_action_cms_publish' : CMSWorkflow.WorkflowButton,
 	'#WorkflowActions #Form_EditForm_action_cms_requestpublication' : CMSWorkflow.WorkflowButton,
 	'#WorkflowActions #Form_EditForm_action_cms_requestdeletefromlive' : CMSWorkflow.WorkflowButton
 });
@@ -75,18 +79,10 @@ function action_cms_requestdeletefromlive_right(e) {
 // Replace these two actions with some alternatives
 
 function action_publish_right(e) {
-	CMSWorkflow.submitWithPromptedMessage(
-			$('Form_EditForm'), 'action_cms_publishwithcomment',
-			'WorkflowComment',
-			'Please comment on this publication, if applicable.'
-	);
+	var messageEl = CMSWorkflow.createPromptElement('WorkflowComment', 'Please comment on this publication, if applicable.');
+	$('Form_EditForm').appendChild(messageEl);
+	$('Form_EditForm_action_publish').value = ss.i18n._t('CMSMAIN.PUBLISHING');
+	$('Form_EditForm_action_publish').className = 'action loading';
+	$('Form_EditForm').save(false, null, 'cms_publishwithcomment', true);
+	$('Form_EditForm').removeChild(messageEl);
 }
-/*
-function action_delete_right(e) {
-	CMSWorkflow.submitWithPromptedMessage(
-			$('Form_EditForm'), 'action_cms_deletewithcomment',
-			'Comment',
-			'Please comment on this publication, if applicable.'
-	);
-}
-*/
