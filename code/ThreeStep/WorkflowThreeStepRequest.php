@@ -14,7 +14,7 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 			return false;
 		}
 	
-		$this->owner->PublisherID = $member->ID;
+		$this->owner->ApproverID = $member->ID;
 		$this->owner->Status = 'Approved';
 		$this->owner->write();
 
@@ -163,9 +163,17 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 		$classesSQL = implode("','", $classes);
 		
 		// build filter
-		$filter = "{$bt}WorkflowRequest_Approvers{$bt}.MemberID = {$approver->ID} 
-			AND {$bt}WorkflowRequest{$bt}.ClassName IN ('$classesSQL')
-		";
+		
+		// check for admin permission
+		if (Permission::checkMember($approver, 'ADMIN') || Permission::checkMember($approver, 'IS_WORKFLOW_ADMIN')) {
+			// Admins can approve/publish anything
+			$filter = "{$bt}WorkflowRequest{$bt}.ClassName IN ('$classesSQL')";
+		} else {
+			$filter = "{$bt}WorkflowRequest_Approvers{$bt}.MemberID = {$approver->ID} 
+				AND {$bt}WorkflowRequest{$bt}.ClassName IN ('$classesSQL')
+			";
+		}
+		
 		if($status) {
 			$filter .= "AND {$bt}WorkflowRequest{$bt}.Status IN (" . $statusStr . ")";
 		} 
