@@ -24,22 +24,16 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 	 * Handler for the CMS button
 	 */
 	public function cms_requestpublication($data, $form) {
-		return $this->workflowAction('WorkflowPublicationRequest', 'request', $data['ID'], $data['WorkflowComment'],
-			_t('SiteTreeCMSWorkflow.REQUEST_PUBLICATION_SUCCESS_MESSAGE','Emailed %s requesting publication')
-		);
+		return $this->workflowAction('WorkflowPublicationRequest', 'request', $data['ID'], $data['WorkflowComment']);
 	}
 	
 	public function cms_requestdeletefromlive($data, $form) {
-		return $this->workflowAction('WorkflowDeletionRequest', 'request', $data['ID'], $data['WorkflowComment'],
-			_t('SiteTreeCMSWorkflow.REQUEST_DELETEFROMLIVE_SUCCESS_MESSAGE','Emailed %s requesting deletion')
-		);
+		return $this->workflowAction('WorkflowDeletionRequest', 'request', $data['ID'], $data['WorkflowComment']);
 	}
 
 	// Approve
 	public function cms_approve($data, $form) {
-		return $this->workflowAction('WorkflowRequest', 'approve', $data['ID'], $data['WorkflowComment'],
-			_t('SiteTreeCMSWorkflow.PUBLISHMESSAGE','Approved request and published to the live version. Emailed %s.')
-		);
+		return $this->workflowAction('WorkflowRequest', 'approve', $data['ID'], $data['WorkflowComment']);
 	}
 	public function cms_publishwithcomment($urlParams, $form) {
 		$className = 'SiteTree';
@@ -187,9 +181,7 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 			$record->setClassName($originalClass);
 			$publishedRecord = $record->newClassInstance($record->ClassName);
 			
-			return $this->workflowAction('WorkflowPublicationRequest', 'saveAndPublish', $urlParams['ID'], $urlParams['WorkflowComment'],
-				_t('SiteTreeCMSWorkflow.PUBLISHMESSAGE','Approved request and published changes to live version. Emailed %s.')
-			);
+			return $this->workflowAction('WorkflowPublicationRequest', 'saveAndPublish', $urlParams['ID'], $urlParams['WorkflowComment']);
 			
 			
 
@@ -210,23 +202,17 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 
 	// Request edit
 	public function cms_requestedit($data, $form) {
-		return $this->workflowAction('WorkflowRequest', 'requestedit', $data['ID'], $data['WorkflowComment'],
-			_t('SiteTreeCMSWorkflow.DENYPUBLICATION_MESSAGE','Denied workflow request, and reset content. Emailed %s')
-		);
+		return $this->workflowAction('WorkflowRequest', 'requestedit', $data['ID'], $data['WorkflowComment']);
 	}
 
 	// Deny - ie, cancel the workflow change
 	public function cms_deny($data, $form) {
-		return $this->workflowAction('WorkflowRequest', 'deny', $data['ID'], $data['WorkflowComment'],
-			_t('SiteTreeCMSWorkflow.DENYPUBLICATION_MESSAGE','Denied workflow request, and reset content. Emailed %s')
-		);
+		return $this->workflowAction('WorkflowRequest', 'deny', $data['ID'], $data['WorkflowComment']);
 	}
 	
 	// Comment (no workflow status change)
 	public function cms_comment($data, $form) {
-		return $this->workflowAction('WorkflowRequest', 'comment', $data['ID'], $data['WorkflowComment'],
-			_t('SiteTreeCMSWorkflow.COMMENT_MESSAGE','Commented on this workflow request. Emailed %s.')
-		);
+		return $this->workflowAction('WorkflowRequest', 'comment', $data['ID'], $data['WorkflowComment']);
 	}
 
 	/**
@@ -237,7 +223,7 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 	 * @param string $comment The comment to attach.
 	 * @param string $successMessage The message to show on success.
 	 */
-	function workflowAction($workflowClass,  $actionName, $id, $comment, $successMessage) {
+	function workflowAction($workflowClass,  $actionName, $id, $comment) {
 		if(is_numeric($id)) {
 			// For 2.3 and 2.4 compatibility
 			$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
@@ -253,7 +239,7 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		$notify = !($actionName == 'action' && !$page->openWorkflowRequest($workflowClass));
 		
 		if($request = $page->openOrNewWorkflowRequest($workflowClass, $notify)) {
-			if($request->$actionName($comment, null, $notify)) {
+			if($successMessage = $request->$actionName($comment, null, $notify)) {
 				FormResponse::get_page($id);
 
 				$title = Convert::raw2js($page->TreeTitle());

@@ -93,7 +93,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$this->addNewChange($comment, $this->Status, $member);
 		$this->notifyAwaitingApproval($comment);
 		
-		return true;
+		return _t('SiteTreeCMSWorkflow.CHANGEREQUESTED','Requested this change. Emailed %s.');
 	}
 	
 	/**
@@ -131,7 +131,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$this->addNewChange($comment, $this->Status, $member);
 		if($notify) $this->notifyAwaitingEdit($comment);
 		
-		return true;
+		return _t('SiteTreeCMSWorkflow.DENYPUBLICATION_MESSAGE','Denied workflow request, and reset content. Emailed %s');
 	}
 	
 	/**
@@ -164,7 +164,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$this->addNewChange($comment, $this->Status, $member);
 		if($notify) $this->notifyDenied($comment);
 		
-		return true;
+		return _t('SiteTreeCMSWorkflow.DENYPUBLICATION_MESSAGE','Denied workflow request, and reset content. Emailed %s');
 	}
 	
 	/**
@@ -526,6 +526,8 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 				return _t('SiteTreeCMSWorkflow.STATUS_OPEN', 'Open');
 			case 'Approved':
 				return _t('SiteTreeCMSWorkflow.STATUS_APPROVED', 'Approved');
+			case 'Completed':
+				return _t('SiteTreeCMSWorkflow.STATUS_COMPLETED', 'Completed');
 			case 'AwaitingApproval':
 				return _t('SiteTreeCMSWorkflow.STATUS_AWAITINGAPPROVAL', 'Awaiting Approval');
 			case 'AwaitingEdit':

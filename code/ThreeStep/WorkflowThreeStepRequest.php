@@ -24,7 +24,7 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 		// The request is now approved, but we haven't published it yet
 		// cause that's not how we roll here in ThreeStepRequest
 		
-		return true;
+		return _t('SiteTreeCMSWorkflow.APPROVEMESSAGE','Approved request. Emailed %s.');
 	}
 	
 	function publish($comment, $member = null, $notify = true) {
@@ -33,18 +33,17 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 			return false;
 		}
 		
-		$this->owner->publish($comment, $member, $notify);
-		
 		if ($notify) {
 			// Notify?
 		}
 		
-		return true;
+		return $this->owner->publish($comment, $member, $notify);
 	}
 	
 	function saveAndPublish($comment, $member = null, $notify = true) {
 		$this->approve($comment, $member, $notify);
-		return $this->publish($comment, $member, $notify);
+		$this->publish($comment, $member, $notify);
+		return _t('SiteTreeCMSWorkflow.PUBLISHMESSAGE','Approved request and published changes to live version. Emailed %s.');
 	}
 	
 	function notifyApproved($comment) {

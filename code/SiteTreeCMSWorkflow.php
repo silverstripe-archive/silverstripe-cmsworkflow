@@ -181,7 +181,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 		$this->componentCache = array();
 		
 		if($filter) $filter .= ' AND ';
-		$filter .= "Status IN ('Approved','Denied')";
+		$filter .= "Status IN ('Completed','Denied')";
 		return $this->owner->getComponents(
 			'WorkflowRequests',
 			$filter,

@@ -13,9 +13,7 @@ class LeftAndMainCMSThreeStepWorkflow extends LeftAndMainDecorator {
 		CMSBatchActionHandler::register('batchCmsWorkflowApprove', 'BatchApprovePages');
 	}
 	public function cms_publish($data, $form) {
-		return $this->owner->workflowAction('WorkflowRequest', 'publish', $data['ID'], $data['WorkflowComment'],
-			_t('SiteTreeCMSWorkflow.PUBLISHMESSAGE','Published this request to the live site. Emailed %s.')
-		);
+		return $this->owner->workflowAction('WorkflowRequest', 'publish', $data['ID'], $data['WorkflowComment']);
 	}
 }
 

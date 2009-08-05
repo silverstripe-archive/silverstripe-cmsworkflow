@@ -108,7 +108,7 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 		$title = Convert::raw2js($page->TreeTitle());
 		FormResponse::add("$('sitetree').setNodeTitle($page->ID, \"$title\");");
 		
-		return true;
+		return _t('SiteTreeCMSWorkflow.PUBLISHMESSAGE','Published changes to live version. Emailed %s.');
 	}
 	
 	/**

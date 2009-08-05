@@ -24,7 +24,7 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		// Action it immediately
 		$this->owner->publish($comment, $member, $notify);
 		
-		return true;
+		return _t('SiteTreeCMSWorkflow.PUBLISHMESSAGE','Approved request and published changes to live version. Emailed %s.');
 	}
 	
 	function saveAndPublish($comment, $member = null, $notify = true) {
