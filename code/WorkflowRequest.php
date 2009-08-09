@@ -62,6 +62,52 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	static $many_many = array(
 		'Approvers' => 'Member'
 	);
+	
+	/**
+	 * Control who gets alerts for certain events
+	 * data structure is fairly self-explanitory
+	 * self::$alerts[CLASS][EVENT][USERROLE] = boolean
+	 * Not all event/role combinations are neccessairily
+	 * implemented by all ApprovalPaths.
+	 */
+	static $alerts = array(
+		'WorkflowPublicationRequest' => array(
+			'request' => array(
+				'author' => false,
+				'publisher' => true
+			),
+			'publish' => array(
+				'author' => true,
+				'publisher' => true
+			),
+			'deny' => array(
+				'author' => true,
+				'publisher' => false
+			),
+			'comment' => array(
+				'author' => true,
+				'publisher' => true
+			)
+		),
+		'WorkflowDeletionRequest' => array(
+			'request' => array(
+				'author' => false,
+				'publisher' => true
+			),
+			'publish' => array(
+				'author' => true,
+				'publisher' => true
+			),
+			'deny' => array(
+				'author' => true,
+				'publisher' => false
+			),
+			'comment' => array(
+				'author' => true,
+				'publisher' => true
+			)
+		)
+	);
 
 	/**
 	 * Factory method setting up a new WorkflowRequest with associated
@@ -74,6 +120,24 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 */
 	public static function create_for_page($page, $author = null, $approvers = null) {
 		user_error('WorkflowRequest::create_for_page() - Abstract method, please implement in subclass', E_USER_ERROR);
+	}
+	
+	/**
+	 * Should we send an email to the following group under
+	 * these circumstances. Default to false.
+	 *
+	 */
+	public static function should_send_alert($class, $event, $group) {
+		if (!isset(self::$alerts[$class])) return false;
+		if (!isset(self::$alerts[$class][$event])) return false;
+		if (!isset(self::$alerts[$class][$event][$group])) return false;
+		return self::$alerts[$class][$event][$group];
+	}
+	
+	public function set_alert($class, $event, $group, $notify) {
+		if (!isset(self::$alerts[$class])) self::$alerts[$class] = array();
+		if (!isset(self::$alerts[$class][$event])) self::$alerts[$class][$event] = array();
+		self::$alerts[$class][$event][$group] = $notify;
 	}
 	
 	/**
@@ -269,28 +333,32 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 			$this->owner->Page()->Title
 		);
 
-		$this->owner->sendNotificationEmail(
-			Member::currentUser(), // sender
-			$author, // recipient
-			_t("{$this->class}.EMAIL_SUBJECT_APPROVED"),
-			_t("{$this->class}.EMAIL_PARA_APPROVED"),
-			$comment,
-			'WorkflowGenericEmail'
-		);
+		if (self::should_send_alert(__CLASS__, 'approve', 'author')) {
+			$this->owner->sendNotificationEmail(
+				Member::currentUser(), // sender
+				$author, // recipient
+				_t("{$this->class}.EMAIL_SUBJECT_APPROVED"),
+				_t("{$this->class}.EMAIL_PARA_APPROVED"),
+				$comment,
+				'WorkflowGenericEmail'
+			);
+		}
 	}
 	
 	function notifyDenied($comment) {
 		$publisher = Member::currentUser();
 		$author = $this->Author();
 
-		$this->sendNotificationEmail(
-			$publisher, // sender
-			$author, // recipient
-			_t("{$this->class}.EMAIL_SUBJECT_DENIED"),
-			_t("{$this->class}.EMAIL_PARA_DENIED"),
-			$comment,
-			'WorkflowGenericEmail'
-		);
+		if (self::should_send_alert(__CLASS__, 'deny', 'author')) {
+			$this->sendNotificationEmail(
+				$publisher, // sender
+				$author, // recipient
+				_t("{$this->class}.EMAIL_SUBJECT_DENIED"),
+				_t("{$this->class}.EMAIL_PARA_DENIED"),
+				$comment,
+				'WorkflowGenericEmail'
+			);
+		}
 	}
 
 	function notifyAwaitingEdit($comment) {
