@@ -55,7 +55,7 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 		
 		$this->clearMembersEmailed();
 		
-		if (self::should_send_alert(__CLASS__, 'approve', 'publisher')) {
+		if (WorkflowRequest::should_send_alert(__CLASS__, 'approve', 'publisher')) {
 			$publishers = $this->owner->Page()->PublisherMembers();
 			foreach($publishers as $publisher){
 				$this->addMemberEmailed($publisher);
@@ -70,7 +70,7 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 			}
 		}
 		
-		if (self::should_send_alert(__CLASS__, 'approve', 'author')) {
+		if (WorkflowRequest::should_send_alert(__CLASS__, 'approve', 'author')) {
 			$this->addMemberEmailed($author);
 			$this->owner->sendNotificationEmail(
 				Member::currentUser(), // sender
@@ -86,11 +86,11 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 	function notifyComment($comment) {
 		// Comment recipients cover everyone except the person making the comment
 		$commentRecipients = array();
-		if (self::should_send_alert(__CLASS__, 'comment', 'author')) {
+		if (WorkflowRequest::should_send_alert(__CLASS__, 'comment', 'author')) {
 			if(Member::currentUserID() != $this->owner->Author()->ID) $commentRecipients[] = $this->owner->Author();
 		}
 		
-		if (self::should_send_alert(__CLASS__, 'comment', 'publisher')) {
+		if (WorkflowRequest::should_send_alert(__CLASS__, 'comment', 'publisher')) {
 			$receivers = $this->owner->Page()->ApproverMembers();
 			foreach($receivers as $receiver) $commentRecipients[] = $receiver;
 		}
@@ -120,7 +120,7 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 
 		$this->clearMembersEmailed();
 		
-		if (self::should_send_alert(__CLASS__, 'request', 'publisher')) {
+		if (WorkflowRequest::should_send_alert(__CLASS__, 'request', 'publisher')) {
 			foreach($publishers as $publisher){
 				$this->addMemberEmailed($publisher);
 				$this->owner->sendNotificationEmail(
