@@ -35,6 +35,20 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 	public function cms_approve($data, $form) {
 		return $this->workflowAction('WorkflowRequest', 'approve', $data['ID'], $data['WorkflowComment']);
 	}
+	
+	/**
+	 * When a page is saved, we need to check if there is an in-progress
+	 * workflow request, and if applicable, set it back to AwaitingApproval
+	 */
+	public function onAfterSave($record) {
+		if ($wf = $record->openWorkflowRequest()) {
+			if ($wf->Status != 'AwaitingApproval') {
+				$wf->request("Page was resaved, automatically set workflow request back to awaiting approval", null, false);
+				FormResponse::add("$('Form_EditForm').getPageFromServer($record->ID);");
+			}
+		}
+	}
+	
 	public function cms_publishwithcomment($urlParams, $form) {
 		$className = 'SiteTree';
 		$result = '';
