@@ -13,14 +13,16 @@ class ThreeStepWorkflowRequestsNeedingApprovalSideReport_ThisSubsite extends Sid
 			array('AwaitingApproval')
 		);
 		$doSet = new DataObjectSet();
-		foreach ($res as $result) {
-			if ($wf = $result->openWorkflowRequest()) {
-				if (!$result->canPublish()) continue;
-				$result->WFAuthorID = $wf->AuthorID;
-				$result->WFAuthorEmail = $wf->Author()->Email;
-				$result->WFApproverID = $wf->ApproverID;
-				$result->WFPublisherID = $wf->PublisherID;
-				$doSet->push($result);
+		if ($res) {
+			foreach ($res as $result) {
+				if ($wf = $result->openWorkflowRequest()) {
+					if (!$result->canPublish()) continue;
+					$result->WFAuthorID = $wf->AuthorID;
+					$result->WFAuthorEmail = $wf->Author()->Email;
+					$result->WFApproverID = $wf->ApproverID;
+					$result->WFPublisherID = $wf->PublisherID;
+					$doSet->push($result);
+				}
 			}
 		}
 		return $doSet;
@@ -51,14 +53,16 @@ class ThreeStepWorkflowRequestsNeedingApprovalSideReport_AllSubsites extends Sid
 			array('AwaitingApproval')
 		);
 		$doSet = new DataObjectSet();
-		foreach ($res as $result) {
-			if ($wf = $result->openWorkflowRequest()) {
-				if (!$result->canPublish()) continue;
-				$result->WFAuthorID = $wf->AuthorID;
-				$result->WFAuthorEmail = $wf->Author()->Email;
-				$result->WFApproverID = $wf->ApproverID;
-				$result->WFPublisherID = $wf->PublisherID;
-				$doSet->push($result);
+		if ($res) {
+			foreach ($res as $result) {
+				if ($wf = $result->openWorkflowRequest()) {
+					if (!$result->canPublish()) continue;
+					$result->WFAuthorID = $wf->AuthorID;
+					$result->WFAuthorEmail = $wf->Author()->Email;
+					$result->WFApproverID = $wf->ApproverID;
+					$result->WFPublisherID = $wf->PublisherID;
+					$doSet->push($result);
+				}
 			}
 		}
 		if (ClassInfo::exists('Subsite')) Subsite::$disable_subsite_filter = false;
