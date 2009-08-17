@@ -164,7 +164,8 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 		// check against parent page (default to FALSE if there is no parent page)
 		if($this->owner->CanApproveType == 'Inherit') {
 			if ($this->owner->Parent()->exists()) {
-				if (!$this->owner->Parent()->getExtensionInstance('SiteTreeCMSThreeStepWorkflow')->canApprove($member)) return false;
+				// if (!$this->owner->Parent()->getExtensionInstance('SiteTreeCMSThreeStepWorkflow')->canApprove($member)) return false;
+				if (!$this->owner->Parent()->canApprove($member)) return false;
 			} else { return false; }
 		}
 		
@@ -229,7 +230,8 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 		// check against parent page (default to FALSE if there is no parent page)
 		if($this->owner->CanPublishType == 'Inherit') {
 			if ($this->owner->Parent()->exists()) {
-				if (!$this->owner->Parent()->getExtensionInstance('SiteTreeCMSTwoStepWorkflow')->canPublish($member)) return false;
+				// if (!$this->owner->Parent()->getExtensionInstance('SiteTreeCMSTwoStepWorkflow')->canPublish($member)) return false;
+				if (!$this->owner->Parent()->canPublish($member)) return false;
 			} else { return false; }
 		}
 		
