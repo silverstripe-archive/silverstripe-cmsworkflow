@@ -156,6 +156,8 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 		// check for missing cmsmain permission
 		if(!Permission::checkMember($member, 'CMS_ACCESS_CMSMain')) return false;
 
+		if ($this->canPublish($member)) return true;
+		
 		// check for empty spec
 		if(!$this->owner->CanApproveType || $this->owner->CanApproveType == 'Anyone') return true;
 
