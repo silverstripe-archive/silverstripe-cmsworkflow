@@ -9,6 +9,7 @@
 class LeftAndMainCMSThreeStepWorkflow extends LeftAndMainDecorator {
 	// action
 	public function init() {
+		parent::init();
 		CMSBatchActionHandler::register('batchCmsWorkflowPublish', 'BatchPublishPages');
 		CMSBatchActionHandler::register('batchCmsWorkflowApprove', 'BatchApprovePages');
 	}

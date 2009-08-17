@@ -27,8 +27,8 @@ the actual process a request goes through before it
 gets published to the live site. You also need to
 delete the _mainfest_exclude file in the sidereports
 and batchactions directory of the path you choose.
-Otherwise, you will not get any reports or batch
-actions. There are two approval paths supplied:
+Otherwise, you will get an error like 'Unknown class
+passed as parameter'. There are two approval paths supplied:
 
 TwoStep
 	Author submits a request. Publisher approves it

@@ -101,6 +101,10 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 		// @todo Coupling to UI :-(
 		FormResponse::add(LeftAndMain::deleteTreeNodeJS($page));
 		
+		if ($notify) {
+			// notify
+		}
+		
 		return _t('SiteTreeCMSWorkflow.PUBLISHMESSAGE','Published changes to live version. Emailed %s.');
 	}
 	
