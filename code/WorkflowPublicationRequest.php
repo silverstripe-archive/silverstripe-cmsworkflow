@@ -18,12 +18,12 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 
 		// if no publishers are set, the request will end up nowhere
 		if(!$approvers->Count()) {
-			echo "No publishers selected\n";
+			user_error("No publishers selected", E_USER_ERROR);
 			return null;
 		}
 
 		if(!self::can_create($author, $page)) {
-			echo "No create permnission for $author->ID on $page->ID\n";
+			user_error("No create permnission for $author->ID on $page->ID", E_USER_ERROR);
 			return null;
 		}
 	
