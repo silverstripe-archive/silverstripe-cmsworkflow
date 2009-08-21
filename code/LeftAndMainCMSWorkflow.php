@@ -190,7 +190,7 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 	// Request edit
 	public function cms_requestedit($data, $form) {
 		return $this->workflowAction('WorkflowRequest', 'requestedit', $data['ID'], $data['WorkflowComment'],
-			_t('SiteTreeCMSWorkflow.DENYPUBLICATION_MESSAGE','Denied workflow request, and reset content. Emailed %s')
+			_t('SiteTreeCMSWorkflow.REQUESTEDIT_MESSAGE','Requested that the author make further changes before publication. Emailed %s')
 		);
 	}
 
@@ -239,11 +239,9 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 				FormResponse::add("$('sitetree').setNodeTitle($id, \"$title\");");
 		
 				// gather members for status output
-				if($notify) {
-					$emails = implode(", ", $page->PublisherMembers()->column('Email'));
-				} else {
-					$emails = "no-one";
-				}
+				$emails = implode(", ", $request->getNotificationRecipients());
+				if(!$emails) $emails = "no-one";
+
 				FormResponse::status_message(sprintf($successMessage, $emails), 'good');
 				return FormResponse::respond();
 			}

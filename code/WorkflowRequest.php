@@ -69,6 +69,8 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		user_error('WorkflowRequest::create_for_page() - Abstract method, please implement in subclass', E_USER_ERROR);
 	}
 	
+	protected $notificationRecipients = array();
+	
 	/*
 	function onBeforeWrite() {
 		// if the request status has changed, we track it through a separate relation
@@ -154,7 +156,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		if($notify) $this->notifyComment($comment);
 		return true;
 	}
-
+	
 	/**
 	 * Request an edit to this page before it can be published.
 	 * 
@@ -433,7 +435,18 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 			"Comment" => $comment,
 			"Paragraph" => $paragraph,
 		));
+		
+		$this->notificationRecipients[] = $recipient->Email;
+		
 		return $email->send();
+	}
+	
+	/**
+	 * Return an array of email addresses that notifications were sent to for this WorkflowRequest
+	 * in this PHP request.
+	 */
+	public function getNotificationRecipients() {
+		return $this->notificationRecipients;
 	}
 	
 	/**
