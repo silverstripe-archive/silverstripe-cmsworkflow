@@ -680,7 +680,11 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		}
 		
 		$actions['cms_comment'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_COMMENT", "Comment");
-		$actions['cms_deny'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_DENY","Deny/cancel");
+		
+		if($this->Page()->canPublish()) {
+			$actions['cms_deny'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_DENY","Deny/cancel");
+		}
+		
 		return $actions;
 	}
 
