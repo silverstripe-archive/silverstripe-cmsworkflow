@@ -128,7 +128,9 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		}
 		
 		$actions['cms_comment'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_COMMENT", "Comment");
-		$actions['cms_deny'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_DENY","Deny/cancel");
+		if($this->owner->Page()->canPublish()) {
+			$actions['cms_deny'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_DENY","Deny/cancel");
+		}
 		return $actions;
 	}
 	
