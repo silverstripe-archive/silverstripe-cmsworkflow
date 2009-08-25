@@ -58,15 +58,18 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 		if (WorkflowRequest::should_send_alert(__CLASS__, 'approve', 'publisher')) {
 			$publishers = $this->owner->Page()->PublisherMembers();
 			foreach($publishers as $publisher){
-				$this->addMemberEmailed($publisher);
-				$this->owner->sendNotificationEmail(
-					Member::currentUser(), // sender
-					$publisher, // recipient
-					_t("{$this->owner->class}.EMAIL_SUBJECT_APPROVED_FOR_PUBLISHING"),
-					_t("{$this->owner->class}.EMAIL_PARA_APPROVED_FOR_PUBLISHING"),
-					$comment,
-					'WorkflowGenericEmail'
-				);
+				// Notify publishers other than the one who is logged in 
+				if(Member::currentUserID() != $publisher->ID) {
+					$this->addMemberEmailed($publisher);
+					$this->owner->sendNotificationEmail(
+						Member::currentUser(), // sender
+						$publisher, // recipient
+						_t("{$this->owner->class}.EMAIL_SUBJECT_APPROVED_FOR_PUBLISHING"),
+						_t("{$this->owner->class}.EMAIL_PARA_APPROVED_FOR_PUBLISHING"),
+						$comment,
+						'WorkflowGenericEmail'
+					);
+				}
 			}
 		}
 		

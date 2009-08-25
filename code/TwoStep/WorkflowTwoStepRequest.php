@@ -41,15 +41,18 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		$this->clearMembersEmailed();
 		$publishers = $this->owner->Page()->PublisherMembers();
 		foreach($publishers as $publisher){
-			$this->addMemberEmailed($publisher);
-			$this->owner->sendNotificationEmail(
-				Member::currentUser(), // sender
-				$publisher, // recipient
-				_t("{$this->owner->class}.EMAIL_SUBJECT_APPROVED"),
-				_t("{$this->owner->class}.EMAIL_PARA_APPROVED"),
-				$comment,
-				'WorkflowGenericEmail'
-			);
+			// Notify publishers other than the one who is logged in 
+			if(Member::currentUserID() != $publisher->ID) {
+				$this->addMemberEmailed($publisher);
+				$this->owner->sendNotificationEmail(
+					Member::currentUser(), // sender
+					$publisher, // recipient
+					_t("{$this->owner->class}.EMAIL_SUBJECT_APPROVED"),
+					_t("{$this->owner->class}.EMAIL_PARA_APPROVED"),
+					$comment,
+					'WorkflowGenericEmail'
+				);
+			}
 		}
 
 		$this->addMemberEmailed($author);
