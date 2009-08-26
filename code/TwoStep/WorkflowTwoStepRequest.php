@@ -38,12 +38,10 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 			$this->owner->Page()->Title
 		);
 		
-		$this->clearMembersEmailed();
 		$publishers = $this->owner->Page()->PublisherMembers();
 		foreach($publishers as $publisher){
 			// Notify publishers other than the one who is logged in 
 			if(Member::currentUserID() != $publisher->ID) {
-				$this->addMemberEmailed($publisher);
 				$this->owner->sendNotificationEmail(
 					Member::currentUser(), // sender
 					$publisher, // recipient
@@ -55,7 +53,6 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 			}
 		}
 
-		$this->addMemberEmailed($author);
 		$this->owner->sendNotificationEmail(
 			Member::currentUser(), // sender
 			$author, // recipient
@@ -75,9 +72,7 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 			if(Member::currentUserID() != $publisher->ID) $commentRecipients[] = $publisher;
 		}
 
-		$this->clearMembersEmailed();
 		foreach($commentRecipients as $recipient) {
-			$this->addMemberEmailed($recipient);
 			$this->owner->sendNotificationEmail(
 				Member::currentUser(), // sender
 				$recipient, // recipient
@@ -97,9 +92,7 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		$publishers = $this->owner->Page()->PublisherMembers();
 		$author = $this->owner->Author();
 		
-		$this->clearMembersEmailed();
 		foreach($publishers as $publisher){
-			$this->addMemberEmailed($publisher);
 			$this->owner->sendNotificationEmail(
 				$author, // sender
 				$publisher, // recipient

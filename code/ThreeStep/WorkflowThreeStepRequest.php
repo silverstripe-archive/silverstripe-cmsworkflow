@@ -53,14 +53,11 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 			$this->owner->Page()->Title
 		);
 		
-		$this->clearMembersEmailed();
-		
 		if (WorkflowRequest::should_send_alert(__CLASS__, 'approve', 'publisher')) {
 			$publishers = $this->owner->Page()->PublisherMembers();
 			foreach($publishers as $publisher){
 				// Notify publishers other than the one who is logged in 
 				if(Member::currentUserID() != $publisher->ID) {
-					$this->addMemberEmailed($publisher);
 					$this->owner->sendNotificationEmail(
 						Member::currentUser(), // sender
 						$publisher, // recipient
@@ -74,7 +71,6 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 		}
 		
 		if (WorkflowRequest::should_send_alert(__CLASS__, 'approve', 'author')) {
-			$this->addMemberEmailed($author);
 			$this->owner->sendNotificationEmail(
 				Member::currentUser(), // sender
 				$author, // recipient
@@ -98,10 +94,8 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 			foreach($receivers as $receiver) $commentRecipients[] = $receiver;
 		}
 
-		$this->clearMembersEmailed();
 		foreach($commentRecipients as $recipient) {
 			if(Member::currentUserID() != $receiver->ID) continue;
-			$this->addMemberEmailed($recipient);
 			$this->owner->sendNotificationEmail(
 				Member::currentUser(), // sender
 				$recipient, // recipient
@@ -121,11 +115,8 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 		$publishers = $this->owner->Page()->ApproverMembers();
 		$author = $this->owner->Author();
 
-		$this->clearMembersEmailed();
-		
 		if (WorkflowRequest::should_send_alert(__CLASS__, 'request', 'publisher')) {
 			foreach($publishers as $publisher){
-				$this->addMemberEmailed($publisher);
 				$this->owner->sendNotificationEmail(
 					$author, // sender
 					$publisher, // recipient

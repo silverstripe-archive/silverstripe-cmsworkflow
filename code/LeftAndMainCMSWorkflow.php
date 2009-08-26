@@ -253,6 +253,8 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		$notify = !($actionName == 'action' && !$page->openWorkflowRequest($workflowClass));
 		
 		if($request = $page->openOrNewWorkflowRequest($workflowClass, $notify)) {
+			$request->clearMembersEmailed();
+
 			if($successMessage = $request->$actionName($comment, null, $notify)) {
 				FormResponse::get_page($id);
 

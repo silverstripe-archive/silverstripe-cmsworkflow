@@ -109,6 +109,8 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		)
 	);
 
+	protected $memberIdsEmailed = array();
+
 	/**
 	 * Factory method setting up a new WorkflowRequest with associated
 	 * state. Sets relations to publishers and authors, 
@@ -170,7 +172,9 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		}
 		$this->addNewChange($comment, null, $member);
 		if($notify) $this->notifyComment($comment);
-		return true;
+
+		return _t('SiteTreeCMSWorkflow.COMMENT_MESSAGE', 
+			'Commented on this workflow request. Emailed %s.');
 	}
 
 	/**
@@ -376,6 +380,8 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	}
 
 	public function sendNotificationEmail($sender, $recipient, $subjectTemplate, $paragraphTemplate, $comment, $template = null) {
+		$this->addMemberEmailed($recipient);
+
 		if(!$template) {
 			$template = 'WorkflowGenericEmail';
 		}
@@ -405,7 +411,38 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		));
 		return $email->send();
 	}
+
+	/**
+	 * Add a member to the 'i've emailed them' list
+	 *
+	 * @param Member $member 
+	 */
+	final public function addMemberEmailed(Member $member) {
+		$this->memberIdsEmailed[] = (int)$member->ID;
+	}
 	
+	/**
+	 * Get a list of people emails this http request
+	 *
+	 * @return DataObjectSet
+	 */
+	final public function getMembersEmailed() {
+		$doSet = new DataObjectSet();
+		foreach(array_unique($this->memberIdsEmailed) as $id) {
+			$doSet->push(DataObject::get_by_id('Member', $id));
+		}
+		return $doSet;
+	}
+	
+	/**
+	 * Clear the list of people emailed this http request
+	 *
+	 * @return void
+	 */
+	final public function clearMembersEmailed() {
+		$this->memberIdsEmailed = array();
+	}
+		
 	/**
 	 * Returns a {@link DataDifferencer} object representing the changes.
 	 */
