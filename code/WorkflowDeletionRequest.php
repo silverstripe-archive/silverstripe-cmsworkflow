@@ -163,7 +163,7 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 			'Email subject with page title'
 		);
 		$entities["{$this->class}.EMAIL_PARA_APPROVED"] = array(
-			"%s has approved your request to delete the \"%s\" page and deleted it from the published site.",
+			"%s has approved the request to delete the \"%s\" page and deleted it from the published site.",
 			PR_MEDIUM,
 			'Intro paragraph for workflow email, with a name and a page title'
 		);
@@ -174,7 +174,7 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 			'Email subject with page title'
 		);
 		$entities["{$this->class}.EMAIL_PARA_DENIED"] = array(
-			"%s has rejected your request to dele the \"%s\" page.",
+			"%s has rejected the request to delete the \"%s\" page.",
 			PR_MEDIUM,
 			'Intro paragraph for workflow email, with a name and a page title'
 		);

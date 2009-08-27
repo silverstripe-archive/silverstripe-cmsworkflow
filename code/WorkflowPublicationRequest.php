@@ -163,7 +163,7 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 			'Email subject with page title'
 		);
 		$entities["{$this->class}.EMAIL_PARA_APPROVED"] = array(
-			"%s has approved and published your changes to the \"%s\" page.",
+			"%s has approved and published the changes to the \"%s\" page.",
 			PR_MEDIUM,
 			'Intro paragraph for workflow email, with a name and a page title'
 		);
@@ -174,7 +174,7 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 			'Email subject with page title'
 		);
 		$entities["{$this->class}.EMAIL_PARA_DENIED"] = array(
-			"%s has rejected your changes to the \"%s\" page.",
+			"%s has rejected the changes to the \"%s\" page.",
 			PR_MEDIUM,
 			'Intro paragraph for workflow email, with a name and a page title'
 		);

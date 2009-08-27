@@ -46,12 +46,12 @@ $lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOW_ACTION_ACTION'] = 'Make it happe
 $lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOW_ACTION_FAILED'] = 'There was an error when processing your workflow request.';
 $lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOW_ACTION_RESUBMIT'] = 'Re-submit';
 $lang['en_US']['WorkflowDeletionRequest']['EMAIL_PARA_APPROVED'] = array(
-	'%s has approved your request to delete the "%s" page and deleted it from the published site.',
+	'%s has approved the request to delete the "%s" page and deleted it from the published site.',
 	50,
 	'Intro paragraph for workflow email, with a name and a page title'
 );
 $lang['en_US']['WorkflowDeletionRequest']['EMAIL_PARA_APPROVED_FOR_PUBLISHING'] = array(
-	'%s has approved your request to delete the "%s" page. A user must now action your request.',
+	'%s has approved the request to delete the "%s" page. A user must now action your request.',
 	50,
 	'Intro paragraph for workflow email, with a name and a page title'
 );
@@ -71,7 +71,7 @@ $lang['en_US']['WorkflowDeletionRequest']['EMAIL_PARA_COMMENT'] = array(
 	'Intro paragraph for workflow email, with a name and a page title'
 );
 $lang['en_US']['WorkflowDeletionRequest']['EMAIL_PARA_DENIED'] = array(
-	'%s has rejected your request to dele the "%s" page.',
+	'%s has rejected the request to delete the "%s" page.',
 	50,
 	'Intro paragraph for workflow email, with a name and a page title'
 );
@@ -106,12 +106,12 @@ $lang['en_US']['WorkflowDeletionRequest']['EMAIL_SUBJECT_DENIED'] = array(
 	'Email subject with page title'
 );
 $lang['en_US']['WorkflowPublicationRequest']['EMAIL_PARA_APPROVED'] = array(
-	'%s has approved and published your changes to the "%s" page.',
+	'%s has approved and published the changes to the "%s" page.',
 	50,
 	'Intro paragraph for workflow email, with a name and a page title'
 );
 $lang['en_US']['WorkflowPublicationRequest']['EMAIL_PARA_APPROVED_FOR_PUBLISHING'] = array(
-	'%s has approved your changes to the "%s" page. A user must now publish your request.',
+	'%s has approved the changes to the "%s" page. A user must now publish your request.',
 	50,
 	'Intro paragraph for workflow email, with a name and a page title'
 );
@@ -131,7 +131,7 @@ $lang['en_US']['WorkflowPublicationRequest']['EMAIL_PARA_COMMENT'] = array(
 	'Intro paragraph for workflow email, with a name and a page title'
 );
 $lang['en_US']['WorkflowPublicationRequest']['EMAIL_PARA_DENIED'] = array(
-	'%s has rejected your changes to the "%s" page.',
+	'%s has rejected the changes to the "%s" page.',
 	50,
 	'Intro paragraph for workflow email, with a name and a page title'
 );
