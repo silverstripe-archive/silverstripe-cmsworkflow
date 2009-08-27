@@ -27,7 +27,7 @@ CMSWorkflow = {
 	},
 	
 	createPromptElement: function(varName, promptText) {
-		var message = prompt(promptText);
+		var message = prompt(promptText, "");
 		var messageEl = document.createElement("input");
 		messageEl.type = "hidden";
 		messageEl.name = varName;
