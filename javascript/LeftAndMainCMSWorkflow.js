@@ -75,21 +75,3 @@ function action_cms_requestdeletefromlive_right(e) {
 			'Please comment on why you are asking to have this page deleted.'
 	);
 }
-
-// Replace these two actions with some alternatives
-
-// function action_publish_right(e) {
-// 	CMSWorkflow.submitWithPromptedMessage(
-// 			$('Form_EditForm'), 'action_cms_publishwithcomment',
-// 			'WorkflowComment',
-// 			'Please comment on this publication, if applicable.'
-// 	);
-// }
-function action_publish_right(e) {
-	var messageEl = CMSWorkflow.createPromptElement('WorkflowComment', 'Please comment on this publication, if applicable.');
-	$('Form_EditForm').appendChild(messageEl);
-	$('Form_EditForm_action_publish').value = ss.i18n._t('CMSMAIN.PUBLISHING');
-	$('Form_EditForm_action_publish').className = 'action loading';
-	$('Form_EditForm').save(false, null, 'cms_publishwithcomment', true);
-	$('Form_EditForm').removeChild(messageEl);
-}
