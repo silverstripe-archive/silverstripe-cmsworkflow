@@ -7,6 +7,8 @@ class WorkflowRequestTest extends FunctionalTest {
 	
 	static $fixture_file = 'cmsworkflow/tests/SiteTreeCMSWorkflowTest.yml';
 	
+	function testFake() {}
+	
 	// function testWorkflowPublicationApprovalTransition() {
 	// 		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
 	// 
