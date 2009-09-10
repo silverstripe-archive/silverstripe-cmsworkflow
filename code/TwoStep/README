@@ -1,4 +1,0 @@
-To use the TwoStep approval path, attach the following decorators.
-
-Object::add_extension('WorkflowRequest', 'WorkflowTwoStepRequest');
-Object::add_extension('SiteTree', 'SiteTreeCMSTwoStepWorkflow');

@@ -6,6 +6,11 @@ Object::add_extension('Member', 'WorkflowMemberRole');
 SiteTreeCMSWorkflow::register_request('WorkflowPublicationRequest');
 SiteTreeCMSWorkflow::register_request('WorkflowDeletionRequest');
 
+// Defaults to a "two step" workflow.
+// See README for instructions to enable "three step" workflow instead.
+Object::add_extension('WorkflowRequest', 'WorkflowTwoStepRequest');
+Object::add_extension('SiteTree', 'SiteTreeCMSTwoStepWorkflow');
+
 Director::addRules(200, array(
 	'admin/changes.rss' => '->admin/cms/changes.rss',
 	'admin/cms/changes.rss' => array('Controller' => 'CMSChangeTracker', 'Data' => 'all'),

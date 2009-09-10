@@ -1,5 +1,0 @@
-To use the ThreeStep approval path, attach the following decorators.
-
-Object::add_extension('WorkflowRequest', 'WorkflowThreeStepRequest');
-Object::add_extension('SiteTree', 'SiteTreeCMSThreeStepWorkflow');
-Object::add_extension('LeftAndMain', 'LeftAndMainCMSThreeStepWorkflow');
