@@ -50,20 +50,23 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 			'db' => array(
 				"ReviewPeriodDays" => "Int",
 				"NextReviewDate" => "Date",
-				"ExpiryDate" => "SSDatetime"
+				"ExpiryDate" => "SSDatetime",
+				'ReviewNotes' => 'Text'
 			),
 			'has_one' => array(
 				'Owner' => 'Member',
 			),
 			'has_many' => array(
 				// has_one OpenWorkflowRequest is implemented as custom getter
-				'WorkflowRequests' => 'WorkflowRequest', 
-			),
-			'many_many' => array(
+				'WorkflowRequests' => 'WorkflowRequest'
 			),
 			'defaults' => array(
 			),
 		);
+	}
+	
+	function getOwnerName() {
+		if($this->owner->Owner()) return $this->owner->Owner()->FirstName . ' ' . $this->owner->Owner()->Surname;
 	}
 	
 	function setEmbargo($date, $time) {
@@ -123,7 +126,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 		$cmsUsers = Permission::get_members_by_permission(array("CMS_ACCESS_CMSMain", "ADMIN"));
 		
 		if(Permission::check("EDIT_CONTENT_REVIEW_FIELDS")) {
-			$fields->addFieldsToTab("Root.Access", array(
+			$fields->addFieldsToTab("Root.Review", array(
 				new HeaderField(_t('SiteTreeCMSWorkflow.REVIEWHEADER', "Content review"), 2),
 				new DropdownField("OwnerID", _t("SiteTreeCMSWorkflow.PAGEOWNER", 
 					"Page owner (will be responsible for reviews)"), $cmsUsers->map('ID', 'Title', '(no owner)')),
@@ -142,6 +145,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 					183 => "6 months",
 					365 => "12 months",
 				)),
+				new TextareaField('ReviewNotes', 'Review Notes')
 			));
 		}
 		
