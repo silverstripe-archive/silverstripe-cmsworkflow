@@ -13,7 +13,7 @@ class PagesScheduledForDeletionSideReport_ThisSubsite extends SideReport {
 		$startDate = isset($this->params['StartDate']) ? $this->params['StartDate'] : null;
 		$endDate = isset($this->params['EndDate']) ? $this->params['EndDate'] : null;
 		if ($startDate && $endDate) {
-			$where = "ExpiryDate >= '".Convert::raw2sql($startDate)."' AND ExpiryDate < '".Convert::raw2sql($endDate)."'";
+			$where = "ExpiryDate >= '".Convert::raw2sql($startDate)."' AND ExpiryDate <= '".Convert::raw2sql($endDate)."'";
 		} else if ($startDate && !$endDate) {
 			$where = "ExpiryDate >= '".Convert::raw2sql($startDate)."'";
 		} else if (!$startDate && $endDate) {
@@ -63,7 +63,7 @@ class PagesScheduledForDeletionSideReport_AllSubsites extends SideReport {
 		$startDate = isset($this->params['StartDate']) ? $this->params['StartDate'] : null;
 		$endDate = isset($this->params['EndDate']) ? $this->params['EndDate'] : null;
 		if ($startDate && $endDate) {
-			$where = "ExpiryDate >= '".Convert::raw2sql($startDate)."' AND ExpiryDate < '".Convert::raw2sql($endDate)."'";
+			$where = "ExpiryDate >= '".Convert::raw2sql($startDate)."' AND ExpiryDate <= '".Convert::raw2sql($endDate)."'";
 		} else if ($startDate && !$endDate) {
 			$where = "ExpiryDate >= '".Convert::raw2sql($startDate)."'";
 		} else if (!$startDate && $endDate) {

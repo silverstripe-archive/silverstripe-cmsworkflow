@@ -13,7 +13,7 @@ class PagesScheduledForPublishingSideReport_ThisSubsite extends SideReport {
 		$startDate = isset($this->params['StartDate']) ? $this->params['StartDate'] : null;
 		$endDate = isset($this->params['EndDate']) ? $this->params['EndDate'] : null;
 		if ($startDate && $endDate) {
-			$where = "EmbargoDate >= '".Convert::raw2sql($startDate)."' AND EmbargoDate < '".Convert::raw2sql($endDate)."'";
+			$where = "EmbargoDate >= '".Convert::raw2sql($startDate)."' AND EmbargoDate <= '".Convert::raw2sql($endDate)."'";
 		} else if ($startDate && !$endDate) {
 			$where = "EmbargoDate >= '".Convert::raw2sql($startDate)."'";
 		} else if (!$startDate && $endDate) {
@@ -60,7 +60,7 @@ class PagesScheduledForPublishingSideReport_AllSubsites extends SideReport {
 		$startDate = isset($this->params['StartDate']) ? $this->params['StartDate'] : null;
 		$endDate = isset($this->params['EndDate']) ? $this->params['EndDate'] : null;
 		if ($startDate && $endDate) {
-			$where = "EmbargoDate >= '".Convert::raw2sql($startDate)."' AND EmbargoDate < '".Convert::raw2sql($endDate)."'";
+			$where = "EmbargoDate >= '".Convert::raw2sql($startDate)."' AND EmbargoDate <= '".Convert::raw2sql($endDate)."'";
 		} else if ($startDate && !$endDate) {
 			$where = "EmbargoDate >= '".Convert::raw2sql($startDate)."'";
 		} else if (!$startDate && $endDate) {
