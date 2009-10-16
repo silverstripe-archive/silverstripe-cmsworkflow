@@ -47,8 +47,8 @@ class PagesScheduledForDeletionSideReport_ThisSubsite extends SideReport {
 	}
 	function getParameterFields() {
 		return new FieldSet(
-			new DateField('StartDate', 'Start date (YYYY-MM-DD)'),
-			new DateField('EndDate', 'End date (YYYY-MM-DD)')
+			new DateField('StartDate', 'Start date (YYYY-MM-DD HH:mm:ss)'),
+			new DateField('EndDate', 'End date (YYYY-MM-DD HH:mm:ss)')
 		);
 	}
 }
@@ -99,8 +99,8 @@ class PagesScheduledForDeletionSideReport_AllSubsites extends SideReport {
 	}
 	function getParameterFields() {
 		return new FieldSet(
-			new DateField('StartDate', 'Start date (YYYY-MM-DD)'),
-			new DateField('EndDate', 'End date (YYYY-MM-DD)')
+			new DateField('StartDate', 'Start date (YYYY-MM-DD HH:mm:ss)'),
+			new DateField('EndDate', 'End date (YYYY-MM-DD HH:mm:ss)')
 		);
 	}
 }
