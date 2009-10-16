@@ -37,21 +37,22 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 		$page = $this->owner;
 		if($request = $page->openWorkflowRequest('WorkflowRequest')) {
 			if ($request->Status == 'AwaitingApproval') {
-				$request->approve('Batch approval', null, false);
-				$request->publish('Batch publish', null, false);
+				$result = $request->approve('Batch approval', null, false);
+				if ($result) $result = $request->publish('Batch publish', null, false);
 			}
 			if ($request->Status == 'Approved') {
-				$request->publish('Batch publish', null, false);
+				$result = $request->publish('Batch publish', null, false);
 			}
-		}
+		} else { $result = false; }
+		return $result;
 	}
 	function batchApprove() {
 		$page = $this->owner;
 		if($request = $page->openWorkflowRequest('WorkflowRequest')) {
 			if ($request->Status == 'AwaitingApproval') {
-				$request->approve('Batch approval', null, false);
+				return $request->approve('Batch approval', null, false);
 			}
-		}
+		} else { return false; }
 	}
 	
 	function canDenyRequests() {
