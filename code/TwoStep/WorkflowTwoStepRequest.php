@@ -18,11 +18,15 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		$this->owner->Status = 'Approved';
 		$this->owner->write();
 		
+		$this->owner->setSchedule();
+		
 		$this->owner->addNewChange($comment, $this->owner->Status, $member);
 		if($notify) $this->notifyApproved($comment);
 		
-		// Action it immediately
-		$this->owner->publish($comment, $member, $notify);
+		// Action it immediately... if it's not scheduled
+		if ($this->owner->status != 'Scheduled') {
+			$this->owner->publish($comment, $member, $notify);
+		}
 		
 		return _t('SiteTreeCMSWorkflow.PUBLISHMESSAGE','Approved request and published changes to live version. Emailed %s.');
 	}

@@ -5,8 +5,72 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		'cms_requestpublication',
 		'cms_requestdeletefromlive',
 		'cms_denypublication',
-		'cms_denydeletion'
+		'cms_denydeletion',
+		'cms_setembargoexpiry',
 	);
+	
+	function cms_setembargoexpiry($data) {
+		$wfRequest = DataObject::get_by_id('WorkflowRequest', $data['wfRequest']);
+		if ($wfRequest) {
+			if (!$wfRequest->CanChangeEmbargoExpiry()) {
+				$result = array(
+					'status' => 'failed',
+					'message' => 'you cannot change the embargo/expiry dates at this time'
+				);
+			} else {
+				if (isset($data['ResetEmbargo'])) {
+					$wfRequest->EmbargoDate = null;
+					$wfRequest->write();
+					$result = array(
+						'status' => 'success'
+					);
+				} else if (isset($data['ResetExpiry'])) {
+					$wfRequest->Page()->ExpiryDate = null;
+					$wfRequest->Page()->write();
+					$result = array(
+						'status' => 'success'
+					);
+				} else {
+					if (isset($data['EmbargoDate']) && isset($data['EmbargoTime'])) {
+						list($day, $month, $year) = explode('/', $data['EmbargoDate']);
+						$embargoTimestamp = strtotime("$year-$month-$day {$data['EmbargoTime']}");
+						if ($wfRequest->EmbargoField()) {
+							$wfRequest->EmbargoDate = $embargoTimestamp;
+							$wfRequest->write();
+						}
+					}
+					
+					if (isset($data['ExpiryDate']) && isset($data['ExpiryTime'])) {
+						list($day, $month, $year) = explode('/', $data['ExpiryDate']);
+						$expiryTimestamp = strtotime("$year-$month-$day {$data['ExpiryTime']}");
+						if ($wfRequest->ExpiryField()) {
+							$wfRequest->Page()->ExpiryDate = $expiryTimestamp;
+							$wfRequest->Page()->write();
+						}
+					}
+					
+					$expiryTimestamp = $wfRequest->getExpiryDate();
+					$embargoTimestamp = $wfRequest->getEmbargoDate();
+					if (!is_numeric($expiryTimestamp)) $expiryTimestamp = strtotime($expiryTimestamp);
+					if (!is_numeric($embargoTimestamp)) $embargoTimestamp = strtotime($embargoTimestamp);
+					
+					$result = array(
+						'status' => 'success',
+						'message' => array(
+							'embargo' => $embargoTimestamp ? date('Y-m-d H:i:s', $embargoTimestamp) : null,
+							'expiry' => $expiryTimestamp ? date('Y-m-d H:i:s', $expiryTimestamp) : null
+						)
+					);
+				}
+			}
+		} else {
+			$result = array(
+				'status' => 'failed',
+				'message' => 'workflow request not found'
+			);
+		}
+		return Convert::array2json($result);
+	}
 	
 	function init() {
 		// We need to make sure these CMSMain scripts are included first

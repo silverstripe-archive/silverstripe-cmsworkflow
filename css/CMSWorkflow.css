@@ -30,3 +30,8 @@
 #CMSWorkflowTab h2 {
 	margin-bottom: -10px;
 }
+
+#embargoExpiry .popupdatetime , #embargoExpiry .popupdatetime ul {
+	float: left;
+	margin-right:3px;
+}

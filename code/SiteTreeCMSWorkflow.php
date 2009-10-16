@@ -50,6 +50,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 			'db' => array(
 				"ReviewPeriodDays" => "Int",
 				"NextReviewDate" => "Date",
+				"ExpiryDate" => "SSDatetime"
 			),
 			'has_one' => array(
 				'Owner' => 'Member',
@@ -96,6 +97,14 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 					183 => "6 months",
 					365 => "12 months",
 				)),
+			));
+		}
+		
+		// Check if there is an expiry date...
+		$liveVersion = Versioned::get_one_by_stage('SiteTree', 'Live', "SiteTree_Live.ID = {$this->owner->ID}");
+		if ($liveVersion && $liveVersion->ExpiryDate != null && $liveVersion->ExpiryDate != '0000-00-00 00:00:00') {
+			$fields->addFieldsToTab('Root.Expiry', array(
+				new LiteralField('ExpiryWarning', "This page is scheduled to expire at ".$liveVersion->ExpiryDate)
 			));
 		}
 		

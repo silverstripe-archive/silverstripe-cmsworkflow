@@ -44,7 +44,8 @@
 class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	static $db = array(
 		// @todo AwaitingReview
-		'Status' => "Enum('AwaitingApproval,Approved,Completed,Denied,AwaitingEdit','AwaitingApproval')",
+		'Status' => "Enum('AwaitingApproval,Approved,Scheduled,Completed,Denied,AwaitingEdit','AwaitingApproval')",
+		'EmbargoDate' => 'SSDatetime'
 		// actioned is true/false whether the change has actually happened on live
 	);
 	
@@ -323,6 +324,41 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		);
 		
 		return $fields;
+	}
+	
+	/**
+	 * Return the field used for setting Embargo/Expiry date.
+	 * returns false if the field cant be used in this context
+	 */
+	function EmbargoField() {
+		return new PopupDateTimeField('EmbargoDate', 'Embargo Date', $this->EmbargoDate);
+	}
+	function ExpiryField() {
+		if (get_class($this) == 'WorkflowDeletionRequest') return false;
+		return new PopupDateTimeField('ExpiryDate', 'Expiry Date', $this->ExpiryDate);
+	}
+	
+	function getEmbargoDate() {
+		return $this->getField('EmbargoDate') != '0000-00-00 00:00:00' && $this->getField('EmbargoDate') != null ? $this->getField('EmbargoDate') : null;
+	}
+	
+	function getExpiryDate() {
+		return $this->ExpiryDate();
+	}
+	
+	function ExpiryDate() {
+		return $this->Page()->getField('ExpiryDate') != '0000-00-00 00:00:00' && $this->Page()->getField('ExpiryDate') != null ? $this->Page()->getField('ExpiryDate') : null;
+	}
+	
+	function WorkflowTimezone() {
+		return date('T').', where is it currently '.date('r');
+	}
+	
+	/**
+	 * Return true/false whether we can currently change the PublishAt time
+	 */
+	function CanChangeEmbargoExpiry() {
+		return $this->Status == 'AwaitingApproval';
 	}
 	
 	/**
@@ -631,6 +667,8 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 				return _t('SiteTreeCMSWorkflow.STATUS_OPEN', 'Open');
 			case 'Approved':
 				return _t('SiteTreeCMSWorkflow.STATUS_APPROVED', 'Approved');
+			case 'Scheduled':
+				return _t('SiteTreeCMSWorkflow.STATUS_SCHEDULED', 'Scheduled for Publishing');
 			case 'Completed':
 				return _t('SiteTreeCMSWorkflow.STATUS_COMPLETED', 'Completed');
 			case 'AwaitingApproval':
@@ -670,6 +708,13 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		);
 		
 		return $entities;
+	}
+	
+	public function setSchedule() {
+		if ($this->EmbargoDate) {
+			$this->Status = 'Scheduled';
+			$this->write();
+		}
 	}
 }
 ?>
