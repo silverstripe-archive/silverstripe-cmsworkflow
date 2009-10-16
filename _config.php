@@ -21,8 +21,5 @@ Director::addRules(200, array(
 ));
 
 unset(CMSBatchActionHandler::$batch_actions['publish']);
-unset(CMSBatchActionHandler::$batch_actions['delete']);
-unset(CMSBatchActionHandler::$batch_actions['deletefromlive']);
-unset(CMSBatchActionHandler::$batch_actions['unpublish']);
 
 ?>
