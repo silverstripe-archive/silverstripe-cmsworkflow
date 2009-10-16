@@ -111,7 +111,7 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 	 */
 	public function onAfterSave($record) {
 		if($record->hasMethod('openWorkflowRequest') && $wf = $record->openWorkflowRequest()) {
-			if ($wf->Status != 'AwaitingApproval') {
+			if ($wf->Status != 'AwaitingApproval' && $wf->Status != 'AwaitingEdit') {
 				$wf->request("Page was resaved, automatically set workflow request back to awaiting approval", null, false);
 				FormResponse::add("$('Form_EditForm').getPageFromServer($record->ID);");
 			}
