@@ -37,9 +37,15 @@ div#futurePublishing div.popupdatetime ul {
 }
 </style>
 
-<h2>Embargo Expiry</h2>
 <div id="embargoExpiry">
+	
+<% if ExpiryField || EmbargoField %>
+	<% if Status = AwaitingApproval %>
+<h2>Embargo Expiry</h2>
 <p>These times are in local server time, which is $WorkflowTimezone</p>
+	<% end_if %>
+<% end_if %>
+
 <% if EmbargoField %>
 	<p id="embargoExpiry-embargoStatus" style="display:<% if EmbargoDate %>block<% else %>none<% end_if %>">
 		This page is currently scheduled to be published at <span id="embargoDate">$EmbargoDate</span>.
@@ -53,7 +59,7 @@ div#futurePublishing div.popupdatetime ul {
 <% end_if %>
 
 <% if ExpiryField || EmbargoField %>
-	<% if Status != Scheduled %>
+	<% if Status = AwaitingApproval %>
 		<p id="startTimers">You need to click 'Approve' to start these timers in motion.</p>
 	<% end_if %>
 <% end_if %>
