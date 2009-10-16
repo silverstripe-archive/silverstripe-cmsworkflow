@@ -43,8 +43,8 @@ class PagesScheduledForPublishingSideReport_ThisSubsite extends SideReport {
 	}
 	function getParameterFields() {
 		return new FieldSet(
-			new DateField('StartDate'),
-			new DateField('EndDate')
+			new DateField('StartDate', 'Start date (YYYY-MM-DD)'),
+			new DateField('EndDate', 'End date (YYYY-MM-DD)')
 		);
 	}
 }
@@ -92,8 +92,8 @@ class PagesScheduledForPublishingSideReport_AllSubsites extends SideReport {
 	}
 	function getParameterFields() {
 		return new FieldSet(
-			new DateField('StartDate'),
-			new DateField('EndDate')
+			new DateField('StartDate', 'Start date (YYYY-MM-DD)'),
+			new DateField('EndDate', 'End date (YYYY-MM-DD)')
 		);
 	}
 }
