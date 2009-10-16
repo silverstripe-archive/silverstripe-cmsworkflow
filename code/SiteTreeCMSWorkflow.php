@@ -231,9 +231,6 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 			)
 		);
 		$closedRequestsTF->setPermissions(array('show'));
-		$closedRequestsTF->setFieldCasting(array(
-			'Created' => 'Date->Nice'
-		));
 		$closedRequestsTF->setFieldFormatting(array(
 			"DiffLinkToLastPublished" => '<a href=\"$value\" target=\"_blank\" class=\"externallink\">' . $diffLinkTitle . '</a>'
 		));

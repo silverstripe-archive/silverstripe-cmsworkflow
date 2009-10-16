@@ -103,6 +103,8 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 
 		$page = $this->Page();
 		$page->doPublish();
+		
+		$this->addNewChange($comment, $this->Status, DataObject::get_by_id('Member', $this->PublisherID));
 
 		// @todo Coupling to UI :-(
 		$title = Convert::raw2js($page->TreeTitle());

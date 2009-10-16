@@ -320,9 +320,6 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 			'DiffLinkToLastPublished' => _t('SiteTreeCMSWorkflow.DIFFERENCESTOLIVECOLUMN', 'Differences to live'),
 			'DiffLinkToPrevious' => _t('SiteTreeCMSWorkflow.DIFFERENCESTHISCHANGECOLUMN', 'Differences in this change'),
 		));
-		$tf->setFieldCasting(array(
-			'Created' => 'Date->Nice'
-		));
 		$tf->setFieldFormatting(array(
 			"DiffLinkToLastPublished" => '<a href=\"$value\" target=\"_blank\" class=\"externallink\">Show</a>',
 			"DiffLinkToPrevious" => '<a href=\"$value\" target=\"_blank\" class=\"externallink\">Show</a>'
