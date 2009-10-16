@@ -21,6 +21,7 @@ class ThreeStepWorkflowRequestsNeedingPublishingSideReport_ThisSubsite extends S
 				if (!$result->canApprove()) continue;
 				$result->WFAuthorID = $wf->AuthorID;
 				$result->WFApproverEmail = $wf->Approver()->Email;
+				$result->WFApprovedWhen = $wf->ApprovalDate();
 				$result->WFApproverID = $wf->ApproverID;
 				$result->WFPublisherID = $wf->PublisherID;
 				$doSet->push($result);
@@ -35,8 +36,13 @@ class ThreeStepWorkflowRequestsNeedingPublishingSideReport_ThisSubsite extends S
 				"link" => true,
 			),
 			"Author" => array(
-				"prefix" => 'Request approved by ',
+				"prefix" => 'Approved by ',
 				"source" => "WFApproverEmail",
+				"link" => false,
+			),
+			"When" => array(
+				"prefix" => ' on ',
+				"source" => "WFApprovedWhen",
 				"link" => false,
 			)
 		);
@@ -60,6 +66,7 @@ class ThreeStepWorkflowRequestsNeedingPublishingSideReport_AllSubsites extends S
 				if (!$result->canApprove()) continue;
 				$result->WFAuthorID = $wf->AuthorID;
 				$result->WFApproverEmail = $wf->Approver()->Email;
+				$result->WFApprovedWhen = $wf->ApprovalDate();
 				$result->WFApproverID = $wf->ApproverID;
 				$result->WFPublisherID = $wf->PublisherID;
 				$doSet->push($result);
@@ -75,8 +82,13 @@ class ThreeStepWorkflowRequestsNeedingPublishingSideReport_AllSubsites extends S
 				"link" => true,
 			),
 			"Author" => array(
-				"prefix" => 'Request approved by ',
+				"prefix" => 'Approved by ',
 				"source" => "WFApproverEmail",
+				"link" => false,
+			),
+			"When" => array(
+				"prefix" => ' on ',
+				"source" => "WFApprovedWhen",
 				"link" => false,
 			)
 		);
