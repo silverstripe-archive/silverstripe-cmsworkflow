@@ -7,7 +7,19 @@ class PagesScheduledForPublishingSideReport_ThisSubsite extends SideReport {
 		return _t('MyWorkflowRequestsSideReport.TITLE',"Workflow: pages scheduled for publishing");
 	}
 	function records() {
-		$res = DataObject::get('WorkflowPublicationRequest', "Status = 'Scheduled'", 'EmbargoDate DESC');
+		$startDate = isset($this->params['StartDate']) ? $this->params['StartDate'] : null;
+		$endDate = isset($this->params['EndDate']) ? $this->params['EndDate'] : null;
+		if ($startDate && $endDate) {
+			$where = "EmbargoDate >= '".Convert::raw2sql($startDate)."' AND EmbargoDate < '".Convert::raw2sql($endDate)."'";
+		} else if ($startDate && !$endDate) {
+			$where = "EmbargoDate >= '".Convert::raw2sql($startDate)."'";
+		} else if (!$startDate && $endDate) {
+			$where = "EmbargoDate <= '".Convert::raw2sql($endDate)."'";
+		} else {
+			$where = "EmbargoDate >= '".SSDatetime::now()->URLDate()."'";
+		}
+		
+		$res = DataObject::get('WorkflowPublicationRequest', "Status = 'Scheduled' AND $where", 'EmbargoDate DESC');
 		$doSet = new DataObjectSet();
 		if (!$res) return false;
 		foreach ($res as $result) {
@@ -29,15 +41,33 @@ class PagesScheduledForPublishingSideReport_ThisSubsite extends SideReport {
 			)
 		);
 	}
+	function getParameterFields() {
+		return new FieldSet(
+			new DateField('StartDate'),
+			new DateField('EndDate')
+		);
+	}
 }
 
 class PagesScheduledForPublishingSideReport_AllSubsites extends SideReport {
 	function title() {
 		return _t('MyWorkflowRequestsSideReport.TITLE',"Workflow: pages scheduled for publishing (all subsites)");
 	}
-	function records() {
+	function records($params = null) {
+		$startDate = isset($this->params['StartDate']) ? $this->params['StartDate'] : null;
+		$endDate = isset($this->params['EndDate']) ? $this->params['EndDate'] : null;
+		if ($startDate && $endDate) {
+			$where = "EmbargoDate >= '".Convert::raw2sql($startDate)."' AND EmbargoDate < '".Convert::raw2sql($endDate)."'";
+		} else if ($startDate && !$endDate) {
+			$where = "EmbargoDate >= '".Convert::raw2sql($startDate)."'";
+		} else if (!$startDate && $endDate) {
+			$where = "EmbargoDate <= '".Convert::raw2sql($endDate)."'";
+		} else {
+			$where = "EmbargoDate >= '".SSDatetime::now()->URLDate()."'";
+		}
+		
 		if (ClassInfo::exists('Subsite')) Subsite::$disable_subsite_filter = true;
-		$res = DataObject::get('WorkflowPublicationRequest', "Status = 'Scheduled'", 'EmbargoDate DESC');
+		$res = DataObject::get('WorkflowPublicationRequest', "Status = 'Scheduled' AND $where", 'EmbargoDate DESC');
 		$doSet = new DataObjectSet();
 		if (!$res) return false;
 		foreach ($res as $result) {
@@ -58,6 +88,12 @@ class PagesScheduledForPublishingSideReport_AllSubsites extends SideReport {
 				"prefix" => 'Will be published at ',
 				"source" => "WFTimeOfPublishing",
 			)
+		);
+	}
+	function getParameterFields() {
+		return new FieldSet(
+			new DateField('StartDate'),
+			new DateField('EndDate')
 		);
 	}
 }
