@@ -40,6 +40,19 @@ CMSWorkflow = {
 	 */
 	WorkflowButton : {
 		onclick: function() {
+			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoExpiryTZConverter_TZ'] = true;
+			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoExpiryTZConverter_From_Date'] = true;
+			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoExpiryTZConverter_From_Time'] = true;
+			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate_Date'] = true;
+			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate_Time'] = true;
+			$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate_Date'] = true;
+			$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate_Time'] = true;
+			$('Form_EditForm').changeDetection_fieldsToIgnore['WorkflowComment'] = true;
+			
+			if ($('Form_EditForm').isChanged()) {
+				if(!confirm('You have unsaved changes. You will lose them if you click OK.')) return false;
+			}
+			
 			Ajax.SubmitForm($('Form_EditForm'), this.name, {
 				onSuccess: Ajax.Evaluator,
 				onFailure: ajaxErrorHandler
