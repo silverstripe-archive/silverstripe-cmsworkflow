@@ -43,10 +43,10 @@ CMSWorkflow = {
 			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoExpiryTZConverter_TZ'] = true;
 			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoExpiryTZConverter_From_Date'] = true;
 			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoExpiryTZConverter_From_Time'] = true;
-			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate_Date'] = true;
-			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate_Time'] = true;
-			$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate_Date'] = true;
-			$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate_Time'] = true;
+			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[Date]'] = true;
+			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[Time]'] = true;
+			$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Date]'] = true;
+			$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Time]'] = true;
 			$('Form_EditForm').changeDetection_fieldsToIgnore['WorkflowComment'] = true;
 			
 			if ($('Form_EditForm').isChanged()) {
