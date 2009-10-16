@@ -11,12 +11,12 @@ class BatchSetExpiry extends CMSBatchAction {
 	function run(DataObjectSet $pages) {
 		return $this->batchaction($pages, 'setExpiry',
 			_t('BatchSetExpiry.ACTIONED_PAGES', 'Set expiry date on %d pages'),
-		array($_REQUEST['ExpiryDate']['Date'], $_REQUEST['ExpiryDate']['Time']));
+		array($_REQUEST['ExpiryDate_Batch']['Date'], $_REQUEST['ExpiryDate_Batch']['Time']));
 	}
 	
 	function getParameterFields() {
 		return new Fieldset(
-			new PopupDateTimeField('ExpiryDate')
+			new PopupDateTimeField('ExpiryDate_Batch')
 		);
 	}
 }
