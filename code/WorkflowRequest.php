@@ -64,6 +64,8 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		'Approvers' => 'Member'
 	);
 	
+	static $allow_deny = true;
+	
 	/**
 	 * Control who gets alerts for certain events
 	 * data structure is fairly self-explanitory
@@ -220,6 +222,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * @return boolean
 	 */
 	public function deny($comment, $member = null, $notify = true) {
+		if (!self::$allow_deny) return false;
 		if(!$member) $member = Member::currentUser();
 		if(!$this->Page()->canDenyRequests($member)) {
 			return false;
@@ -271,7 +274,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$this->addNewChange($comment, $this->Status, $member);
 		if($notify) $this->notifyCancelled($comment);
 		
-		return _t('SiteTreeCMSWorkflow.CANCELREQUEST_MESSAGE','Cancelled workflow request, and reset content. Emailed %s');
+		return _t('SiteTreeCMSWorkflow.CANCELREQUEST_MESSAGE','Cancelled workflow request. Emailed %s');
 	}
 	
 	/**

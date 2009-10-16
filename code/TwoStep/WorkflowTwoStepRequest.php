@@ -120,17 +120,18 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		if($this->owner->Status == 'AwaitingApproval' && $this->owner->Page()->canPublish()) {
 			$actions['cms_approve'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_APPROVE", "Approve");
 			$actions['cms_requestedit'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_REQUESTEDIT", "Request edit");
-			
+			if (self::$allow_deny) $actions['cms_deny'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_DENY","Deny");
 		} else if($this->owner->Status == 'AwaitingEdit' && $this->owner->Page()->canEdit()) {
 			// @todo this couples this class to its subclasses. :-(
 			$requestAction = (get_class($this->owner) == 'WorkflowDeletionRequest') ? 'cms_requestdeletefromlive' : 'cms_requestpublication';
 			$actions[$requestAction] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_RESUBMIT", "Re-submit");
 		}
 		
-		$actions['cms_comment'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_COMMENT", "Comment");
-		if($this->owner->Page()->canPublish()) {
-			$actions['cms_deny'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_DENY","Deny/cancel");
+		if ($this->owner->Page()->canEdit()) {
+			$actions['cms_cancel'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_CANCEL","Cancel");
 		}
+		$actions['cms_comment'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_COMMENT", "Comment");
+
 		return $actions;
 	}
 	
