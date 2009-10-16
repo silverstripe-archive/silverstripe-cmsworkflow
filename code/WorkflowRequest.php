@@ -239,7 +239,9 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$this->write();
 
 		// revert page to live (which might undo independent changes by other authors)
-		$this->Page()->doRevertToLive();
+		if (Versioned::get_one_by_stage('SiteTree', 'Live', 'SiteTree_Live.ID = '.$this->Page()->ID)) {
+			$this->Page()->doRevertToLive();
+		}
 
 		$this->addNewChange($comment, $this->Status, $member);
 		if($notify) $this->notifyDenied($comment);
