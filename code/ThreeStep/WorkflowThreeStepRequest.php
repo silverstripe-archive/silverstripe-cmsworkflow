@@ -141,7 +141,7 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 		
 		if($this->owner->Status == 'Approved' && $this->owner->Page()->canPublish()) {
 			$actions['cms_publish'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_ACTION", "Publish change");
-			return $actions;
+			$actions['cms_requestedit'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_REQUESTEDIT", "Request edit");
 		} elseif($this->owner->Status == 'AwaitingApproval' && $this->owner->Page()->canApprove()) {
 			$actions['cms_approve'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_APPROVE", "Approve");
 			$actions['cms_requestedit'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_REQUESTEDIT", "Request edit");
