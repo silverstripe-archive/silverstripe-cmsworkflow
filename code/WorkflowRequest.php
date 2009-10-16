@@ -318,11 +318,11 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 			'Comment' => $this->fieldLabel('Comment'), 
 			'StatusDescription' => $this->fieldLabel('Status'), 
 			'DiffLinkToLastPublished' => _t('SiteTreeCMSWorkflow.DIFFERENCESTOLIVECOLUMN', 'Differences to live'),
-			'DiffLinkToPrevious' => _t('SiteTreeCMSWorkflow.DIFFERENCESTHISCHANGECOLUMN', 'Differences in this change'),
+			'DiffLinkContentToPrevious' => _t('SiteTreeCMSWorkflow.DIFFERENCESTHISCHANGECOLUMN', 'Differences in this change'),
 		));
 		$tf->setFieldFormatting(array(
 			"DiffLinkToLastPublished" => '<a href=\"$value\" target=\"_blank\" class=\"externallink\">Show</a>',
-			"DiffLinkToPrevious" => '<a href=\"$value\" target=\"_blank\" class=\"externallink\">Show</a>'
+			// "DiffLinkToPrevious" => '<a href=\"$value\" target=\"_blank\" class=\"externallink\">Show</a>'
 		));
 		$fields->replaceField(
 			'Status',
