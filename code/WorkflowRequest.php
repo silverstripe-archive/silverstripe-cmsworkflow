@@ -268,9 +268,6 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$this->Status = 'Cancelled';
 		$this->write();
 
-		// revert page to live (which might undo independent changes by other authors)
-		$this->Page()->doRevertToLive();
-
 		$this->addNewChange($comment, $this->Status, $member);
 		if($notify) $this->notifyCancelled($comment);
 		
