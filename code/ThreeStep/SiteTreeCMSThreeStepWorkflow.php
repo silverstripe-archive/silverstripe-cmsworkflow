@@ -20,8 +20,8 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 				"PublisherGroups" => "Group",
 			),
 			'defaults' => array(
-				"CanApproveType" => "OnlyTheseUsers",
-				"CanPublishType" => "OnlyTheseUsers",
+				"CanApproveType" => "Inherit",
+				"CanPublishType" => "Inherit",
 			)
 		);
 	}
@@ -131,7 +131,7 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 		} elseif($this->owner->CanApproveType == 'Inherit') {
 			if ($this->owner->ParentID) {
 				return $this->owner->Parent()->ApproverMembers();
-			} else { return SiteConfig::current_site_config()->ApproverMembers($member); }
+			} else { return SiteConfig::current_site_config()->ApproverMembers(); }
 		} elseif($this->owner->CanApproveType == 'LoggedInUsers') {
 			return Permission::get_members_by_permission('CMS_ACCESS_CMSMain');
 		} else {
@@ -201,7 +201,7 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 		} elseif($this->owner->CanPublishType == 'Inherit') {
 			if ($this->owner->Parent()->Exists()) {
 				return $this->owner->Parent()->PublisherMembers();
-			} else { return SiteConfig::current_site_config()->PublisherMembers($member); }
+			} else { return SiteConfig::current_site_config()->PublisherMembers(); }
 		} elseif($this->owner->CanPublishType == 'LoggedInUsers') {
 			return Permission::get_members_by_permission('CMS_ACCESS_CMSMain');
 		} else {
@@ -264,13 +264,13 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 			if($groupCheckObj) $this->owner->EditorGroups()->add($groupCheckObj);
 		}
 		
-		if(!$this->owner->ApproverGroups()->Count()) {
+		if($this->owner->CanApproveType == 'OnlyTheseUsers' && !$this->owner->ApproverGroups()->Count()) {
 			$SQL_group = Convert::raw2sql('site-content-approvers');
 			$groupCheckObj = DataObject::get_one('Group', "Code = '{$SQL_group}'");
 			if($groupCheckObj) $this->owner->ApproverGroups()->add($groupCheckObj);
 		}
 		
-		if(!$this->owner->PublisherGroups()->Count()) {
+		if($this->owner->CanPublishType == 'OnlyTheseUsers' && !$this->owner->PublisherGroups()->Count()) {
 			$SQL_group = Convert::raw2sql('site-content-publishers');
 			$groupCheckObj = DataObject::get_one('Group', "Code = '{$SQL_group}'");
 			if($groupCheckObj) $this->owner->PublisherGroups()->add($groupCheckObj);
