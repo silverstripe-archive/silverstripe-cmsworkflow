@@ -71,6 +71,16 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 			$actions->removeByName('action_publish');
 		}
 		
+		$liveVersion = Versioned::get_one_by_stage('SiteTree', 'Live', "SiteTree_Live.ID = {$page->ID}");
+		if ($liveVersion && $liveVersion->ExpiryDate != null && $liveVersion->ExpiryDate != '0000-00-00 00:00:00') {
+			if ($page->canApprove()) {
+				$actions->push(new FormAction(
+					'cms_cancelexpiry', 
+					_t('WorkflowPublicationRequest.BUTTONCANCELEXPIRY', 'Cancel expiry')
+				));
+			}
+		}
+		
 		
 		if(
 			!$openRequest

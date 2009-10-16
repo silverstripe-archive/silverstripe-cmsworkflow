@@ -13,6 +13,29 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		if(!$this->owner->Page()->canPublish($member)) {
 			return false;
 		}
+		
+		if ($this->owner->ClassName == 'WorkflowDeletionRequest') {
+			if (isset($_REQUEST['DeletionScheduling']) && $_REQUEST['DeletionScheduling'] = 'scheduled') {
+				// Update SiteTree_Live directly, rather than doing a publish
+				// Because otherwise, unauthorized edits could be pushed live.
+				
+				list($day, $month, $year) = explode('/', $_REQUEST['ExpiryDate']['Date']);
+				$expiryTimestamp = Convert::raw2sql(date('Y-m-d H:i:s', strtotime("$year-$month-$day {$_REQUEST['ExpiryDate']['Time']}")));
+				$pageID = $this->owner->Page()->ID;
+			
+				if ($expiryTimestamp)
+				
+				DB::query("UPDATE SiteTree_Live SET ExpiryDate = '$expiryTimestamp' WHERE ID = $pageID");
+
+				$this->owner->ApproverID = $member->ID;
+				$this->owner->Status = 'Completed';
+				$this->owner->write();
+				
+				$this->owner->addNewChange($comment, $this->owner->Status, $member);
+				if($notify) $this->notifyApproved($comment);
+				return _t('WorkflowDeletionRequest.SETEXPIRY','Set Expiry date. Emailed %s');
+			}
+		}
 
 		$this->owner->PublisherID = $member->ID;
 		$this->owner->Status = 'Approved';

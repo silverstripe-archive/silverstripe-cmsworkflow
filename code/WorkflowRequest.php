@@ -187,7 +187,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		return _t('SiteTreeCMSWorkflow.COMMENT_MESSAGE', 
 			'Commented on this workflow request. Emailed %s.');
 	}
-
+	
 	/**
 	 * Request an edit to this page before it can be published.
 	 * 
@@ -379,7 +379,6 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		return new PopupDateTimeField('EmbargoDate', 'Embargo Date', $this->EmbargoDate);
 	}
 	function ExpiryField() {
-		if (get_class($this) == 'WorkflowDeletionRequest') return false;
 		return new PopupDateTimeField('ExpiryDate', 'Expiry Date', $this->ExpiryDate);
 	}
 	

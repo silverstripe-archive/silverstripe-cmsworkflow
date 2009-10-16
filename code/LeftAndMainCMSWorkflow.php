@@ -105,6 +105,16 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		return $this->workflowAction('WorkflowRequest', 'approve', $data['ID'], $data['WorkflowComment']);
 	}
 	
+	// Cancel expiry
+	public function cms_cancelexpiry($data, $form) {
+		$id = Convert::raw2sql($data['ID']);
+		$page = Versioned::get_one_by_stage('SiteTree', 'Live', "SiteTree_Live.ID = '$id'");
+		if ($page) $page->cancelexpiry();
+		FormResponse::get_page($data['ID']);
+		FormResponse::status_message(_t('SiteTreeCMSWorkflow.EXPIRYCANCELLED', 'Expiry cancelled.'), 'good');
+		return FormResponse::respond();
+	}
+	
 	/**
 	 * When a page is saved, we need to check if there is an in-progress
 	 * workflow request, and if applicable, set it back to AwaitingApproval

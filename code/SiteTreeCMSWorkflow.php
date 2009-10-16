@@ -143,6 +143,15 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 		return false;
 	}
 	
+	/**
+	 * Cancel a expiry on the live end directly
+	 */
+	public function cancelexpiry() {
+		if(!$this->owner->canApprove()) return false;
+		
+		DB::query('UPDATE "SiteTree_Live" SET "ExpiryDate" = \'0000-00-00 00:00:00\' WHERE ID = '.$this->owner->ID);
+	}
+	
 	public function updateCMSFields(&$fields) {
 		if($wf = $this->openWorkflowRequest()) {
 			$verb = ($wf->class == "WorkflowDeletionRequest") ? "Removal " : "Change ";
