@@ -356,7 +356,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 	/**
 	 * 
 	 */
-	function onAfterDelete() {
+	function onBeforeDelete() {
 		if($wf = $this->openWorkflowRequest()) {
 			if(get_class($wf) == 'WorkflowDeletionRequest') $wf->approve(_t('SiteTreeCMSWorkflow.AUTO_APPROVED', "(automatically approved)"));
 			else $wf->deny(_t("SiteTreeCMSWorkflow.AUTO_DENIED_DELETED", "(automatically denied when the page was deleted)"));
