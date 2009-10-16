@@ -24,6 +24,7 @@ class ThreeStepWorkflowRequestsNeedingPublishingSideReport_ThisSubsite extends S
 				$result->WFApprovedWhen = $wf->ApprovalDate();
 				$result->WFApproverID = $wf->ApproverID;
 				$result->WFPublisherID = $wf->PublisherID;
+				if (isset($_REQUEST['OnlyMine']) && $result->WFApproverID != Member::currentUserID()) continue;
 				$doSet->push($result);
 			}
 		}
@@ -45,6 +46,11 @@ class ThreeStepWorkflowRequestsNeedingPublishingSideReport_ThisSubsite extends S
 				"source" => "WFApprovedWhen",
 				"link" => false,
 			)
+		);
+	}
+	function getParameterFields() {
+		return new FieldSet(
+			new CheckboxField('OnlyMine', 'Only requests I approved')
 		);
 	}
 }
@@ -69,6 +75,7 @@ class ThreeStepWorkflowRequestsNeedingPublishingSideReport_AllSubsites extends S
 				$result->WFApprovedWhen = $wf->ApprovalDate();
 				$result->WFApproverID = $wf->ApproverID;
 				$result->WFPublisherID = $wf->PublisherID;
+				if (isset($_REQUEST['OnlyMine']) && $result->WFApproverID != Member::currentUserID()) continue;
 				$doSet->push($result);
 			}
 		}
@@ -92,6 +99,11 @@ class ThreeStepWorkflowRequestsNeedingPublishingSideReport_AllSubsites extends S
 				"source" => "WFApprovedWhen",
 				"link" => false,
 			)
+		);
+	}
+	function getParameterFields() {
+		return new FieldSet(
+			new CheckboxField('OnlyMine', 'Only requests I approved')
 		);
 	}
 }
