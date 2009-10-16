@@ -136,7 +136,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		return self::$alerts[$class][$event][$group];
 	}
 	
-	public function set_alert($class, $event, $group, $notify) {
+	public static function set_alert($class, $event, $group, $notify) {
 		if (!isset(self::$alerts[$class])) self::$alerts[$class] = array();
 		if (!isset(self::$alerts[$class][$event])) self::$alerts[$class][$event] = array();
 		self::$alerts[$class][$event][$group] = $notify;
