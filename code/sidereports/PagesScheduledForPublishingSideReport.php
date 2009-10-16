@@ -1,10 +1,13 @@
 <?php
 /**
+ * Report to show pages that will be published soon
+ *
  * @package cmsworkflow
+ * @subpackage reports
  */
 class PagesScheduledForPublishingSideReport_ThisSubsite extends SideReport {
 	function title() {
-		return _t('MyWorkflowRequestsSideReport.TITLE',"Workflow: pages scheduled for publishing");
+		return _t('PagesScheduledForPublishingSideReport.TITLE',"Workflow: pages scheduled for publishing");
 	}
 	function records() {
 		$startDate = isset($this->params['StartDate']) ? $this->params['StartDate'] : null;
@@ -51,7 +54,7 @@ class PagesScheduledForPublishingSideReport_ThisSubsite extends SideReport {
 
 class PagesScheduledForPublishingSideReport_AllSubsites extends SideReport {
 	function title() {
-		return _t('MyWorkflowRequestsSideReport.TITLE',"Workflow: pages scheduled for publishing (all subsites)");
+		return _t('PagesScheduledForPublishingSideReport.TITLE_ALLSUBSITES',"Workflow: pages scheduled for publishing (all subsites)");
 	}
 	function records($params = null) {
 		$startDate = isset($this->params['StartDate']) ? $this->params['StartDate'] : null;

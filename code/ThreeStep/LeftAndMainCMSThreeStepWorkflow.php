@@ -4,7 +4,7 @@
  * Adds the LeftAndMain function to action a pending change
  *
  * @package cmsworkflow
- * @subpackage threestep
+ * @subpackage ThreeStep
  */
 class LeftAndMainCMSThreeStepWorkflow extends LeftAndMainDecorator {
 	// action

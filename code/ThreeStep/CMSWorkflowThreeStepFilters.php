@@ -1,8 +1,14 @@
 <?php
 
+/**
+ * Filter the SiteTree by pages awaiting approval
+ *
+ * @package cmsworkflow
+ * @subpackage ThreeStep
+ */
 class CMSWorkflowThreeStepFilters_PagesAwaitingApproval extends CMSSiteTreeFilter {
 	static function title() {
-		return "Pages awaiting approval";
+		return _t('CMSWorkflowThreeStepFilters_PagesAwaitingApproval.TITLE', "Pages awaiting approval");
 	}
 	
 	static function showNode($node) {
@@ -24,9 +30,15 @@ class CMSWorkflowThreeStepFilters_PagesAwaitingApproval extends CMSSiteTreeFilte
 	}
 }
 
+/**
+ * Fitler the SiteTree by pages awaiting publishing
+ *
+ * @package cmsworkflow
+ * @subpackage ThreeStep
+ */
 class CMSWorkflowThreeStepFilters_PagesAwaitingPublishing extends CMSSiteTreeFilter {
 	static function title() {
-		return "Pages awaiting publishing";
+		return _t('CMSWorkflowThreeStepFilters_PagesAwaitingPublishing.TITLE', "Pages awaiting publishing");
 	}
 	
 	static function showNode($node) {

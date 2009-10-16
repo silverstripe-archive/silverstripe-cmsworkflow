@@ -1,10 +1,13 @@
 <?php
 /**
+ * Report showing my publication requests
+ * 
  * @package cmsworkflow
+ * @subpackage ThreeStep
  */
 class ThreeStepMyPublicationRequestsSideReport extends SideReport {
 	function title() {
-		return _t('PublicationRequestSideReport.TITLE',"Workflow: my publication requests");
+		return _t('ThreeStepMyPublicationRequestsSideReport.TITLE',"Workflow: my publication requests");
 	}
 	function records() {
 		return WorkflowThreeStepRequest::get_by_author(

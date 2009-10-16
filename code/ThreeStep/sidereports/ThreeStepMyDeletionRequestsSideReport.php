@@ -1,10 +1,13 @@
 <?php
 /**
+ * Report showing my deletion requests
+ * 
  * @package cmsworkflow
+ * @subpackage ThreeStep
  */
 class ThreeStepMyDeletionRequestsSideReport extends SideReport {
 	function title() {
-		return _t('DeletionRequestSideReport.TITLE',"Workflow: my deletion requests");
+		return _t('ThreeStepMyDeletionRequestsSideReport.TITLE',"Workflow: my deletion requests");
 	}
 	function records() {
 		// Set stage, otherwise, we won't get any results

@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Report to show pages that will be due for review soon
+ *
+ * @package cmsworkflow
+ * @subpackage reports
+ */
 class PagesDueForReviewSideReport extends SideReport {
 	function title() {
 		return _t('PagesDueForReviewSideReport.TITLE', 'Pages due for review');

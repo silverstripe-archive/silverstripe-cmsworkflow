@@ -1,10 +1,13 @@
 <?php
 /**
+ * Report showing requests I need to publish
+ * 
  * @package cmsworkflow
+ * @subpackage ThreeStep
  */
 class ThreeStepWorkflowRequestsNeedingPublishingSideReport_ThisSubsite extends SideReport {
 	function title() {
-		return _t('MyWorkflowRequestsSideReport.TITLE',"Workflow: requests I need to publish");
+		return _t('ThreeStepWorkflowRequestsNeedingPublishingSideReport.TITLE',"Workflow: requests I need to publish");
 	}
 	function records() {
 		$res = WorkflowThreeStepRequest::get_by_publisher(

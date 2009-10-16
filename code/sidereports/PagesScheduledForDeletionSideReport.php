@@ -1,10 +1,13 @@
 <?php
 /**
+ * Report to show pages scheduled to be deleted
+ *
  * @package cmsworkflow
+ * @subpackage reports
  */
 class PagesScheduledForDeletionSideReport_ThisSubsite extends SideReport {
 	function title() {
-		return _t('MyWorkflowRequestsSideReport.TITLE',"Workflow: pages scheduled for deletion");
+		return _t('PagesScheduledForDeletionSideReport.TITLE',"Workflow: pages scheduled for deletion");
 	}
 	function records() {
 		$startDate = isset($this->params['StartDate']) ? $this->params['StartDate'] : null;
@@ -19,7 +22,13 @@ class PagesScheduledForDeletionSideReport_ThisSubsite extends SideReport {
 			$where = "ExpiryDate >= '".SSDatetime::now()->URLDate()."'";
 		}
 
-		return Versioned::get_by_stage('SiteTree', 'Live', $where, 'ExpiryDate DESC');
+		$doSet = Versioned::get_by_stage('SiteTree', 'Live', $where, 'ExpiryDate DESC');
+		if ($doSet) {
+			foreach($doSet as $do) {
+				$do->HasBacklinks = $do->BackLinkTracking()->Count() ? ' HAS BLS' : false;
+			}
+		}
+		return $doSet;
 	}
 	function fieldsToShow() {
 		return array(
@@ -30,6 +39,9 @@ class PagesScheduledForDeletionSideReport_ThisSubsite extends SideReport {
 			"Requester" => array(
 				"prefix" => 'Will be deleted at ',
 				"source" => "ExpiryDate",
+			),
+			"HasBacklinks" => array(
+				'source' => 'HasBacklinks'
 			)
 		);
 	}
@@ -43,7 +55,7 @@ class PagesScheduledForDeletionSideReport_ThisSubsite extends SideReport {
 
 class PagesScheduledForDeletionSideReport_AllSubsites extends SideReport {
 	function title() {
-		return _t('MyWorkflowRequestsSideReport.TITLE',"Workflow: pages scheduled for deletion (all subsites)");
+		return _t('PagesScheduledForDeletionSideReport.TITLE_ALLSUBSITES',"Workflow: pages scheduled for deletion (all subsites)");
 	}
 	function records($params = null) {
 		if (ClassInfo::exists('Subsite')) Subsite::$disable_subsite_filter = true;
@@ -60,10 +72,15 @@ class PagesScheduledForDeletionSideReport_AllSubsites extends SideReport {
 			$where = "ExpiryDate >= '".SSDatetime::now()->URLDate()."'";
 		}
 		
-		$res = Versioned::get_by_stage('SiteTree', 'Live', $where, 'ExpiryDate DESC');
+		$doSet = Versioned::get_by_stage('SiteTree', 'Live', $where, 'ExpiryDate DESC');
+		if ($doSet) {
+			foreach($doSet as $do) {
+				$do->HasBacklinks = $do->BackLinkTracking()->Count() ? ' HAS BLS' : false;
+			}
+		}
 		
 		if (ClassInfo::exists('Subsite')) Subsite::$disable_subsite_filter = false;
-		return $res;
+		return $doSet;
 	}
 	function fieldsToShow() {
 		return array(
@@ -74,6 +91,9 @@ class PagesScheduledForDeletionSideReport_AllSubsites extends SideReport {
 			"Requester" => array(
 				"prefix" => 'Will be deleted at ',
 				"source" => "ExpiryDate",
+			),
+			"HasBacklinks" => array(
+				'source' => 'HasBacklinks'
 			)
 		);
 	}

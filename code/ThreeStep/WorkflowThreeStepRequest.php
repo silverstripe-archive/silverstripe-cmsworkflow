@@ -4,8 +4,7 @@
  * ThreeStep, where an item is not actioned immediately.
  *
  * @package cmsworkflow
- * @subpackage threestep
- * @author Tom Rix
+ * @subpackage ThreeStep
  */
 class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 	function approve($comment, $member = null, $notify = true) {

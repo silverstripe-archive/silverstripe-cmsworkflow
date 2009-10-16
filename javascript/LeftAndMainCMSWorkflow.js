@@ -194,7 +194,7 @@ var EmbargoExpiry = {
 			EmbargoExpiry.eButton(ids.saveButton);
 			EmbargoExpiry.eButton(ids.resetButton);
 		}
-		
+
 		window.setTimeout('EmbargoExpiry.fieldCheck();', 1000);
 	}
 };

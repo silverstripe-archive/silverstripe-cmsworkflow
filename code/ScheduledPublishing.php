@@ -1,7 +1,18 @@
 <?php
 
+/**
+ * Looks for pages that are embargo'd/expiry'd
+ *
+ * @package cmsworkflow
+ */
 class ScheduledPublishing extends BuildTask {
+	/**
+	 * Whether to echo progress
+	 */
 	protected $suppressOutput = false;
+	function suppressOutput($yn = true) {
+		$this->suppressOutput = $yn;
+	}
 	
 	function getDescription() {
 		return 'Publish changes that are scheduled';
@@ -9,14 +20,16 @@ class ScheduledPublishing extends BuildTask {
 	function getTitle() {
 		return 'CMS Workflow: embargo/expiry';
 	}
-	function suppressOutput($yn = true) {
-		$this->suppressOutput = $yn;
-	}
+
+	/**
+	 * Run the task, and do the business
+	 *
+	 * @param HTTPRequest $httpRequest 
+	 */
 	function run($httpRequest) {
 		Cookie::$report_errors = false;
-		
 		if (class_exists('Subsite')) Subsite::$disable_subsite_filter = true;
-		
+
 		// Look for changes that need to be published
 		$wfRequests = DataObject::get('WorkflowRequest', "Status = 'Scheduled' AND EmbargoDate <= '".SSDatetime::now()->getValue()."'");
 		$admin = Security::findAnAdministrator();

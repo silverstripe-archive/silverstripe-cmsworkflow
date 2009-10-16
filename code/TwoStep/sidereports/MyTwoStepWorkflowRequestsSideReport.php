@@ -6,7 +6,7 @@
  */
 class MyTwoStepWorkflowRequestsSideReport extends SideReport {
 	function title() {
-		return _t('MyWorkflowRequestsSideReport.TITLE',"Workflow: My requests pending review");
+		return _t('MyTwoStepWorkflowRequestsSideReport.TITLE',"Workflow: My requests pending review");
 	}
 	function records() {
 		return WorkflowTwoStepRequest::get_by_author(

@@ -1,10 +1,13 @@
 <?php
 /**
+ * Report showing my publication requests
+ * 
  * @package cmsworkflow
+ * @subpackage ThreeStep
  */
 class ThreeStepWorkflowRequestsNeedingApprovalSideReport_ThisSubsite extends SideReport {
 	function title() {
-		return _t('MyWorkflowRequestsSideReport.TITLE',"Workflow: requests I need to approve");
+		return _t('ThreeStepWorkflowRequestsNeedingApprovalSideReport.TITLE',"Workflow: requests I need to approve");
 	}
 	function records() {
 		$res = WorkflowThreeStepRequest::get_by_approver(

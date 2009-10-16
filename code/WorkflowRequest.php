@@ -210,7 +210,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$this->addNewChange($comment, $this->Status, $member);
 		if($notify) $this->notifyAwaitingEdit($comment);
 		
-		return _t('SiteTreeCMSWorkflow.DENYPUBLICATION_MESSAGE','Denied workflow request, and reset content. Emailed %s');
+		return _t('SiteTreeCMSWorkflow.CHANGEREQUESTED','Requested this change. Emailed %s.');
 	}
 	
 	/**

@@ -20,4 +20,9 @@ Director::addRules(200, array(
 	//'admin/cms/children-of/$PageID/changes.rss' => array('Controller' => 'CMSChangeTracker', 'Data' => 'children'),
 ));
 
+unset(CMSBatchActionHandler::$batch_actions['publish']);
+unset(CMSBatchActionHandler::$batch_actions['delete']);
+unset(CMSBatchActionHandler::$batch_actions['deletefromlive']);
+unset(CMSBatchActionHandler::$batch_actions['unpublish']);
+
 ?>

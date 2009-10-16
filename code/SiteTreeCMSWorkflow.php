@@ -69,6 +69,15 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 		if($this->owner->Owner()) return $this->owner->Owner()->FirstName . ' ' . $this->owner->Owner()->Surname;
 	}
 	
+	/**
+	 * Set the embargo date for this SiteTree object
+	 * this actually gets written to the current open
+	 * workflow request, not the SiteTree object.
+	 *
+	 * @param string $date dd/mm/yyyy
+	 * @param string $time 
+	 * @return boolean
+	 */
 	function setEmbargo($date, $time) {
 		if ($wf = $this->openWorkflowRequest()) {
 			if ($wf->EmbargoField()) {
@@ -83,6 +92,14 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 		}
 		return false;
 	}
+	
+	/**
+	 * Set the expiry date for this SiteTree object
+	 *
+	 * @param string $date dd/mm/yyyy
+	 * @param string $time 
+	 * @return boolean
+	 */
 	function setExpiry($date, $time) {
 		if ($wf = $this->openWorkflowRequest()) {
 			if ($wf->ExpiryField()) {
@@ -97,6 +114,12 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 		}
 		return false;
 	}
+	
+	/**
+	 * Reset the embargo date
+	 *
+	 * @return boolean
+	 */
 	function resetEmbargo() {
 		if ($wf = $this->openWorkflowRequest()) {
 			$wf->EmbargoDate = null;
@@ -105,6 +128,12 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 		}
 		return false;
 	}
+	
+	/**
+	 * Reset the expiry date
+	 *
+	 * @return boolean
+	 */
 	function resetExpiry() {
 		if ($wf = $this->openWorkflowRequest()) {
 			$this->owner->ExpiryDate = null;
@@ -155,6 +184,22 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 			$fields->addFieldsToTab('Root.Expiry', array(
 				new LiteralField('ExpiryWarning', "This page is scheduled to expire at ".$liveVersion->ExpiryDate)
 			));
+			if ($this->owner->BackLinkTracking() && $this->owner->BackLinkTracking()->Count() > 0) {
+				$fields->addFieldsToTab('Root.Expiry', array(
+					new HeaderField("Please check these pages", 2),
+					new LiteralField('ExpiryBacklinkWarning', "This page is scheduled to expire, but the following pages link to it"),
+					new TableListField(
+						'BackLinkTracking',
+						'SiteTree',
+						array(
+							'Title' => 'Title'
+						),
+						'"ChildID" = ' . $this->owner->ID,
+						'',
+						'LEFT JOIN "SiteTree_LinkTracking" ON "SiteTree"."ID" = "SiteTree_LinkTracking"."SiteTreeID"'
+					)
+				));
+			}
 		}
 		
 		$fields->addFieldsToTab('Root.Workflow', $this->getWorkflowCMSFields());
@@ -286,7 +331,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 	 */
 	function onAfterPublish() {
 		if($wf = $this->openWorkflowRequest()) {
-			if(get_class($wf) == 'WorkflowPublicationRequest') $wf->approve("(automatically approved)");
+			if(get_class($wf) == 'WorkflowPublicationRequest') $wf->approve(_t('SiteTreeCMSWorkflow.AUTO_APPROVED', "(automatically approved)"));
 			else $wf->deny(_t("SiteTreeCMSWorkflow.AUTO_DENIED_PUBLISHED", "(automatically denied when the page was published)"));
 		}
 		
@@ -307,14 +352,14 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 	 */
 	function onAfterDelete() {
 		if($wf = $this->openWorkflowRequest()) {
-			if(get_class($wf) == 'WorkflowDeletionRequest') $wf->approve("(automatically approved)");
+			if(get_class($wf) == 'WorkflowDeletionRequest') $wf->approve(_t('SiteTreeCMSWorkflow.AUTO_APPROVED', "(automatically approved)"));
 			else $wf->deny(_t("SiteTreeCMSWorkflow.AUTO_DENIED_DELETED", "(automatically denied when the page was deleted)"));
 		}
 	}
 	
 	function onAfterRevertToLive() {
 		if($wf = $this->openWorkflowRequest()) {
-			$wf->deny("(automatically denied)");
+			$wf->deny(_t('SiteTreeCMSWorkflow.AUTO_DENIED', "(automatically denied)"));
 		}
 	}
 	

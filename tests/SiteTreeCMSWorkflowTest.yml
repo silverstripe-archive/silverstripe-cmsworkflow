@@ -43,6 +43,11 @@ Member:
    workflowadmin:
       Email: wfadmins@test.com
       Groups: =>Group.workflowadmins
+SiteConfig:
+   default:
+      CanEditType: LoggedInUsers
+      CanPublishType: OnlyTheseUsers
+      PublisherGroups: =>Group.custompublishergroup
 SiteTree:
    defaultpublisherspage:
       Title: defaultpublisherspage
@@ -59,6 +64,22 @@ SiteTree:
       Title: Open Delete Workflow
    embargoexpirypage:
       Title: Test Embargo and Expiry
+      CanPublishType: OnlyTheseUsers
+      PublisherGroups: =>Group.custompublishergroup
+   batchTest1:
+      Title: BatchTestPage1
+      CanPublishType: OnlyTheseUsers
+      PublisherGroups: =>Group.custompublishergroup
+   batchTest2:
+      Title: BatchTestPage2
+      CanPublishType: OnlyTheseUsers
+      PublisherGroups: =>Group.custompublishergroup
+   batchTest3:
+      Title: BatchTestPage3
+      CanPublishType: OnlyTheseUsers
+      PublisherGroups: =>Group.custompublishergroup
+   batchTest4:
+      Title: BatchTestPage4
       CanPublishType: OnlyTheseUsers
       PublisherGroups: =>Group.custompublishergroup
       

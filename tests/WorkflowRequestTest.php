@@ -110,9 +110,45 @@ class WorkflowRequestTest extends FunctionalTest {
 			'AwaitingApproval',
 			"Request is set to AwaitingApproval after requestPublication() is called"
 		);
+
+		$this->assertContains(
+			'cms_cancel',
+			array_flip($request1->WorkflowActions()),
+			"Author can cancel own request"
+		);
+		
+		$this->assertNotContains(
+			'cms_deny',
+			array_flip($request1->WorkflowActions()),
+			"Author cant deny own request"
+		);
 		
 		$this->session()->inst_set('loggedInAs', $custompublisher->ID);
 	
+		$this->assertContains(
+			'cms_cancel',
+			array_flip($request1->WorkflowActions()),
+			"Publisher can cancel requests"
+		);
+		
+		WorkflowRequest::$allow_deny = true;
+	
+		$this->assertContains(
+			'cms_deny',
+			array_flip($request1->WorkflowActions()),
+			"Publisher can deny requests when WorkflowRequest::allow_deny is true"
+		);
+		
+		WorkflowRequest::$allow_deny = false;
+		
+		$this->assertNotContains(
+			'cms_deny',
+			array_flip($request1->WorkflowActions()),
+			"Publisher can't deny requests when WorkflowRequest::allow_deny is false"
+		);
+		
+		WorkflowRequest::$allow_deny = true;
+		
 		$request1->approve('Looks good');
 	
 		$this->assertEquals(

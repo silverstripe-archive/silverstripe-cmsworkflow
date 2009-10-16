@@ -29,6 +29,8 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 			'WorkflowThreeStepRequest'
 		), 'LeftAndMain' => array(
 			'LeftAndMainCMSThreeStepWorkflow'
+		), 'SiteConfig' => array(
+			'SiteConfigThreeStepWorkflow'
 		)
 	);
 	
@@ -215,6 +217,58 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		$this->assertNull($onLive, 'Page has expired from live');
 		
 		SSDatetime::clear_mock_now();
+	}
+	
+	function testBatchActions() {
+		// Get fixtures
+		$page1 = $this->objFromFixture('SiteTree', 'batchTest1');
+		$page2 = $this->objFromFixture('SiteTree', 'batchTest2');
+		$page3 = $this->objFromFixture('SiteTree', 'batchTest3');
+		$page4 = $this->objFromFixture('SiteTree', 'batchTest4');
+		$custompublisher = $this->objFromFixture('Member', 'custompublisher');
+		$customauthor = $this->objFromFixture('Member', 'customauthor');
+	
+		// Modify content
+		$page1->Title = rand();$page1->write();
+		$page2->Title = rand();$page2->write();
+		$page3->Title = rand();$page3->write();
+		$page4->Title = rand();$page4->write();
+	
+		// Create WF requests for each of em
+		$customauthor->logIn();
+		$wf1 = $page1->openOrNewWorkflowRequest('WorkflowPublicationRequest');
+		$wf2 = $page2->openOrNewWorkflowRequest('WorkflowPublicationRequest');
+		$wf3 = $page3->openOrNewWorkflowRequest('WorkflowPublicationRequest');
+		$wf4 = $page4->openOrNewWorkflowRequest('WorkflowPublicationRequest');
+		
+		// // Create dataset
+		$doSet = new DataObjectSet();
+		$doSet->push($page1);
+		$doSet->push($page2);
+		$doSet->push($page3);
+		$doSet->push($page4);
+		
+		// Batch approve
+		$custompublisher->logIn();
+		$this->session()->inst_set('loggedInAs', $custompublisher->ID);
+		$page1->batchApprove();
+		$page2->batchApprove();
+		$page3->batchApprove();
+		$page4->batchApprove();
+		$this->assertEquals($page1->openWorkflowRequest()->Status, 'Approved', 'Workflow status is approved after batch action');
+		$this->assertEquals($page2->openWorkflowRequest()->Status, 'Approved', 'Workflow status is approved after batch action');
+		$this->assertEquals($page3->openWorkflowRequest()->Status, 'Approved', 'Workflow status is approved after batch action');
+		$this->assertEquals($page4->openWorkflowRequest()->Status, 'Approved', 'Workflow status is approved after batch action');
+
+		// Batch publish
+		$page1->batchPublish();
+		$page2->batchPublish();
+		$page3->batchPublish();
+		$page4->batchPublish();
+		$this->assertNull($page1->openWorkflowRequest(), 'No open workflow after publishing live');
+		$this->assertNull($page2->openWorkflowRequest(), 'No open workflow after publishing live');
+		$this->assertNull($page3->openWorkflowRequest(), 'No open workflow after publishing live');
+		$this->assertNull($page4->openWorkflowRequest(), 'No open workflow after publishing live');
 	}
 }
 ?>

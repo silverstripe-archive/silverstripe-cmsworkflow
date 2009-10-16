@@ -5,7 +5,7 @@
  * and 'canAction'.
  *
  * @package cmsworkflow
- * @subpackage threestep
+ * @subpackage ThreeStep
  * @author Tom Rix
  */
 class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements PermissionProvider {

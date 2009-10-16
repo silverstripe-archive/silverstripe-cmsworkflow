@@ -1,12 +1,13 @@
 <?php
 /**
- * Adds a new "sidereport" in the CMS listing all pages which require publication.
+ * Report showing my deletion requests
  * 
  * @package cmsworkflow
+ * @subpackage TwoStep
  */
 class MyTwoStepDeletionRequestsSideReport extends SideReport {
 	function title() {
-		return _t('DeletionRequestSideReport.TITLE',"Workflow: Awaiting deletion");
+		return _t('MyTwoStepDeletionRequestsSideReport.TITLE',"Workflow: Awaiting deletion");
 	}
 	function records() {
 		return WorkflowTwoStepRequest::get_by_publisher(
