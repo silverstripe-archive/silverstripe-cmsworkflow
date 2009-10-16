@@ -55,11 +55,11 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 	}
 	
 	function canDenyRequests() {
-		return $this->canPublish();
+		return true;
 	}
 	
 	function canRequestEdit() {
-		return $this->canPublish();
+		return true;
 	}
 	
 	function whoCanApprove() {
