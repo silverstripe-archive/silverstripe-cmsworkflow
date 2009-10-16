@@ -75,11 +75,7 @@ div#futurePublishing div.popupdatetime ul {
 	<% end_if %>
 <% end_if %>
 
-<% if EmbargoDate %><% else %>
-	<script type="text/javascript">EmbargoExpiry.dButton('saveEmbargoButton');</script>
-	<script type="text/javascript">EmbargoExpiry.dButton('resetEmbargoButton');</script>
-<% end_if %>
-
+<script type="text/javascript">EmbargoExpiry.fieldCheck();</script>
 </div>
 
 

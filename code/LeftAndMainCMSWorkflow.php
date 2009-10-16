@@ -118,9 +118,14 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		return $this->workflowAction('WorkflowRequest', 'requestedit', $data['ID'], $data['WorkflowComment']);
 	}
 
-	// Deny - ie, cancel the workflow change
+	// Deny
 	public function cms_deny($data, $form) {
 		return $this->workflowAction('WorkflowRequest', 'deny', $data['ID'], $data['WorkflowComment']);
+	}
+	
+	// Cancel
+	public function cms_cancel($data, $form) {
+		return $this->workflowAction('WorkflowRequest', 'cancel', $data['ID'], $data['WorkflowComment']);
 	}
 	
 	// Comment (no workflow status change)

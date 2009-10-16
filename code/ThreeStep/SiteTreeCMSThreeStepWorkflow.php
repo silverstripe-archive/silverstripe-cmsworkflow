@@ -27,7 +27,7 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 	}
 	
 	function getOpenRequest($workflowClass) {
-		$wf = DataObject::get_one($workflowClass, "PageID = " . (int)$this->owner->ID . " AND Status NOT IN ('Completed', 'Denied')");
+		$wf = DataObject::get_one($workflowClass, "PageID = " . (int)$this->owner->ID . " AND Status NOT IN ('Completed', 'Denied', 'Cancelled')");
 		if($wf) return $wf;
 		
 		return null;

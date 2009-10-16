@@ -44,7 +44,7 @@
 class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	static $db = array(
 		// @todo AwaitingReview
-		'Status' => "Enum('AwaitingApproval,Approved,Scheduled,Completed,Denied,AwaitingEdit','AwaitingApproval')",
+		'Status' => "Enum('AwaitingApproval,Approved,Scheduled,Completed,Denied,Cancelled,AwaitingEdit','AwaitingApproval')",
 		'EmbargoDate' => 'SSDatetime'
 		// actioned is true/false whether the change has actually happened on live
 	);
@@ -85,6 +85,10 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 				'author' => true,
 				'publisher' => false
 			),
+			'cancel' => array(
+				'author' => true,
+				'publisher' => false
+			),
 			'comment' => array(
 				'author' => true,
 				'publisher' => true
@@ -100,6 +104,10 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 				'publisher' => true
 			),
 			'deny' => array(
+				'author' => true,
+				'publisher' => false
+			),
+			'cancel' => array(
 				'author' => true,
 				'publisher' => false
 			),
@@ -234,6 +242,39 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		if($notify) $this->notifyDenied($comment);
 		
 		return _t('SiteTreeCMSWorkflow.DENYPUBLICATION_MESSAGE','Denied workflow request, and reset content. Emailed %s');
+	}
+	
+	/**
+	 * Cancel this request, notify interested parties
+	 * and close it. Used by {@link LeftAndMainCMSWorkflow}
+	 * and {@link SiteTreeCMSWorkflow}.
+	 * 
+	 * @param Member $author
+	 * @return boolean
+	 */
+	public function cancel($comment, $member = null, $notify = true) {
+		if(!$member) $member = Member::currentUser();
+		if(!$this->Page()->canEdit()) {
+			return false;
+		}
+		
+		// "publisher" in this sense means "deny-author"
+		$this->ApproverID = $member->ID;
+		$this->ActionerID = $member->ID;
+		$this->Actioned = true;
+		$this->write();
+		
+		// open the request and notify interested parties
+		$this->Status = 'Cancelled';
+		$this->write();
+
+		// revert page to live (which might undo independent changes by other authors)
+		$this->Page()->doRevertToLive();
+
+		$this->addNewChange($comment, $this->Status, $member);
+		if($notify) $this->notifyCancelled($comment);
+		
+		return _t('SiteTreeCMSWorkflow.CANCELREQUEST_MESSAGE','Cancelled workflow request, and reset content. Emailed %s');
 	}
 	
 	/**
@@ -395,6 +436,22 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 				$author, // recipient
 				_t("{$this->class}.EMAIL_SUBJECT_DENIED"),
 				_t("{$this->class}.EMAIL_PARA_DENIED"),
+				$comment,
+				'WorkflowGenericEmail'
+			);
+		}
+	}
+	
+	function notifyCancelled($comment) {
+		$publisher = Member::currentUser();
+		$author = $this->Author();
+
+		if (self::should_send_alert(__CLASS__, 'cancel', 'author')) {
+			$this->sendNotificationEmail(
+				$publisher, // sender
+				$author, // recipient
+				_t("{$this->class}.EMAIL_SUBJECT_CANCELLED"),
+				_t("{$this->class}.EMAIL_PARA_CANCELLED"),
 				$comment,
 				'WorkflowGenericEmail'
 			);
@@ -677,8 +734,10 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 				return _t('SiteTreeCMSWorkflow.STATUS_AWAITINGEDIT', 'Awaiting Edit');
 			case 'Denied':
 				return _t('SiteTreeCMSWorkflow.STATUS_DENIED', 'Denied');
+			case 'Cancelled':
+				return _t('SiteTreeCMSWorkflow.STATUS_CANCELLED', 'Cancelled');
 			default:
-				return _t('SiteTreeCMSWorkflow.STATUS_UNKNOWN', 'Unknown');
+				return _t('SiteTreeCMSWorkflow.STATUS_'.strtoupper($status), $status);
 		}
 	}
 	
