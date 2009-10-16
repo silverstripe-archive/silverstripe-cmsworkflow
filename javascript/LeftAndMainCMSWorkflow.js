@@ -81,7 +81,7 @@ var EmbargoExpiry = {
 	save: function(what, el) {
 		EmbargoExpiry.fieldCheck();
 		
-		var url = '/admin/cms_setembargoexpiry?wfRequest='+$('WorkflowRequest_ID').value;
+		var url = 'admin/cms_setembargoexpiry?wfRequest='+$('WorkflowRequest_ID').value;
 		var ids = EmbargoExpiry.ids(what);
 		
 		if (what == 'embargo') {
@@ -115,7 +115,7 @@ var EmbargoExpiry = {
 	},
 	reset: function(what, el) {
 		ids = EmbargoExpiry.ids(what);
-		var url = '/admin/cms_setembargoexpiry?wfRequest='+$('WorkflowRequest_ID').value;
+		var url = 'admin/cms_setembargoexpiry?wfRequest='+$('WorkflowRequest_ID').value;
 		
 		$(ids.dateField).value = '';
 		$(ids.timeField).value = '';

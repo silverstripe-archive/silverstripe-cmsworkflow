@@ -13,6 +13,8 @@ class ScheduledPublishing extends BuildTask {
 		$this->suppressOutput = $yn;
 	}
 	function run($httpRequest) {
+		Cookie::$report_errors = false;
+		
 		// Look for changes that need to be published
 		$wfRequests = DataObject::get('WorkflowRequest', "Status = 'Scheduled' AND EmbargoDate <= '".SSDatetime::now()->getValue()."'");
 		$admin = Security::findAnAdministrator();
