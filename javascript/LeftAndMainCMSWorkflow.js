@@ -103,7 +103,6 @@ var EmbargoExpiry = {
 		new Ajax.Request(url, {
 			method: 'get',
 			onSuccess: function(t) {
-				if (what == 'expiry') CurrentPage.setVersion(CurrentPage.version() + 1);
 				data = eval('('+t.responseText+')');
 				if (data.status == 'success') {
 					$(ids.wholeMessage).style.display = 'block';
@@ -133,7 +132,6 @@ var EmbargoExpiry = {
 		new Ajax.Request(url, {
 			method: 'get',
 			onSuccess: function(t) {
-				if (what == 'expiry') CurrentPage.setVersion(CurrentPage.version() + 1);
 				data = eval('('+t.responseText+')');
 				if (data.status == 'success') {
 					$(ids.wholeMessage).style.display = 'none';
