@@ -9,9 +9,9 @@ class PagesDueForReviewSideReport extends SideReport {
 		$where =	array();
 	
 		if(isset($this->params['ReviewDate']) && $this->params['ReviewDate']) {
-			$where[] = 'NextReviewDate < \'' . Convert::raw2sql($this->params['ReviewDate']) . '\'';
+			$where[] = 'NextReviewDate <= \'' . Convert::raw2sql($this->params['ReviewDate']) . '\'';
 		} else {
-			$where[] = 'NextReviewDate < \'' . SSDatetime::now()->URLDate() . '\'';
+			$where[] = 'NextReviewDate <= \'' . SSDatetime::now()->URLDate() . '\'';
 		}
 		
 		if(isset($this->params['Owner']) && $this->params['Owner']) {

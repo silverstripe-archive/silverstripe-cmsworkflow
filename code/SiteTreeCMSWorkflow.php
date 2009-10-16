@@ -291,7 +291,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 		}
 		
 		if($this->owner->ReviewPeriodDays) {
-			$this->owner->NextReviewDate = date('Y-m-d', strtotime('+' . $this->ReviewPeriodDays . ' days'));
+			$this->owner->NextReviewDate = date('Y-m-d', strtotime('+' . $this->owner->ReviewPeriodDays . ' days'));
 			$this->owner->write();
 		}
 	}
