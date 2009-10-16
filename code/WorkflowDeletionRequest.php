@@ -112,7 +112,7 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 	 * Return the page for a deletion request.  This is a little tricky because it's not in the stage site
 	 */
 	public function Page() {
-		$page = Versioned::get_latest_version('SiteTree', $this->PageID);
+		$page = Versioned::get_one_by_stage('SiteTree', 'Live', 'SiteTree_Live.ID = '.$this->PageID);
 		$page->ID = $page->RecordID;
 		return $page;
 	}
