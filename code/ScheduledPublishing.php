@@ -1,11 +1,16 @@
 <?php
 
 class ScheduledPublishing extends BuildTask {
+	protected $suppressOutput = false;
+	
 	function getDescription() {
 		return 'Publish changes that are scheduled';
 	}
 	function getTitle() {
 		return 'CMS Workflow: embargo/expiry';
+	}
+	function suppressOutput($yn = true) {
+		$this->suppressOutput = $yn;
 	}
 	function run($httpRequest) {
 		// Look for changes that need to be published
@@ -15,12 +20,12 @@ class ScheduledPublishing extends BuildTask {
 				// Use a try block to prevet one bad requests
 				// taking down the whole queue
 				try {
-					echo "\n<br />Attempting to publish ".$request->Page()->Title.": ";
+					if (!$this->suppressOutput) echo "\n<br />Attempting to publish ".$request->Page()->Title.": ";
 					$request->publish('Scheduled publishing', null, false);
-					echo "ok.";
+					if (!$this->suppressOutput) echo "ok.";
 				} catch (Exception $e) {
 					// Log it?
-					echo "fail.";
+					if (!$this->suppressOutput) echo "fail.";
 					user_error("Error publishing change to Page ID ".$request->PageID." - ".$request->Page()->Title." Error: ".$e->getMessage, E_USER_WARNING);
 					continue;
 				}
@@ -34,23 +39,23 @@ class ScheduledPublishing extends BuildTask {
 				// Use a try block to prevet one bad requests
 				// taking down the whole queue
 				try {
-					echo "\n<br />Attempting to unpublish ".$page->Title.": ";
+					if (!$this->suppressOutput) echo "\n<br />Attempting to unpublish ".$page->Title.": ";
 					
 					// Close any existing workflows
 					if ($wf = $page->openWorkflowRequest()) {
-						echo "closing ".$wf->Status." workflow request: ";
+						if (!$this->suppressOutput) echo "closing ".$wf->Status." workflow request: ";
 						$wf->deny('Page automatically expired. Removing from Live site.');
-						echo "ok, unpublishing: ";
+						if (!$this->suppressOutput) echo "ok, unpublishing: ";
 					}
 
 					$page->ExpiryDate = null;
 					$page->write();
 					$page->doUnpublish();
 					
-					echo "ok.";
+					if (!$this->suppressOutput) echo "ok.";
 				} catch (Exception $e) {
 					// Log it?
-					echo "fail.";
+					if (!$this->suppressOutput) echo "fail.";
 					user_error("Error unpublishing Page ID ".$page->ID." - ".$page->Title." Error: ".$e->getMessage, E_USER_WARNING);
 					continue;
 				}

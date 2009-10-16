@@ -13,7 +13,7 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		if(!$this->owner->Page()->canPublish($member)) {
 			return false;
 		}
-	
+
 		$this->owner->PublisherID = $member->ID;
 		$this->owner->Status = 'Approved';
 		$this->owner->write();
@@ -24,7 +24,7 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		if($notify) $this->notifyApproved($comment);
 		
 		// Action it immediately... if it's not scheduled
-		if ($this->owner->status != 'Scheduled') {
+		if ($this->owner->Status != 'Scheduled') {
 			$this->owner->publish($comment, $member, $notify);
 		}
 		

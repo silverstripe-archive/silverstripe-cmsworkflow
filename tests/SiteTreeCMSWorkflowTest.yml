@@ -5,6 +5,11 @@ Permission:
       Code: CMS_ACCESS_CMSMain
    grantaccess1:
       Code: SITETREE_GRANT_ACCESS
+   admin:
+      Code: ADMIN
+   workflowadmin:
+      Code: IS_WORKFLOW_ADMIN
+      
 Group:
    custompublishergroup:
       Title: custompublishergroup
@@ -12,6 +17,12 @@ Group:
    customauthorsgroup:
       Title: customauthorsgroup
       Permissions: =>Permission.accesscmsmain2
+   adminsgroup:
+      Title: adminsgroup
+      Permissions: =>Permission.admin
+   workflowadmins:
+      Title: WFAdmins
+      Permissions: =>Permission.workflowadmin
 Member:
    randomuser:
       Email: randomuser@test.com
@@ -26,6 +37,12 @@ Member:
    customauthor2:
         Email: customauthor2@test.com
         Groups: =>Group.customauthorsgroup
+   admin:
+      Email: admin@test.com
+      Groups: =>Group.adminsgroup
+   workflowadmin:
+      Email: wfadmins@test.com
+      Groups: =>Group.workflowadmins
 SiteTree:
    defaultpublisherspage:
       Title: defaultpublisherspage
@@ -40,10 +57,17 @@ SiteTree:
       Title: Open Publish Workflow
    opendeleteworkflowpage:
       Title: Open Delete Workflow
+   embargoexpirypage:
+      Title: Test Embargo and Expiry
+      CanPublishType: OnlyTheseUsers
+      PublisherGroups: =>Group.custompublishergroup
       
 WorkflowPublicationRequest:
    openpublishworkflow:
       Page: =>SiteTree.openpublishworkflowpage
+   embargoexpiry:
+      Page: =>SiteTree.embargoexpirypage
+      Author: =>Member.customauthor
 
 WorkflowDeletionRequest:
    opendeleteworkflow:
