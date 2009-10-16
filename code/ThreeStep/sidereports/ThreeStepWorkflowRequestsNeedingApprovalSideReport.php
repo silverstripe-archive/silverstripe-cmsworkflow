@@ -83,6 +83,7 @@ class ThreeStepWorkflowRequestsNeedingApprovalSideReport_AllSubsites extends Sid
 			"Title" => array(
 				"source" => array("NestedTitle", array("2")),
 				"link" => true,
+				"reload" => true
 			),
 			"Requester" => array(
 				"prefix" => 'Approval requested by ',

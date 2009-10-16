@@ -80,6 +80,7 @@ class ThreeStepWorkflowRequestsNeedingPublishingSideReport_AllSubsites extends S
 			"Title" => array(
 				"source" => array("NestedTitle", array("2")),
 				"link" => true,
+				"reload" => true
 			),
 			"Author" => array(
 				"prefix" => 'Approved by ',
