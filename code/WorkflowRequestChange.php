@@ -58,11 +58,21 @@ class WorkflowRequestChange extends DataObject {
 	 * 
 	 * @return string Relative URL into the CMS
 	 */
+	function getDiffLinkContentToPrevious() {
+		$link = $this->getDiffLinkToPrevious();
+
+		if (!$link)	return 'Not applicable';
+		
+		return "<a href=\"$link\" target=\"_blank\" class=\"externallink\">Show</a>";
+	}
+	
 	function getDiffLinkToPrevious() {
 		$page = $this->WorkflowRequest()->Page();
 		$previousChange = $this->PreviousChange();
 		$fromVersion = ($previousChange) ? $previousChange->PageDraftVersion : $this->WorkflowRequest()->Changes()->First()->PageLiveVersion;
 		$toVersion = $this->PageDraftVersion;
+		
+		if ($fromVersion == 0) return false;
 		
 		return "admin/compareversions/$page->ID/?From={$fromVersion}&To={$toVersion}";
 	}
