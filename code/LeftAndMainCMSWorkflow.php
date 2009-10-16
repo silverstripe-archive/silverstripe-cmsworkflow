@@ -78,6 +78,11 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		Requirements::javascript('cms/javascript/CMSMain_left.js');
 		Requirements::javascript('cms/javascript/CMSMain_right.js');
 
+		CMSBatchActionHandler::register('batchCmsWorkflowSetEmbargo', 'BatchSetEmbargo');
+		CMSBatchActionHandler::register('batchCmsWorkflowSetExpiry', 'BatchSetExpiry');
+		CMSBatchActionHandler::register('batchCmsWorkflowResetEmbargo', 'BatchResetEmbargo');
+		CMSBatchActionHandler::register('batchCmsWorkflowResetExpiry', 'BatchResetExpiry');
+		
 		Requirements::javascript('cmsworkflow/javascript/LeftAndMainCMSWorkflow.js');
 		RSSFeed::linkToFeed(Director::absoluteURL('admin/cms/changes.rss'), 'All content changes');
 	}

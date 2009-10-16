@@ -66,6 +66,51 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 		);
 	}
 	
+	function setEmbargo($date, $time) {
+		if ($wf = $this->openWorkflowRequest()) {
+			if ($wf->EmbargoField()) {
+				list($day, $month, $year) = explode('/', $date);
+				$timestamp = strtotime("$year-$month-$day $time");
+				if ($timestamp) {
+					$wf->EmbargoDate = $timestamp;
+					$wf->write();
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	function setExpiry($date, $time) {
+		if ($wf = $this->openWorkflowRequest()) {
+			if ($wf->ExpiryField()) {
+				list($day, $month, $year) = explode('/', $date);
+				$timestamp = strtotime("$year-$month-$day $time");
+				if ($timestamp) {
+					$this->owner->ExpiryDate = $timestamp;
+					$this->owner->write();
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	function resetEmbargo() {
+		if ($wf = $this->openWorkflowRequest()) {
+			$wf->EmbargoDate = null;
+			$wf->write();
+			return true;
+		}
+		return false;
+	}
+	function resetExpiry() {
+		if ($wf = $this->openWorkflowRequest()) {
+			$this->owner->ExpiryDate = null;
+			$this->owner->write();
+			return true;
+		}
+		return false;
+	}
+	
 	public function updateCMSFields(&$fields) {
 		if($wf = $this->openWorkflowRequest()) {
 			$verb = ($wf->class == "WorkflowDeletionRequest") ? "Removal " : "Change ";
