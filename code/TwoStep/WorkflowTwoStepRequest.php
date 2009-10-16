@@ -15,7 +15,7 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		}
 		
 		if ($this->owner->ClassName == 'WorkflowDeletionRequest') {
-			if (isset($_REQUEST['DeletionScheduling']) && $_REQUEST['DeletionScheduling'] = 'scheduled') {
+			if (isset($_REQUEST['DeletionScheduling']) && $_REQUEST['DeletionScheduling'] == 'scheduled') {
 				// Update SiteTree_Live directly, rather than doing a publish
 				// Because otherwise, unauthorized edits could be pushed live.
 				
