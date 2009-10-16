@@ -104,9 +104,18 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 		
 		if(!$this->owner->canPublish() || !Permission::check('SITETREE_GRANT_ACCESS')) {
 			$fields->replaceField('CanApproveType', $approveTypeField->performReadonlyTransformation());
-			$fields->replaceField('ApproverGroups', $approverGroupsField->performReadonlyTransformation());
+			if($this->owner->CanApproveType == 'OnlyTheseUsers') {
+				$fields->replaceField('ApproverGroups', $approverGroupsField->performReadonlyTransformation());
+			} else {
+				$fields->removeByName('ApproverGroups');
+			}
+			
 			$fields->replaceField('CanPublishType', $actionTypeField->performReadonlyTransformation());
-			$fields->replaceField('PublisherGroups', $actionerGroupsField->performReadonlyTransformation());
+			if($this->owner->CanPublishType == 'OnlyTheseUsers') {
+				$fields->replaceField('PublisherGroups', $actionerGroupsField->performReadonlyTransformation());
+			} else {
+				$fields->removeByName('PublisherGroups');
+			}
 		}
 	}
 	
