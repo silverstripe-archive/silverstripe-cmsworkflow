@@ -59,10 +59,22 @@ CMSWorkflow = {
 			});
 			return false;
 		}
+	},
+	
+	showHideExpiry: {
+		onclick: function() {
+			if ($('deleteImmediate').checked) {
+				$('expiryField').style.display = 'none';
+			} else {
+				$('expiryField').style.display = 'block';
+			}
+		}
 	}
 };
 
 Behaviour.register({
+	'#deleteImmediate' : CMSWorkflow.showHideExpiry,
+	'#deleteLater' : CMSWorkflow.showHideExpiry,
 	'#Form_EditForm_action_cms_requestedit' : CMSWorkflow.WorkflowButton,
 	'#Form_EditForm_action_cms_approve' : CMSWorkflow.WorkflowButton,
 	'#Form_EditForm_action_cms_deny' : CMSWorkflow.WorkflowButton,

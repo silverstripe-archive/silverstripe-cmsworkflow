@@ -46,11 +46,11 @@ div#futurePublishing div.popupdatetime ul {
 
 <table>
 	<tr>
-		<td><input onclick="showHideExpiry()" onchange="showHideExpiry()" id="deleteImmediate" <% if ExpiryDate %><% else %>checked="true"<% end_if %> type="radio" name="DeletionScheduling" value="immediate" /></td>
+		<td><input id="deleteImmediate" <% if ExpiryDate %><% else %>checked="true"<% end_if %> type="radio" name="DeletionScheduling" value="immediate" /></td>
 		<td>Action this request when the publish button is pushed</td>
 	</tr>
 	<tr>
-		<td><input onclick="showHideExpiry()" onchange="showHideExpiry()" id="deleteLater" <% if ExpiryDate %>checked="true"<% end_if %> type="radio" name="DeletionScheduling" value="scheduled"/></td>
+		<td><input id="deleteLater" <% if ExpiryDate %>checked="true"<% end_if %> type="radio" name="DeletionScheduling" value="scheduled"/></td>
 		<td>Schedule this page to expire at a later date</td>
 	</tr>
 	<tr>
@@ -58,20 +58,6 @@ div#futurePublishing div.popupdatetime ul {
 		<td><div id="expiryField" style="display:<% if ExpiryDate %>block<% else %>none<% end_if %>">$ExpiryField</div></td>
 	</tr>
 </table>
-
-
-<script type="text/javascript">
-function showHideExpiry() {
-	if ($('deleteImmediate').checked) {
-		$('expiryField').style.display = 'none';
-	} else {
-		$('expiryField').style.display = 'block';
-	}
-}
-Event.observe('deleteImmediate', 'click', function(event){ showHideExpiry(); });
-Event.observe('deleteLater', 'click', function(event){ showHideExpiry(); });
-
-</script>
 
 <% if ExpiryField %>
 	<p id="embargoExpiry-expiryStatus" style="display:<% if ExpiryDate %>block<% else %>none<% end_if %>">
