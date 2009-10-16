@@ -86,6 +86,10 @@ Behaviour.register({
 
 // Create these actions
 function action_cms_requestpublication_right(e) {
+	if ($('Form_EditForm').isChanged()) {
+		if(!confirm('You have unsaved changes. You will lose them if you click to continue requesting publication.')) return false;
+	}
+	
 	CMSWorkflow.submitWithPromptedMessage(
 			$('Form_EditForm'), 'action_cms_requestpublication',
 			'WorkflowComment',
