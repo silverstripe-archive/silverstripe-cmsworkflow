@@ -12,8 +12,8 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 	public function extraStatics() {
 		return array(
 			'db' => array(
-				"CanApproveType" =>"Enum('LoggedInUsers, OnlyTheseUsers, Inherit', 'OnlyTheseUsers')",
-				"CanPublishType" =>"Enum('LoggedInUsers, OnlyTheseUsers, Inherit', 'OnlyTheseUsers')"
+				"CanApproveType" =>"Enum('LoggedInUsers, OnlyTheseUsers, Inherit', 'Inherit')",
+				"CanPublishType" =>"Enum('LoggedInUsers, OnlyTheseUsers, Inherit', 'Inherit')"
 			),
 			'many_many' => array(
 				"ApproverGroups" => "Group",
@@ -131,7 +131,9 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 		} elseif($this->owner->CanApproveType == 'Inherit') {
 			if ($this->owner->ParentID) {
 				return $this->owner->Parent()->ApproverMembers();
-			} else { return new DataObjectSet(); }
+			} else { return SiteConfig::current_site_config()->ApproverMembers($member); }
+		} elseif($this->owner->CanApproveType == 'LoggedInUsers') {
+			return Permission::get_members_by_permission('CMS_ACCESS_CMSMain');
 		} else {
 			$group = Permission::get_groups_by_permission('ADMIN')->first();
 			return $group->Members();
@@ -161,12 +163,12 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 		// check for empty spec
 		if(!$this->owner->CanApproveType || $this->owner->CanApproveType == 'Anyone') return true;
 
-		// check against parent page (default to FALSE if there is no parent page)
+		// check against parent page/site config
 		if($this->owner->CanApproveType == 'Inherit') {
 			if ($this->owner->Parent()->exists()) {
 				// if (!$this->owner->Parent()->getExtensionInstance('SiteTreeCMSThreeStepWorkflow')->canApprove($member)) return false;
 				if (!$this->owner->Parent()->canApprove($member)) return false;
-			} else { return false; }
+			} else { return SiteConfig::current_site_config()->canApprove($member); }
 		}
 		
 		// check for any logged-in users
@@ -199,7 +201,9 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 		} elseif($this->owner->CanPublishType == 'Inherit') {
 			if ($this->owner->Parent()->Exists()) {
 				return $this->owner->Parent()->PublisherMembers();
-			} else { return new DataObjectSet(); }
+			} else { return SiteConfig::current_site_config()->PublisherMembers($member); }
+		} elseif($this->owner->CanPublishType == 'LoggedInUsers') {
+			return Permission::get_members_by_permission('CMS_ACCESS_CMSMain');
 		} else {
 			$group = Permission::get_groups_by_permission('ADMIN')->first();
 			return $group->Members();
@@ -227,12 +231,12 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 		// check for empty spec
 		if(!$this->owner->CanPublishType || $this->owner->CanPublishType == 'Anyone') return true;
 
-		// check against parent page (default to FALSE if there is no parent page)
+		// check against parent page/site config
 		if($this->owner->CanPublishType == 'Inherit') {
 			if ($this->owner->Parent()->exists()) {
 				// if (!$this->owner->Parent()->getExtensionInstance('SiteTreeCMSTwoStepWorkflow')->canPublish($member)) return false;
 				if (!$this->owner->Parent()->canPublish($member)) return false;
-			} else { return false; }
+			} else { return SiteConfig::current_site_config()->canPublish($member); }
 		}
 		
 		// check for any logged-in users

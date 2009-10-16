@@ -11,7 +11,7 @@ class SiteTreeCMSTwoStepWorkflow extends SiteTreeCMSWFDecorator {
 	public function extraStatics() {
 		return array(
 			'db' => array(
-				"CanPublishType" =>"Enum('LoggedInUsers, OnlyTheseUsers, Inherit', 'OnlyTheseUsers')"
+				"CanPublishType" =>"Enum('LoggedInUsers, OnlyTheseUsers, Inherit', 'Inherit')"
 			),
 			'many_many' => array(
 				"PublisherGroups" => "Group",
@@ -77,6 +77,8 @@ class SiteTreeCMSTwoStepWorkflow extends SiteTreeCMSWFDecorator {
 			if ($this->owner->Parent()->Exists()) {
 				return $this->owner->Parent()->PublisherMembers();
 			} else { return new DataObjectSet(); }
+		} elseif($this->owner->CanPublishType == 'LoggedInUsers') {
+			return Permission::get_members_by_permission('CMS_ACCESS_CMSMain');
 		} else {
 			$group = Permission::get_groups_by_permission('ADMIN')->first();
 			return $group->Members();
