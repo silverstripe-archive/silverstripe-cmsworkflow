@@ -71,12 +71,14 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 			//&& $page->isPublished()
 			&& $page->IsDeletedFromStage
 		) { 
-			$actions->push(
-				$requestDeletionAction = new FormAction(
-					'cms_requestdeletefromlive', 
-					_t('SiteTreeCMSWorkflow.BUTTONREQUESTREMOVAL', 'Request Removal')
-				)
-			);
+			if ($page->ExistsOnLive) {
+				$actions->push(
+					$requestDeletionAction = new FormAction(
+						'cms_requestdeletefromlive', 
+						_t('SiteTreeCMSWorkflow.BUTTONREQUESTREMOVAL', 'Request Removal')
+					)
+				);
+			}
 			
 			// don't allow creation of a second request by another author
 			if(!self::can_create(null, $page)) {
