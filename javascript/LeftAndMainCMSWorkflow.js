@@ -47,7 +47,7 @@ CMSWorkflow = {
 			return false;
 		}
 	}
-}
+};
 
 Behaviour.register({
 	'#Form_EditForm_action_cms_requestedit' : CMSWorkflow.WorkflowButton,
@@ -198,8 +198,8 @@ var EmbargoExpiry = {
 		}
 		
 		window.setTimeout('EmbargoExpiry.fieldCheck();', 1000);
-	},
-}
+	}
+};
 
 function action_publish_right(e) {
 	var messageEl = CMSWorkflow.createPromptElement('WorkflowComment', 'Please comment on this publication, if applicable.');
