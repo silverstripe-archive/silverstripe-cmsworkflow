@@ -22,6 +22,7 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 		
 		// if no publishers are set, the request will end up nowhere
 		if(!$approvers->Count()) {
+			user_error("No publishers selected", E_USER_ERROR);
 			return null;
 		}
 		
@@ -113,7 +114,6 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 	 */
 	public function Page() {
 		$page = Versioned::get_one_by_stage('SiteTree', 'Live', 'SiteTree_Live.ID = '.$this->PageID);
-		$page->ID = $page->RecordID;
 		return $page;
 	}
 	

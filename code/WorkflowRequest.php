@@ -582,6 +582,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	protected function getDiffLinkToLastPublished() {
 		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
 		$page = $this->Page();
+		if (!$page) return;
 		$fromVersion = $page->Version;
 		$latestPublished = Versioned::get_one_by_stage($page->class, 'Live', "{$bt}SiteTree_Live{$bt}.ID = {$page->ID}", true, "Created DESC");
 		if(!$latestPublished) return false;

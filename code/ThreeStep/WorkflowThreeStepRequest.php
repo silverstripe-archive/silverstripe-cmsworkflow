@@ -187,14 +187,30 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 		if($status) {
 			$filter .= "AND {$bt}WorkflowRequest{$bt}.Status IN (" . $statusStr . ")";
 		} 
-		
-		return DataObject::get(
-			"SiteTree", 
+
+		$onDraft = Versioned::get_by_stage(
+			"SiteTree",
+			"Stage",
 			$filter, 
 			"{$bt}SiteTree{$bt}.{$bt}LastEdited{$bt} DESC",
 			"LEFT JOIN {$bt}WorkflowRequest{$bt} ON {$bt}WorkflowRequest{$bt}.PageID = {$bt}SiteTree{$bt}.ID " .
 			"LEFT JOIN {$bt}WorkflowRequest_Approvers{$bt} ON {$bt}WorkflowRequest{$bt}.ID = {$bt}WorkflowRequest_Approvers{$bt}.WorkflowRequestID"
 		);
+		
+		$onLive = Versioned::get_by_stage(
+			"SiteTree",
+			"Live",
+			$filter, 
+			"{$bt}SiteTree_Live{$bt}.{$bt}LastEdited{$bt} DESC",
+			"LEFT JOIN {$bt}WorkflowRequest{$bt} ON {$bt}WorkflowRequest{$bt}.PageID = {$bt}SiteTree_Live{$bt}.ID " .
+			"LEFT JOIN {$bt}WorkflowRequest_Approvers{$bt} ON {$bt}WorkflowRequest{$bt}.ID = {$bt}WorkflowRequest_Approvers{$bt}.WorkflowRequestID"
+		);
+
+		$return = new DataObjectSet();
+		$return->merge($onDraft);
+		$return->merge($onLive);
+		$return->removeDuplicates();
+		return $return;
 	}
 	
 	public static function get_by_publisher($class, $publisher, $status = null) {
@@ -213,24 +229,37 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 			$filter .= "AND {$bt}WorkflowRequest{$bt}.Status IN (" . $statusStr . ")";
 		} 
 		
-		$doSet = new DataObjectSet();
-		$objects = DataObject::get(
-			"SiteTree", 
+		$onDraft = Versioned::get_by_stage(
+			"SiteTree",
+			"Stage",
 			$filter, 
 			"{$bt}SiteTree{$bt}.{$bt}LastEdited{$bt} DESC",
 			"LEFT JOIN {$bt}WorkflowRequest{$bt} ON {$bt}WorkflowRequest{$bt}.PageID = {$bt}SiteTree{$bt}.ID "
 		);
 		
+		$onLive = Versioned::get_by_stage(
+			"SiteTree",
+			"Live",
+			$filter, 
+			"{$bt}SiteTree_Live{$bt}.{$bt}LastEdited{$bt} DESC",
+			"LEFT JOIN {$bt}WorkflowRequest{$bt} ON {$bt}WorkflowRequest{$bt}.PageID = {$bt}SiteTree_Live{$bt}.ID "
+		);
+
+		$objects = new DataObjectSet();
+		$return = new DataObjectSet();
+		$objects->merge($onDraft);
+		$objects->merge($onLive);
+		$objects->removeDuplicates();
+		
 		if ($objects) {
 			foreach($objects as $do) {
 				if ($do->canPublish($publisher)) {
-					$doSet->push($do);
+					$return->push($do);
 				}
 			}
 		}
 		
-		return $doSet;
-		return WorkflowRequest::get_by_publisher($class, $publisher, $status);
+		return $return;
 	}
 	
 	public static function get_by_author($class, $author, $status = null) {
