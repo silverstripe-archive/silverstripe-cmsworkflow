@@ -47,6 +47,7 @@ CMSWorkflow = {
 			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[Time]'] = true;
 			$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Date]'] = true;
 			$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Time]'] = true;
+			$('Form_EditForm').changeDetection_fieldsToIgnore['DeletionScheduling'] = true;
 			$('Form_EditForm').changeDetection_fieldsToIgnore['WorkflowComment'] = true;
 			
 			if ($('Form_EditForm').isChanged()) {
