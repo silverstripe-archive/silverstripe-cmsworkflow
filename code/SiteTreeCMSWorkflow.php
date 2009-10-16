@@ -285,6 +285,17 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 			if(get_class($wf) == 'WorkflowPublicationRequest') $wf->approve("(automatically approved)");
 			else $wf->deny(_t("SiteTreeCMSWorkflow.AUTO_DENIED_PUBLISHED", "(automatically denied when the page was published)"));
 		}
+		
+		if($this->owner->ReviewPeriodDays) {
+			$this->owner->NextReviewDate = date('Y-m-d', strtotime('+' . $this->ReviewPeriodDays . ' days'));
+			$this->owner->write();
+		}
+	}
+	
+	function onBeforeWrite() {
+		if($this->owner->ReviewPeriodDays && !$this->owner->NextReviewDate) {
+			$this->owner->NextReviewDate = date('Y-m-d', strtotime('+' . $this->owner->ReviewPeriodDays . ' days'));
+		}
 	}
 	
 	/**
