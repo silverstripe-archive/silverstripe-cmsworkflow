@@ -7,17 +7,18 @@ SiteTreeCMSWorkflow::register_request('WorkflowPublicationRequest');
 SiteTreeCMSWorkflow::register_request('WorkflowDeletionRequest');
 
 // Defaults to a "two step" workflow.
-// See README for instructions to enable "three step" workflow instead.
 Object::add_extension('WorkflowRequest', 'WorkflowTwoStepRequest');
 Object::add_extension('SiteTree', 'SiteTreeCMSTwoStepWorkflow');
+
+// To enable ThreeStep, remove the two Object:: lines above, and uncomment these.
+// Object::add_extension('WorkflowRequest', 'WorkflowThreeStepRequest');
+// Object::add_extension('SiteTree', 'SiteTreeCMSThreeStepWorkflow');
+// Object::add_extension('SiteConfig', 'SiteConfigThreeStepWorkflow');
+// Object::add_extension('LeftAndMain', 'LeftAndMainCMSThreeStepWorkflow');
 
 Director::addRules(200, array(
 	'admin/changes.rss' => '->admin/cms/changes.rss',
 	'admin/cms/changes.rss' => array('Controller' => 'CMSChangeTracker', 'Data' => 'all'),
-	// These still need to be implemented :-P
-	//'admin/cms/page/$PageID/changes.rss' => array('Controller' => 'CMSChangeTracker', 'Data' => 'page'),
-	//'admin/cms/subtree-of/$PageID/changes.rss' => array('Controller' => 'CMSChangeTracker', 'Data' => 'subtree'),
-	//'admin/cms/children-of/$PageID/changes.rss' => array('Controller' => 'CMSChangeTracker', 'Data' => 'children'),
 ));
 
 unset(CMSBatchActionHandler::$batch_actions['publish']);
