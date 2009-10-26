@@ -294,7 +294,7 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 	 */
 	function augmentDefaultRecords() {
 		// For 2.3 and 2.4 compatibility
-		$bt = defined('SS_SS_Database::USE_ANSI_SQL') ? "\"" : "`";
+		$bt = defined('DB::USE_ANSI_SQL') ? "\"" : "`";
 		
 		$query = "SELECT * FROM {$bt}Group{$bt} WHERE {$bt}Group{$bt}.{$bt}Code{$bt} = 'site-content-authors'";
 		if(!DB::query($query)->value()){
@@ -304,7 +304,7 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 			$authorGroup->write();
 			Permission::grant($authorGroup->ID, "CMS_ACCESS_CMSMain");
 			Permission::grant($authorGroup->ID, "CMS_ACCESS_AssetAdmin");
-			SS_SS_Database::alteration_message("Added site content author group","created");
+			if(method_exists('DB', 'alteration_message')) DB::alteration_message("Added site content author group","created");
 		}
 
 		$query = "SELECT * FROM {$bt}Group{$bt} WHERE {$bt}Group{$bt}.{$bt}Code{$bt} = 'site-content-approvers'";
@@ -315,7 +315,8 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 			$approversGroup->write();
 			Permission::grant($approversGroup->ID, "CMS_ACCESS_CMSMain");
 			Permission::grant($approversGroup->ID, "CMS_ACCESS_AssetAdmin");
-			SS_SS_Database::alteration_message("Added site content approver group","created");
+
+			if(method_exists('DB', 'alteration_message')) DB::alteration_message("Added site content approver group","created");
 		}
 		
 		$query = "SELECT * FROM {$bt}Group{$bt} WHERE {$bt}Group{$bt}.{$bt}Code{$bt} = 'site-content-publishers'";
@@ -326,7 +327,8 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 			$actionersGroup->write();
 			Permission::grant($actionersGroup->ID, "CMS_ACCESS_CMSMain");
 			Permission::grant($actionersGroup->ID, "CMS_ACCESS_AssetAdmin");
-			SS_SS_Database::alteration_message("Added site content publisher group","created");
+
+			if(method_exists('DB', 'alteration_message')) DB::alteration_message("Added site content publisher group","created");
 		}
 	}	
 	

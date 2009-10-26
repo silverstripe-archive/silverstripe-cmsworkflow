@@ -50,7 +50,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 			'db' => array(
 				"ReviewPeriodDays" => "Int",
 				"NextReviewDate" => "Date",
-				"ExpiryDate" => "SSDatetime",
+				"ExpiryDate" => "SS_Datetime",
 				'ReviewNotes' => 'Text'
 			),
 			'has_one' => array(

@@ -24,14 +24,14 @@ class ScheduledPublishing extends BuildTask {
 	/**
 	 * Run the task, and do the business
 	 *
-	 * @param HTTPRequest $httpRequest 
+	 * @param SS_HTTPRequest $httpRequest 
 	 */
 	function run($httpRequest) {
 		Cookie::$report_errors = false;
 		if (class_exists('Subsite')) Subsite::$disable_subsite_filter = true;
 
 		// Look for changes that need to be published
-		$wfRequests = DataObject::get('WorkflowRequest', "Status = 'Scheduled' AND EmbargoDate <= '".SSDatetime::now()->getValue()."'");
+		$wfRequests = DataObject::get('WorkflowRequest', "Status = 'Scheduled' AND EmbargoDate <= '".SS_Datetime::now()->getValue()."'");
 		$admin = Security::findAnAdministrator();
 		$admin->logIn();
 		
@@ -53,7 +53,7 @@ class ScheduledPublishing extends BuildTask {
 		}
 		
 		// Look for live pages that need to be expired
-		$pagesToExpire = Versioned::get_by_stage('SiteTree', 'Live', "ExpiryDate <= '".SSDatetime::now()->getValue()."'");
+		$pagesToExpire = Versioned::get_by_stage('SiteTree', 'Live', "ExpiryDate <= '".SS_Datetime::now()->getValue()."'");
 		if (count($pagesToExpire)) {
 			foreach($pagesToExpire as $page) {
 				// Use a try block to prevent one bad request

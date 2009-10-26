@@ -185,7 +185,7 @@ class WorkflowRequestTest extends FunctionalTest {
 		$this->assertNotNull($request->EmbargoField());
 		$this->assertNotNull($request->ExpiryField());
 		
-		SSDatetime::set_mock_now('2009-05-25 15:00:00');
+		SS_Datetime::set_mock_now('2009-05-25 15:00:00');
 		
 		// Set embargo date to 01/06/2009 3:00pm, expriry to 7 days later
 		$this->assertTrue($page->setEmbargo('01/06/2009', '3:00pm'), 'Setting embargo date');
@@ -209,7 +209,7 @@ class WorkflowRequestTest extends FunctionalTest {
 		
 		$sp = new ScheduledPublishing();
 		$sp->suppressOutput();
-		$sp->run(new HTTPRequest('GET', '/'));
+		$sp->run(new SS_HTTPRequest('GET', '/'));
 		
 		$this->assertEquals(
 			$request->Status,
@@ -217,9 +217,9 @@ class WorkflowRequestTest extends FunctionalTest {
 			"Request is still set to Scheduled after approving a request with embargo and/or expriy dates set, and running the publisher cron"
 		);
 		
-		SSDatetime::set_mock_now('2009-06-03 15:00:00');
+		SS_Datetime::set_mock_now('2009-06-03 15:00:00');
 		
-		$sp->run(new HTTPRequest('GET', '/'));
+		$sp->run(new SS_HTTPRequest('GET', '/'));
 		
 		$request = DataObject::get_by_id('WorkflowPublicationRequest', $request->ID);
 		
@@ -229,13 +229,13 @@ class WorkflowRequestTest extends FunctionalTest {
 			"Request is Completed after embargo date set"
 		);
 		
-		SSDatetime::set_mock_now('2009-06-15 15:00:00');
-		$sp->run(new HTTPRequest('GET', '/'));
+		SS_Datetime::set_mock_now('2009-06-15 15:00:00');
+		$sp->run(new SS_HTTPRequest('GET', '/'));
 		
 		$onLive = Versioned::get_by_stage('Page', 'Live', "SiteTree_Live.ID = ".$page->ID);
 		$this->assertNull($onLive, 'Page has expired from live');
 		
-		SSDatetime::clear_mock_now();
+		SS_Datetime::clear_mock_now();
 	}
 	
 	function testNotificationEmails() {
