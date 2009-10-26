@@ -286,7 +286,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * @return WorkflowRequestChange
 	 */
 	public function addNewChange($comment, $status, $member) {
-		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+		$bt = defined('SS_SS_Database::USE_ANSI_SQL') ? "\"" : "`";
 		
 		$change = new WorkflowRequestChange();
 		$change->AuthorID = $member->ID;
@@ -552,7 +552,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * Returns the old record that will be replaced by this publication.
 	 */
 	public function fromRecord() {
-		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+		$bt = defined('SS_SS_Database::USE_ANSI_SQL') ? "\"" : "`";
 		return Versioned::get_one_by_stage('SiteTree', 'Live', "{$bt}SiteTree_Live{$bt}.ID = {$this->PageID}", true, "Created DESC");
 	}
 	
@@ -611,7 +611,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 */
 	public static function get_by_author($class, $author, $status = null) {
 		// To ensure 2.3 and 2.4 compatibility
-		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+		$bt = defined('SS_SS_Database::USE_ANSI_SQL') ? "\"" : "`";
 		
 		if($status) $statusStr = "'".implode("','", $status)."'";
 
@@ -646,7 +646,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 */
 	public static function get_by_publisher($class, $publisher, $status = null) {
 		// To ensure 2.3 and 2.4 compatibility
-		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+		$bt = defined('SS_SS_Database::USE_ANSI_SQL') ? "\"" : "`";
 
 		if($status) $statusStr = "'".implode("','", $status)."'";
 
@@ -679,7 +679,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 */
 	public static function get($class, $status = null) {
 		// To ensure 2.3 and 2.4 compatibility
-		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+		$bt = defined('SS_SS_Database::USE_ANSI_SQL') ? "\"" : "`";
 
 		if($status) $statusStr = implode(',', $status);
 

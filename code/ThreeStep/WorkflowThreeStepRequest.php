@@ -190,7 +190,7 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 	
 	public static function get_by_approver($class, $approver, $status = null) {
 		// To ensure 2.3 and 2.4 compatibility
-		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+		$bt = defined('SS_SS_Database::USE_ANSI_SQL') ? "\"" : "`";
 
 		if($status) $statusStr = "'".implode("','", $status)."'";
 
@@ -241,7 +241,7 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 	
 	public static function get_by_publisher($class, $publisher, $status = null) {
 		// To ensure 2.3 and 2.4 compatibility
-		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+		$bt = defined('SS_SS_Database::USE_ANSI_SQL') ? "\"" : "`";
 
 		if($status) $statusStr = "'".implode("','", $status)."'";
 

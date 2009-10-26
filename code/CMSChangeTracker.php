@@ -10,7 +10,7 @@ class CMSChangeTracker extends Controller {
 	
 	function index($request) {
 		// For 2.3 and 2.4 compatibility
-		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+		$bt = defined('SS_SS_Database::USE_ANSI_SQL') ? "\"" : "`";
 
 		BasicAuth::enable();
 		BasicAuth::requireLogin("CMS RSS feed access.  Use your CMS login", "CMS_ACCESS_CMSMain");
@@ -103,7 +103,7 @@ HTML;
 	 */
 	function changes($SQL_filter = null, $limit = 10) {
 		// For 2.3 and 2.4 compatibility
-		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+		$bt = defined('SS_SS_Database::USE_ANSI_SQL') ? "\"" : "`";
 		
 		// Build the query by  replacing `SiteTree` with `SiteTree_versions` in a regular query.
 		// Note that this should *really* be handled by a more full-featured data mapper; as it stands

@@ -157,7 +157,7 @@ class SiteTreeCMSTwoStepWorkflow extends SiteTreeCMSWFDecorator {
 
 	function augmentDefaultRecords() {
 		// For 2.3 and 2.4 compatibility
-		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+		$bt = defined('SS_SS_Database::USE_ANSI_SQL') ? "\"" : "`";
 		
 		$query = "SELECT * FROM {$bt}Group{$bt} WHERE {$bt}Group{$bt}.{$bt}Code{$bt} = 'site-content-authors'";
 		if(!DB::query($query)->value()){
@@ -167,7 +167,7 @@ class SiteTreeCMSTwoStepWorkflow extends SiteTreeCMSWFDecorator {
 			$authorGroup->write();
 			Permission::grant($authorGroup->ID, "CMS_ACCESS_CMSMain");
 			Permission::grant($authorGroup->ID, "CMS_ACCESS_AssetAdmin");
-			Database::alteration_message("Added site content author group","created");
+			SS_SS_Database::alteration_message("Added site content author group","created");
 		}
 
 		$query = "SELECT * FROM {$bt}Group{$bt} WHERE {$bt}Group{$bt}.{$bt}Code{$bt} = 'site-content-publishers'";
@@ -178,7 +178,7 @@ class SiteTreeCMSTwoStepWorkflow extends SiteTreeCMSWFDecorator {
 			$publishersGroup->write();
 			Permission::grant($publishersGroup->ID, "CMS_ACCESS_CMSMain");
 			Permission::grant($publishersGroup->ID, "CMS_ACCESS_AssetAdmin");
-			Database::alteration_message("Added site content publisher group","created");
+			SS_SS_Database::alteration_message("Added site content publisher group","created");
 		}
 	}
 }

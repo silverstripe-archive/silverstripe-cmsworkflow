@@ -331,7 +331,7 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 	function workflowAction($workflowClass,  $actionName, $id, $comment) {
 		if(is_numeric($id)) {
 			// For 2.3 and 2.4 compatibility
-			$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+			$bt = defined('SS_SS_Database::USE_ANSI_SQL') ? "\"" : "`";
 
 			$page = DataObject::get_by_id("SiteTree", $id);
 			if(!$page) $page = Versioned::get_one_by_stage("SiteTree", "Live", "{$bt}SiteTree{$bt}.ID = $id");

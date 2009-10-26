@@ -100,7 +100,7 @@ class WorkflowRequestChange extends DataObject {
 	 */
 	function getDiffLinkOriginalToLastPublished() {
 		// For 2.3 and 2.4 compatibility
-		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+		$bt = defined('SS_SS_Database::USE_ANSI_SQL') ? "\"" : "`";
 
 		$page = $this->WorkflowRequest()->Page();
 		$fromVersion = $page->Version;
@@ -118,7 +118,7 @@ class WorkflowRequestChange extends DataObject {
 	 */
 	function getDiffLinkToLastPublished() {
 		// For 2.3 and 2.4 compatibility
-		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+		$bt = defined('SS_SS_Database::USE_ANSI_SQL') ? "\"" : "`";
 
 		$page = $this->WorkflowRequest()->Page();
 		$fromVersion = $this->PageDraftVersion;

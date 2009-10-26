@@ -163,7 +163,7 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 	
 	function testCmsActionsLimited() {
 		// For 2.3 and 2.4 compatibility
-		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+		$bt = defined('SS_SS_Database::USE_ANSI_SQL') ? "\"" : "`";
 
 		$custompublisherspage = $this->objFromFixture('SiteTree', 'custompublisherpage');
 		
