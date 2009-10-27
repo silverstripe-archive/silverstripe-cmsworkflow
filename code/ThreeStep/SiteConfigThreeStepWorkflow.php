@@ -25,7 +25,7 @@ class SiteConfigThreeStepWorkflow extends DataObjectDecorator {
 	 * @return void
 	 */
 	function updateEditFormFields(&$fields) {
-		$fields->addFieldsToTab("Root.Workflow", array(
+		$fields->addFieldsToTab("Root.Access", array(
 			new HeaderField(_t('SiteTreeCMSWorkflow.APPROVEHEADER', "Who can approve requests inside the CMS?"), 2),
 			$approveTypeField = new OptionsetField(
 				"CanApproveType", 
@@ -39,7 +39,7 @@ class SiteConfigThreeStepWorkflow extends DataObjectDecorator {
 			$approverGroupsField = new TreeMultiselectField("ApproverGroups", "Approver groups")
 		));
 		
-		$fields->addFieldsToTab("Root.Workflow", array(
+		$fields->addFieldsToTab("Root.Access", array(
 			new HeaderField(_t('SiteTreeCMSWorkflow.PUBLISHAPPROVEDHEADER', "Who can publish approved requests inside the CMS?"), 2),
 			$actionTypeField = new OptionsetField(
 				"CanPublishType", 
