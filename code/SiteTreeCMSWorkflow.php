@@ -371,7 +371,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 	
 	function providePermissions() {
 		return array(
-			"EDIT_CONTENT_REVIEW_FIELDS" => "Can edit the 'Content review' fields on each page",
+			"EDIT_CONTENT_REVIEW_FIELDS" => "Set content owners and review dates",
 		);
 	}
 }

@@ -334,7 +334,7 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 	
 	function providePermissions() {
 		return array(
-			"IS_WORKFLOW_ADMIN" => "Is a CMS workflow admin",
+			"IS_WORKFLOW_ADMIN" => "Perform any workflow task",
 		);
 	}
 }
