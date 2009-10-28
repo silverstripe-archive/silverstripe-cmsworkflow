@@ -24,6 +24,9 @@ class ThreeStepMyPublicationRequestsSideReport extends SideReport {
 			),
 		);
 	}
+	function canView() {
+		return Object::has_extension('SiteTree', 'SiteTreeCMSThreeStepWorkflow');
+	}
 }
 
 ?>

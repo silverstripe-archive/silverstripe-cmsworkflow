@@ -23,6 +23,9 @@ class MyTwoStepWorkflowRequestsSideReport extends SideReport {
 			),
 		);
 	}
+	function canView() {
+		return Object::has_extension('SiteTree', 'SiteTreeCMSTwoStepWorkflow');
+	}
 }
 
 ?>

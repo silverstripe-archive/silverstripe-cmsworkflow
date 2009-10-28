@@ -24,6 +24,9 @@ class MyTwoStepDeletionRequestsSideReport extends SideReport {
 			),
 		);
 	}
+	function canView() {
+		return Object::has_extension('SiteTree', 'SiteTreeCMSTwoStepWorkflow');
+	}
 }
 
 ?>

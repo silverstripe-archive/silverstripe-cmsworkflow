@@ -30,6 +30,9 @@ class ThreeStepMyDeletionRequestsSideReport extends SideReport {
 			)
 		);
 	}
+	function canView() {
+		return Object::has_extension('SiteTree', 'SiteTreeCMSThreeStepWorkflow');
+	}
 }
 
 ?>
