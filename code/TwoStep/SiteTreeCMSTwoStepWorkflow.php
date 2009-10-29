@@ -119,6 +119,13 @@ class SiteTreeCMSTwoStepWorkflow extends SiteTreeCMSWFDecorator {
 		return true;
 	}
 	
+	/**
+	 * Stub. Hook into canPublish() for template usage
+	 */
+	function canApprove($member = null) {
+		return $this->canPublish($member);
+	}
+	
 	function whoCanApprove() {
 		return $this->PublisherMembers();
 	}
