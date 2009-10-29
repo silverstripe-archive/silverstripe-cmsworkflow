@@ -7,7 +7,13 @@
  */
 class PagesScheduledForPublishingSideReport extends SideReport {
 	function title() {
-		return _t('PagesScheduledForPublishingSideReport.TITLE',"Workflow: pages scheduled for publishing");
+		return _t('PagesScheduledForPublishingSideReport.TITLE',"Pages scheduled for publishing");
+	}
+	function group() {
+		return "Workflow reports";
+	}
+	function sort() {
+		return 900;
 	}
 	function records() {
 		if (ClassInfo::exists('Subsite') && isset($this->params['AllSubsites'])) {

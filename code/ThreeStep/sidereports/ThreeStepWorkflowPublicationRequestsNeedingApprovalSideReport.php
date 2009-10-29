@@ -7,7 +7,13 @@
  */
 class ThreeStepWorkflowPublicationRequestsNeedingApprovalSideReport extends SideReport {
 	function title() {
-		return _t('ThreeStepWorkflowPublicationRequestsNeedingApprovalSideReport.TITLE',"Workflow: publication requests I need to approve");
+		return _t('ThreeStepWorkflowPublicationRequestsNeedingApprovalSideReport.TITLE',"Publication requests I need to approve");
+	}
+	function group() {
+		return "Workflow reports";
+	}
+	function sort() {
+		return 100;
 	}
 	function records() {
 		if (ClassInfo::exists('Subsite') && isset($this->params['AllSubsites'])) {

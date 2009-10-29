@@ -9,6 +9,12 @@ class MyTwoStepDeletionRequestsSideReport extends SideReport {
 	function title() {
 		return _t('MyTwoStepDeletionRequestsSideReport.TITLE',"Workflow: Awaiting deletion");
 	}
+	function group() {
+		return "Workflow reports";
+	}
+	function sort() {
+		return -100;
+	}
 	function records() {
 		return WorkflowTwoStepRequest::get_by_publisher(
 			'WorkflowDeletionRequest',
@@ -25,6 +31,7 @@ class MyTwoStepDeletionRequestsSideReport extends SideReport {
 		);
 	}
 	function canView() {
+		return false;
 		return Object::has_extension('SiteTree', 'SiteTreeCMSTwoStepWorkflow');
 	}
 }

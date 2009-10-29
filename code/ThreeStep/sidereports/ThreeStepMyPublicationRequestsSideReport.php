@@ -7,7 +7,13 @@
  */
 class ThreeStepMyPublicationRequestsSideReport extends SideReport {
 	function title() {
-		return _t('ThreeStepMyPublicationRequestsSideReport.TITLE',"Workflow: my publication requests");
+		return _t('ThreeStepMyPublicationRequestsSideReport.TITLE',"Publication requests I have made");
+	}
+	function group() {
+		return "Workflow reports";
+	}
+	function sort() {
+		return -200;
 	}
 	function records() {
 		return WorkflowThreeStepRequest::get_by_author(

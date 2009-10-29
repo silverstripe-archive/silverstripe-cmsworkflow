@@ -7,7 +7,13 @@
  */
 class ThreeStepMyDeletionRequestsSideReport extends SideReport {
 	function title() {
-		return _t('ThreeStepMyDeletionRequestsSideReport.TITLE',"Workflow: my deletion requests");
+		return _t('ThreeStepMyDeletionRequestsSideReport.TITLE',"Removal requests I have made");
+	}
+	function group() {
+		return "Workflow reports";
+	}
+	function sort() {
+		return -100;
 	}
 	function records() {
 		// Set stage, otherwise, we won't get any results

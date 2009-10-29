@@ -8,6 +8,12 @@ class MyTwoStepWorkflowRequestsSideReport extends SideReport {
 	function title() {
 		return _t('MyTwoStepWorkflowRequestsSideReport.TITLE',"Workflow: My requests pending review");
 	}
+	function group() {
+		return "Workflow reports";
+	}
+	function sort() {
+		return 100;
+	}
 	function records() {
 		return WorkflowTwoStepRequest::get_by_author(
 			'WorkflowRequest',
@@ -24,6 +30,7 @@ class MyTwoStepWorkflowRequestsSideReport extends SideReport {
 		);
 	}
 	function canView() {
+		return false;
 		return Object::has_extension('SiteTree', 'SiteTreeCMSTwoStepWorkflow');
 	}
 }

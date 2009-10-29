@@ -9,6 +9,12 @@ class MyTwoStepPublicationRequestsSideReport extends SideReport {
 	function title() {
 		return _t('MyTwoStepPublicationRequestsSideReport.TITLE',"Workflow: Awaiting publication");
 	}
+	function group() {
+		return "Workflow reports";
+	}
+	function sort() {
+		return -200;
+	}
 	function records() {
 		if(Permission::check("ADMIN")) {
 			return WorkflowTwoStepRequest::get(
@@ -32,6 +38,7 @@ class MyTwoStepPublicationRequestsSideReport extends SideReport {
 		);
 	}
 	function canView() {
+		return false;
 		return Object::has_extension('SiteTree', 'SiteTreeCMSTwoStepWorkflow');
 	}
 }

@@ -7,7 +7,13 @@
  */
 class PagesScheduledForDeletionSideReport extends SideReport {
 	function title() {
-		return _t('PagesScheduledForDeletionSideReport.TITLE',"Workflow: pages scheduled for deletion");
+		return _t('PagesScheduledForDeletionSideReport.TITLE',"Pages scheduled for removal");
+	}
+	function group() {
+		return "Workflow reports";
+	}
+	function sort() {
+		return 1000;
 	}
 	function records() {
 		if (ClassInfo::exists('Subsite') && isset($this->params['AllSubsites'])) {
