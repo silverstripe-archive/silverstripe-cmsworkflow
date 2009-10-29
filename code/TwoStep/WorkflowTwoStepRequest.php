@@ -142,7 +142,7 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		
 		if($this->owner->Status == 'AwaitingApproval' && $this->owner->Page()->canPublish()) {
 			$actions['cms_approve'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_APPROVE", "Approve");
-			$actions['cms_requestedit'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_REQUESTEDIT", "Request edit");
+			if (get_class($this->owner) != 'WorkflowDeletionRequest') $actions['cms_requestedit'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_REQUESTEDIT", "Request edit");
 			if (WorkflowRequest::$allow_deny) $actions['cms_deny'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_DENY","Deny");
 		} else if($this->owner->Status == 'AwaitingEdit' && $this->owner->Page()->canEdit()) {
 			// @todo this couples this class to its subclasses. :-(
