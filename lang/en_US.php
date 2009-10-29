@@ -2,18 +2,45 @@
 
 global $lang;
 
-$lang['en_US']['DeletionRequestSideReport']['TITLE'] = 'Workflow: Awaiting deletion';
-$lang['en_US']['MyWorkflowRequestsSideReport']['TITLE'] = 'Workflow: My requests pending review';
-$lang['en_US']['PublisherReviewSideReport']['TITLE'] = 'Workflow: Awaiting publication';
+$lang['en_US']['BatchApprovePages']['APPROVED_PAGES'] = 'Approved %d pages';
+$lang['en_US']['BatchApprovePages']['APPROVE_PAGES'] = 'CMS Workflow Approve pages';
+$lang['en_US']['BatchApprovePages']['APPROVING_PAGES'] = 'Approving pages';
+$lang['en_US']['BatchPublishPages']['PUBLISHED_PAGES'] = 'Published %d pages';
+$lang['en_US']['BatchPublishPages']['PUBLISHING_PAGES'] = 'Publishing pages';
+$lang['en_US']['BatchPublishPages']['PUBLISH_PAGES'] = 'CMS Workflow Publish pages';
+$lang['en_US']['BatchResetEmbargo']['ACTIONED_PAGES'] = 'Reset embargo date on %d pages';
+$lang['en_US']['BatchResetEmbargo']['ACTION_TITLE'] = 'Reset embargo date';
+$lang['en_US']['BatchResetEmbargo']['DOING_TEXT'] = 'Resetting embargo date';
+$lang['en_US']['BatchResetExpiry']['ACTIONED_PAGES'] = 'Reset expiry date on %d pages';
+$lang['en_US']['BatchResetExpiry']['ACTION_TITLE'] = 'Reset expiry date';
+$lang['en_US']['BatchResetExpiry']['DOING_TEXT'] = 'Resetting expiry date';
+$lang['en_US']['BatchSetEmbargo']['ACTIONED_PAGES'] = 'Set embargo date on %d pages';
+$lang['en_US']['BatchSetEmbargo']['ACTION_TITLE'] = 'Set expiry date';
+$lang['en_US']['BatchSetEmbargo']['DOING_TEXT'] = 'Setting expiry date';
+$lang['en_US']['BatchSetExpiry']['ACTIONED_PAGES'] = 'Set expiry date on %d pages';
+$lang['en_US']['CMSWorkflowThreeStepFilters_PagesAwaitingApproval']['TITLE'] = 'Pages awaiting approval';
+$lang['en_US']['CMSWorkflowThreeStepFilters_PagesAwaitingPublishing']['TITLE'] = 'Pages awaiting publishing';
+$lang['en_US']['LeftAndMain']['CHANGEDURL'] = '  Changed URL to \'%s\'';
+$lang['en_US']['LeftAndMain']['SAVEDUP'] = 'Saved';
+$lang['en_US']['LeftAndMain']['STATUSTO'] = '  Status changed to \'%s\'';
+$lang['en_US']['MyTwoStepDeletionRequestsSideReport']['TITLE'] = 'Workflow: Awaiting deletion';
+$lang['en_US']['MyTwoStepPublicationRequestsSideReport']['TITLE'] = 'Workflow: Awaiting publication';
+$lang['en_US']['MyTwoStepWorkflowRequestsSideReport']['TITLE'] = 'Workflow: My requests pending review';
+$lang['en_US']['PagesDueForReviewSideReport']['TITLE'] = 'Pages due for review';
+$lang['en_US']['PagesScheduledForDeletionSideReport']['TITLE'] = 'Workflow: pages scheduled for deletion';
+$lang['en_US']['PagesScheduledForPublishingSideReport']['TITLE'] = 'Workflow: pages scheduled for publishing';
 $lang['en_US']['SiteTree']['EDITANYONE'] = 'Anyone who can log-in to the CMS';
 $lang['en_US']['SiteTree']['EDITINHERIT'] = 'Inherit from parent page';
 $lang['en_US']['SiteTree']['EDITONLYTHESE'] = 'Only these people (choose from list)';
 $lang['en_US']['SiteTreeCMSWorkflow']['APPROVEHEADER'] = 'Who can approve requests inside the CMS?';
 $lang['en_US']['SiteTreeCMSWorkflow']['APPROVEMESSAGE'] = 'Approved request. Emailed %s.';
+$lang['en_US']['SiteTreeCMSWorkflow']['AUTO_APPROVED'] = '(automatically approved)';
+$lang['en_US']['SiteTreeCMSWorkflow']['AUTO_DENIED'] = '(automatically denied)';
 $lang['en_US']['SiteTreeCMSWorkflow']['AUTO_DENIED_DELETED'] = '(automatically denied when the page was deleted)';
 $lang['en_US']['SiteTreeCMSWorkflow']['AUTO_DENIED_PUBLISHED'] = '(automatically denied when the page was published)';
 $lang['en_US']['SiteTreeCMSWorkflow']['BUTTONREQUESTPUBLICATION'] = 'Request Publication';
 $lang['en_US']['SiteTreeCMSWorkflow']['BUTTONREQUESTREMOVAL'] = 'Request Removal';
+$lang['en_US']['SiteTreeCMSWorkflow']['CANCELREQUEST_MESSAGE'] = 'Cancelled workflow request. Emailed %s';
 $lang['en_US']['SiteTreeCMSWorkflow']['CHANGEREQUESTED'] = 'Requested this change. Emailed %s.';
 $lang['en_US']['SiteTreeCMSWorkflow']['CLOSEDREQUESTSHEADER'] = 'Closed Requests';
 $lang['en_US']['SiteTreeCMSWorkflow']['COMMENT_MESSAGE'] = 'Commented on this workflow request. Emailed %s.';
@@ -22,6 +49,7 @@ $lang['en_US']['SiteTreeCMSWorkflow']['DIFFERENCESCOLUMN'] = 'Differences';
 $lang['en_US']['SiteTreeCMSWorkflow']['DIFFERENCESLINK'] = 'Show differences to live';
 $lang['en_US']['SiteTreeCMSWorkflow']['DIFFERENCESTHISCHANGECOLUMN'] = 'Differences in this change';
 $lang['en_US']['SiteTreeCMSWorkflow']['DIFFERENCESTOLIVECOLUMN'] = 'Differences to live';
+$lang['en_US']['SiteTreeCMSWorkflow']['EXPIRYCANCELLED'] = 'Expiry cancelled.';
 $lang['en_US']['SiteTreeCMSWorkflow']['FIELDLABEL_AUTHOR'] = 'Author';
 $lang['en_US']['SiteTreeCMSWorkflow']['FIELDLABEL_PAGE'] = 'Page';
 $lang['en_US']['SiteTreeCMSWorkflow']['FIELDLABEL_PUBLISHER'] = 'Publisher';
@@ -37,18 +65,25 @@ $lang['en_US']['SiteTreeCMSWorkflow']['REVIEWHEADER'] = 'Content review';
 $lang['en_US']['SiteTreeCMSWorkflow']['STATUS_APPROVED'] = 'Approved';
 $lang['en_US']['SiteTreeCMSWorkflow']['STATUS_AWAITINGAPPROVAL'] = 'Awaiting Approval';
 $lang['en_US']['SiteTreeCMSWorkflow']['STATUS_AWAITINGEDIT'] = 'Awaiting Edit';
+$lang['en_US']['SiteTreeCMSWorkflow']['STATUS_CANCELLED'] = 'Cancelled';
 $lang['en_US']['SiteTreeCMSWorkflow']['STATUS_COMPLETED'] = 'Completed';
 $lang['en_US']['SiteTreeCMSWorkflow']['STATUS_DENIED'] = 'Denied';
 $lang['en_US']['SiteTreeCMSWorkflow']['STATUS_OPEN'] = 'Open';
-$lang['en_US']['SiteTreeCMSWorkflow']['STATUS_UNKNOWN'] = 'Unknown';
+$lang['en_US']['SiteTreeCMSWorkflow']['STATUS_SCHEDULED'] = 'Scheduled for Publishing';
 $lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOWACTION_ACTION'] = 'Publish change';
 $lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOWACTION_APPROVE'] = 'Approve';
 $lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOWACTION_REQUESTEDIT'] = 'Request edit';
+$lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOW_ACTION_CANCEL'] = 'Cancel';
 $lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOW_ACTION_COMMENT'] = 'Comment';
 $lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOW_ACTION_DENY'] = 'Deny';
-$lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOW_ACTION_CANCEL'] = 'Cancel';
 $lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOW_ACTION_FAILED'] = 'There was an error when processing your workflow request.';
 $lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOW_ACTION_RESUBMIT'] = 'Re-submit';
+$lang['en_US']['ThreeStepMyDeletionRequestsSideReport']['TITLE'] = 'Workflow: my deletion requests';
+$lang['en_US']['ThreeStepMyPublicationRequestsSideReport']['TITLE'] = 'Workflow: my publication requests';
+$lang['en_US']['ThreeStepWorkflowPublicationRequestsNeedingApprovalSideReport']['TITLE'] = 'Workflow: publication requests I need to approve';
+$lang['en_US']['ThreeStepWorkflowPublicationRequestsNeedingPublishingSideReport']['TITLE'] = 'Workflow: publication requests I need to publish';
+$lang['en_US']['ThreeStepWorkflowRemovalRequestsNeedingApprovalSideReport']['TITLE'] = 'Workflow: removal requests I need to approve';
+$lang['en_US']['ThreeStepWorkflowRemovalRequestsNeedingPublishingSideReport']['TITLE'] = 'Workflow: removal requests I need to publish';
 $lang['en_US']['WorkflowDeletionRequest']['EMAIL_PARA_APPROVED'] = array(
 	'%s has approved the request to delete the "%s" page and deleted it from the published site.',
 	50,
@@ -99,6 +134,8 @@ $lang['en_US']['WorkflowDeletionRequest']['EMAIL_SUBJECT_DENIED'] = array(
 	50,
 	'Email subject with page title'
 );
+$lang['en_US']['WorkflowDeletionRequest']['SETEXPIRY'] = 'Set Expiry date. Emailed %s';
+$lang['en_US']['WorkflowPublicationRequest']['BUTTONCANCELEXPIRY'] = 'Cancel expiry';
 $lang['en_US']['WorkflowPublicationRequest']['EMAIL_PARA_APPROVED'] = array(
 	'%s has approved and published the changes to the "%s" page.',
 	50,

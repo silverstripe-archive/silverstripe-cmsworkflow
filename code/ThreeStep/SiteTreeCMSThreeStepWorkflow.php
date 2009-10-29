@@ -334,7 +334,12 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 	
 	function providePermissions() {
 		return array(
-			"IS_WORKFLOW_ADMIN" => "Perform any workflow task",
+			"IS_WORKFLOW_ADMIN" => array(
+				'name' => "Perform any workflow task",
+				'category' => 'Roles and access permissions',
+				'help' => 'Ability to do anything within workflow (approve, publish etc.), i.e., a global override of all workflow.',
+				'sort' => 500
+			)
 		);
 	}
 }
