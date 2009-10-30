@@ -10,6 +10,6 @@ class BatchResetExpiry extends CMSBatchAction {
 
 	function run(DataObjectSet $pages) {
 		return $this->batchaction($pages, 'resetExpiry',
-			_t('BatchResetExpiry.ACTIONED_PAGES', 'Reset expiry date on %d pages'));
+			_t('BatchResetExpiry.ACTIONED_PAGES', 'Reset expiry date on %d pages, %d failures'));
 	}
 }

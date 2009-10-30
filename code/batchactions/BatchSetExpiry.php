@@ -10,7 +10,7 @@ class BatchSetExpiry extends CMSBatchAction {
 
 	function run(DataObjectSet $pages) {
 		return $this->batchaction($pages, 'setExpiry',
-			_t('BatchSetExpiry.ACTIONED_PAGES', 'Set expiry date on %d pages'),
+			_t('BatchSetExpiry.ACTIONED_PAGES', 'Set expiry date on %d pages, %d failures'),
 		array($_REQUEST['ExpiryDate_Batch']['Date'], $_REQUEST['ExpiryDate_Batch']['Time']));
 	}
 	

@@ -10,7 +10,7 @@ class BatchSetEmbargo extends CMSBatchAction {
 
 	function run(DataObjectSet $pages) {
 		return $this->batchaction($pages, 'setEmbargo',
-			_t('BatchSetEmbargo.ACTIONED_PAGES', 'Set embargo date on %d pages'),
+			_t('BatchSetEmbargo.ACTIONED_PAGES', 'Set embargo date on %d pages, %d failures'),
 		array($_REQUEST['EmbargoDate_Batch']['Date'], $_REQUEST['EmbargoDate_Batch']['Time']));
 	}
 	
