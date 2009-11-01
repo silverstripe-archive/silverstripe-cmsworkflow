@@ -10,11 +10,11 @@ class BatchApprovePages extends CMSBatchAction {
 
 	function run(DataObjectSet $pages) {
 		$pageIDs = $pages->column('ID');
+		foreach($pageIDs as $pageID) FormResponse::add("$('Form_EditForm').reloadIfSetTo($pageID);");
+		
 		$this->batchaction($pages, 'batchApprove',
 			_t('BatchApprovePages.APPROVED_PAGES', 'Approved %d pages, %d failures')
 		);
-		
-		foreach($pageIDs as $pageID) FormResponse::add("$('Form_EditForm').reloadIfSetTo($pageID);");
 		
 		return FormResponse::respond();
 	}
