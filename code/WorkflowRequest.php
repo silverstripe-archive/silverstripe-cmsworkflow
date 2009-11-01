@@ -73,52 +73,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * Not all event/role combinations are neccessairily
 	 * implemented by all ApprovalPaths.
 	 */
-	static $alerts = array(
-		'WorkflowPublicationRequest' => array(
-			'request' => array(
-				'author' => false,
-				'publisher' => true
-			),
-			'publish' => array(
-				'author' => true,
-				'publisher' => true
-			),
-			'deny' => array(
-				'author' => true,
-				'publisher' => false
-			),
-			'cancel' => array(
-				'author' => true,
-				'publisher' => false
-			),
-			'comment' => array(
-				'author' => true,
-				'publisher' => true
-			)
-		),
-		'WorkflowDeletionRequest' => array(
-			'request' => array(
-				'author' => false,
-				'publisher' => true
-			),
-			'publish' => array(
-				'author' => true,
-				'publisher' => true
-			),
-			'deny' => array(
-				'author' => true,
-				'publisher' => false
-			),
-			'cancel' => array(
-				'author' => true,
-				'publisher' => false
-			),
-			'comment' => array(
-				'author' => true,
-				'publisher' => true
-			)
-		)
-	);
+	static $alerts = array();
 
 	protected $memberIdsEmailed = array();
 

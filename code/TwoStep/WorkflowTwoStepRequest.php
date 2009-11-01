@@ -65,38 +65,46 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 			$this->owner->Page()->Title
 		);
 		
-		$publishers = $this->owner->Page()->PublisherMembers();
-		foreach($publishers as $publisher){
-			// Notify publishers other than the one who is logged in 
-			if(Member::currentUserID() != $publisher->ID) {
-				$this->owner->sendNotificationEmail(
-					Member::currentUser(), // sender
-					$publisher, // recipient
-					_t("{$this->owner->class}.EMAIL_SUBJECT_APPROVED"),
-					_t("{$this->owner->class}.EMAIL_PARA_APPROVED"),
-					$comment,
-					'WorkflowGenericEmail'
-				);
+		if (WorkflowRequest::should_send_alert($this->owner->class, 'request', 'publisher')) {
+			$publishers = $this->owner->Page()->PublisherMembers();
+			foreach($publishers as $publisher){
+				// Notify publishers other than the one who is logged in 
+				if(Member::currentUserID() != $publisher->ID) {
+					$this->owner->sendNotificationEmail(
+						Member::currentUser(), // sender
+						$publisher, // recipient
+						_t("{$this->owner->class}.EMAIL_SUBJECT_APPROVED"),
+						_t("{$this->owner->class}.EMAIL_PARA_APPROVED"),
+						$comment,
+						'WorkflowGenericEmail'
+					);
+				}
 			}
 		}
 
-		$this->owner->sendNotificationEmail(
-			Member::currentUser(), // sender
-			$author, // recipient
-			_t("{$this->owner->class}.EMAIL_SUBJECT_APPROVED"),
-			_t("{$this->owner->class}.EMAIL_PARA_APPROVED"),
-			$comment,
-			'WorkflowGenericEmail'
-		);
+		if (WorkflowRequest::should_send_alert($this->owner->class, 'request', 'author')) {
+			$this->owner->sendNotificationEmail(
+				Member::currentUser(), // sender
+				$author, // recipient
+				_t("{$this->owner->class}.EMAIL_SUBJECT_APPROVED"),
+				_t("{$this->owner->class}.EMAIL_PARA_APPROVED"),
+				$comment,
+				'WorkflowGenericEmail'
+			);
+		}
 	}
 	
 	function notifyComment($comment) {
 		// Comment recipients cover everyone except the person making the comment
 		$commentRecipients = array();
-		if(Member::currentUserID() != $this->owner->Author()->ID) $commentRecipients[] = $this->owner->Author();
-		$publishers = $this->owner->Page()->PublisherMembers();
-		foreach($publishers as $publisher){
-			if(Member::currentUserID() != $publisher->ID) $commentRecipients[] = $publisher;
+		if (WorkflowRequest::should_send_alert($this->owner->class, 'comment', 'author')) {
+			if(Member::currentUserID() != $this->owner->Author()->ID) $commentRecipients[] = $this->owner->Author();
+		}
+		if (WorkflowRequest::should_send_alert($this->owner->class, 'comment', 'publisher')) {
+			$publishers = $this->owner->Page()->PublisherMembers();
+			foreach($publishers as $publisher){
+				if(Member::currentUserID() != $publisher->ID) $commentRecipients[] = $publisher;
+			}
 		}
 
 		foreach($commentRecipients as $recipient) {
@@ -119,15 +127,17 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		$publishers = $this->owner->Page()->PublisherMembers();
 		$author = $this->owner->Author();
 		
-		foreach($publishers as $publisher){
-			$this->owner->sendNotificationEmail(
-				$author, // sender
-				$publisher, // recipient
-				_t("{$this->owner->class}.EMAIL_SUBJECT_AWAITINGAPPROVAL"),
-				_t("{$this->owner->class}.EMAIL_PARA_AWAITINGAPPROVAL"),
-				$comment,
-				'WorkflowGenericEmail'
-			);
+		if (WorkflowRequest::should_send_alert($this->owner->class, 'request', 'publisher')) {
+			foreach($publishers as $publisher){
+				$this->owner->sendNotificationEmail(
+					$author, // sender
+					$publisher, // recipient
+					_t("{$this->owner->class}.EMAIL_SUBJECT_AWAITINGAPPROVAL"),
+					_t("{$this->owner->class}.EMAIL_PARA_AWAITINGAPPROVAL"),
+					$comment,
+					'WorkflowGenericEmail'
+				);
+			}
 		}
 	}
 	
@@ -168,5 +178,48 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 	
 	public static function get($class, $status = null) {
 		return WorkflowRequest::get($class, $status);
+	}
+	
+	public static function apply_alerts() {
+		WorkflowRequest::$alerts = array(
+			'WorkflowPublicationRequest' => array(
+				'request' => array(
+					'publisher' => true
+				),
+				'publish' => array(
+					'author' => true,
+					'publisher' => true
+				),
+				'deny' => array(
+					'author' => true
+				),
+				'cancel' => array(
+					'author' => true
+				),
+				'comment' => array(
+					'author' => true,
+					'publisher' => true
+				)
+			),
+			'WorkflowDeletionRequest' => array(
+				'request' => array(
+					'publisher' => true
+				),
+				'publish' => array(
+					'author' => true,
+					'publisher' => true
+				),
+				'deny' => array(
+					'author' => true
+				),
+				'cancel' => array(
+					'author' => true
+				),
+				'comment' => array(
+					'author' => true,
+					'publisher' => true
+				)
+			)
+		);
 	}
 }
