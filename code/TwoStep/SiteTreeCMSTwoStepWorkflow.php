@@ -76,7 +76,7 @@ class SiteTreeCMSTwoStepWorkflow extends SiteTreeCMSWFDecorator {
 		} elseif($this->owner->CanPublishType == 'Inherit') {
 			if ($this->owner->Parent()->Exists()) {
 				return $this->owner->Parent()->PublisherMembers();
-			} else { return new DataObjectSet(); }
+			} else { return SiteConfig::current_site_config()->PublisherMembers(); }
 		} elseif($this->owner->CanPublishType == 'LoggedInUsers') {
 			return Permission::get_members_by_permission('CMS_ACCESS_CMSMain');
 		} else {
