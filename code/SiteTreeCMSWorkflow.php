@@ -8,7 +8,7 @@
  *
  * @package cmsworkflow
  */
-class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvider {
+class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	
 	/**
 	 * A registry of all allowed request classes.
@@ -48,25 +48,12 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 	function extraStatics() {
 		return array(
 			'db' => array(
-				"ReviewPeriodDays" => "Int",
-				"NextReviewDate" => "Date",
 				"ExpiryDate" => "SS_Datetime",
-				'ReviewNotes' => 'Text'
 			),
 			'has_one' => array(
 				'Owner' => 'Member',
-			),
-			'has_many' => array(
-				// has_one OpenWorkflowRequest is implemented as custom getter
-				'WorkflowRequests' => 'WorkflowRequest'
-			),
-			'defaults' => array(
-			),
+			)
 		);
-	}
-	
-	function getOwnerName() {
-		if($this->owner->Owner()) return $this->owner->Owner()->FirstName . ' ' . $this->owner->Owner()->Surname;
 	}
 	
 	/**
@@ -158,33 +145,6 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 			$fields->fieldByName('Root')->insertBefore(new Tab($verb . $wf->StatusDescription,
 				new LiteralField("WorkflowInfo", $this->owner->renderWith("SiteTreeCMSWorkflow_workflowtab"))
 			), "Content");
-		}
-		
-		// Review fields
-		$cmsUsers = Permission::get_members_by_permission(array("CMS_ACCESS_CMSMain", "ADMIN"));
-		
-		if(Permission::check("EDIT_CONTENT_REVIEW_FIELDS")) {
-			$fields->addFieldsToTab("Root.Review", array(
-				new HeaderField(_t('SiteTreeCMSWorkflow.REVIEWHEADER', "Content review"), 2),
-				new DropdownField("OwnerID", _t("SiteTreeCMSWorkflow.PAGEOWNER", 
-					"Page owner (will be responsible for reviews)"), $cmsUsers->map('ID', 'Title', '(no owner)')),
-				new CalendarDateField("NextReviewDate", _t("SiteTreeCMSWorkflow.NEXTREVIEWDATE",
-					"Next review date (leave blank for no review)")),
-				new DropdownField("ReviewPeriodDays", _t("SiteTreeCMSWorkflow.REVIEWFREQUENCY", 
-					"Review frequency (the review date will be set to this far in the future whenever the page is published.)"), array(
-					0 => "No automatic review date",
-					1 => "1 day",
-					7 => "1 week",
-					30 => "1 month",
-					60 => "2 months",
-					91 => "3 months",
-					121 => "4 months",
-					152 => "5 months",
-					183 => "6 months",
-					365 => "12 months",
-				)),
-				new TextareaField('ReviewNotes', 'Review Notes')
-			));
 		}
 		
 		// Check if there is an expiry date...
@@ -347,12 +307,6 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 		}
 	}
 	
-	function onBeforeWrite() {
-		if($this->owner->ReviewPeriodDays && !$this->owner->NextReviewDate) {
-			$this->owner->NextReviewDate = date('Y-m-d', strtotime('+' . $this->owner->ReviewPeriodDays . ' days'));
-		}
-	}
-	
 	/**
 	 * 
 	 */
@@ -367,16 +321,6 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvi
 		if($wf = $this->openWorkflowRequest()) {
 			$wf->deny(_t('SiteTreeCMSWorkflow.AUTO_DENIED', "(automatically denied)"));
 		}
-	}
-	
-	function providePermissions() {
-		return array(
-			"EDIT_CONTENT_REVIEW_FIELDS" => array(
-				'name' => "Set content owners and review dates",
-				'category' => _t('Permissions.CONTENT_CATEGORY', 'Content permissions'),
-				'sort' => 50
-			)
-		);
 	}
 }
 ?>
