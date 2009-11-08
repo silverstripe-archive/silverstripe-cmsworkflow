@@ -30,7 +30,7 @@ class PagesScheduledForPublishingSideReport extends SideReport {
 		} else if (!$startDate && $endDate) {
 			$where = "EmbargoDate <= '".Convert::raw2sql($endDate)."'";
 		} else {
-			$where = "EmbargoDate >= '".SSDatetime::now()->URLDate()."'";
+			$where = "EmbargoDate >= '".SS_Datetime::now()->URLDate()."'";
 		}
 		
 		$res = DataObject::get('SiteTree', '"WorkflowRequest"."Status" = \'Scheduled\' AND '.$where, null, "LEFT JOIN WorkflowRequest on WorkflowRequest.PageID = SiteTree.ID");

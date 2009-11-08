@@ -30,7 +30,7 @@ class PagesScheduledForDeletionSideReport extends SideReport {
 		} else if (!$startDate && $endDate) {
 			$where = "ExpiryDate <= '".Convert::raw2sql($endDate)."'";
 		} else {
-			$where = "ExpiryDate >= '".SSDatetime::now()->URLDate()."'";
+			$where = "ExpiryDate >= '".SS_Datetime::now()->URLDate()."'";
 		}
 
 		$doSet = Versioned::get_by_stage('SiteTree', 'Live', $where, 'ExpiryDate DESC');
