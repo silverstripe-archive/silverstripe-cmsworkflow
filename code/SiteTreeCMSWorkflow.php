@@ -142,8 +142,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	
 	public function updateCMSFields(&$fields) {
 		if($wf = $this->openWorkflowRequest()) {
-			$verb = ($wf->class == "WorkflowDeletionRequest") ? "Removal " : "Change ";
-			$fields->fieldByName('Root')->insertBefore(new Tab($verb . $wf->StatusDescription,
+			$fields->fieldByName('Root')->insertBefore(new Tab("Workflow",
 				new LiteralField("WorkflowInfo", $this->owner->renderWith("SiteTreeCMSWorkflow_workflowtab"))
 			), "Content");
 		}
@@ -172,7 +171,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			}
 		}
 		
-		$fields->addFieldsToTab('Root.Workflow', $this->getWorkflowCMSFields());
+		$fields->addFieldsToTab('Root.WorkflowArchive', $this->getWorkflowCMSFields());
 	}
 	
 	/**

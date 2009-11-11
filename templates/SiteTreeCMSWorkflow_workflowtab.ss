@@ -1,7 +1,7 @@
 <% require themedCSS(CMSWorkflow) %>
 <div id="CMSWorkflowTab">
 <% control OpenWorkflowRequest %>
-<h1>Change $StatusDescription</h1>
+<h1>A Change is $StatusDescription.</h1>
 <input type="hidden" id="WorkflowRequest_ID" value="$ID" />
 <p>$Author.FirstName $Author.Surname has requested that a change to the site be published.</p>
 
@@ -72,7 +72,7 @@ div#futurePublishing div.popupdatetime ul {
 
 <% if ExpiryField || EmbargoField %>
 	<% if Status = AwaitingApproval %>
-<h2>Embargo Expiry</h2>
+<h2>Embargo &amp; Expiry</h2>
 <p>These times are in local server time, which is $WorkflowTimezone</p>
 	<% end_if %>
 <% end_if %>
@@ -91,7 +91,7 @@ div#futurePublishing div.popupdatetime ul {
 
 <% if ExpiryField || EmbargoField %>
 	<% if Status = AwaitingApproval %>
-		<p id="startTimers">You need to click 'Approve' to start these timers in motion.</p>
+		<p id="startTimers">You need to click <% if IsTwoStep %>'Publish'<% else %>'Approve'<% end_if %> to start these timers in motion.</p>
 	<% end_if %>
 <% end_if %>
 
@@ -99,14 +99,14 @@ div#futurePublishing div.popupdatetime ul {
 	<% if EmbargoField %>
 		<p>
 			$EmbargoField
-			<input type="button" id="saveEmbargoButton" class="action" onclick="EmbargoExpiry.save('embargo', this);" value="Set embargo date">
+			<input type="button" id="saveEmbargoButton" class="action" onclick="EmbargoExpiry.save('embargo', this);" value="Set publish date">
 			<input type="button" id="resetEmbargoButton" class="action" onclick="EmbargoExpiry.reset('embargo', this);" value="Reset">
 		</p>
 	<% end_if %>
 	<% if ExpiryField %>
 		<p>
 			$ExpiryField
-			<input type="button" id="saveExpiryButton" class="action" onclick="EmbargoExpiry.save('expiry', this);" value="Set expiry date">
+			<input type="button" id="saveExpiryButton" class="action" onclick="EmbargoExpiry.save('expiry', this);" value="Set unpublish date">
 			<input type="button" id="resetExpiryButton" class="action" onclick="EmbargoExpiry.reset('expiry', this);" value="Reset">
 		</p>
 	<% end_if %>
