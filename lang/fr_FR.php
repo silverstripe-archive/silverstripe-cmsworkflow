@@ -2,11 +2,11 @@
 
 /**
  * French (France) language pack
- * @package modules: cms workflow
+ * @package cmsworkflow
  * @subpackage i18n
  */
 
-i18n::include_locale_file('modules: cms workflow', 'en_US');
+i18n::include_locale_file('cmsworkflow', 'en_US');
 
 global $lang;
 

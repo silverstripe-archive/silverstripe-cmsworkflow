@@ -2,11 +2,11 @@
 
 /**
  * Portuguese (Brazil) language pack
- * @package modules: cms workflow
+ * @package cmsworkflow
  * @subpackage i18n
  */
 
-i18n::include_locale_file('modules: cms workflow', 'en_US');
+i18n::include_locale_file('cmsworkflow', 'en_US');
 
 global $lang;
 
@@ -48,13 +48,25 @@ $lang['pt_BR']['SiteTreeCMSWorkflow']['STATUS_DENIED'] = 'Negado';
 $lang['pt_BR']['SiteTreeCMSWorkflow']['STATUS_OPEN'] = 'Abrir';
 $lang['pt_BR']['SiteTreeCMSWorkflow']['STATUS_UNKNOWN'] = 'Desconhecido';
 $lang['pt_BR']['SiteTreeCMSWorkflow']['WORKFLOWTABTITLE'] = 'Workflow';
+$lang['pt_BR']['WorkflowDeletionRequest']['EMAIL_PARA_APPROVED'] = '%s aprovou o pedido de excluir a página "%s" e deletou do site publicado.';
+$lang['pt_BR']['WorkflowDeletionRequest']['EMAIL_PARA_AWAITINGAPPROVAL'] = '%s pediu que você exclua a página  "%s"';
+$lang['pt_BR']['WorkflowDeletionRequest']['EMAIL_PARA_AWAITINGEDIT'] = '%s solicitou que você reconsidere o seu pedido de exlcuir a página  "%s".';
+$lang['pt_BR']['WorkflowDeletionRequest']['EMAIL_PARA_COMMENT'] = '%s comentou no pedido de excluir a página  "%s" page.';
+$lang['pt_BR']['WorkflowDeletionRequest']['EMAIL_PARA_DENIED'] = '%s rejeitou o seu pedido de exlcuir a página  "%s".';
 $lang['pt_BR']['WorkflowDeletionRequest']['EMAIL_SUBJECT_APPROVED'] = 'Seu pedido de exclusão para "%s" foi aprovado';
 $lang['pt_BR']['WorkflowDeletionRequest']['EMAIL_SUBJECT_AWAITINGAPPROVAL'] = 'Por favor, revise e exclua a "%s" página do seu site';
 $lang['pt_BR']['WorkflowDeletionRequest']['EMAIL_SUBJECT_AWAITINGEDIT'] = 'Você solicitou uma revisão para página "%s"';
+$lang['pt_BR']['WorkflowDeletionRequest']['EMAIL_SUBJECT_COMMENT'] = 'Comentário no pedido de exlcusão: "%s"';
 $lang['pt_BR']['WorkflowDeletionRequest']['EMAIL_SUBJECT_DENIED'] = 'Seu pedido de exclusão para página "%s" foi negado';
+$lang['pt_BR']['WorkflowPublicationRequest']['EMAIL_PARA_APPROVED'] = '%s aprovou e publicou as mudanças na página "%s".';
+$lang['pt_BR']['WorkflowPublicationRequest']['EMAIL_PARA_AWAITINGAPPROVAL'] = '%s pediu que você revise e publique a seguinte mudança para a página "%s"';
+$lang['pt_BR']['WorkflowPublicationRequest']['EMAIL_PARA_AWAITINGEDIT'] = '%s pediu que você revise suas mudanças na página "%s".';
+$lang['pt_BR']['WorkflowPublicationRequest']['EMAIL_PARA_COMMENT'] = '%s comentou no pedido de mudança da página "%s".';
+$lang['pt_BR']['WorkflowPublicationRequest']['EMAIL_PARA_DENIED'] = '%s rejeitou as mudanças na página "%s" page.';
 $lang['pt_BR']['WorkflowPublicationRequest']['EMAIL_SUBJECT_APPROVED'] = 'Seu pedido de publicação para a página "%s" foi aprovado';
 $lang['pt_BR']['WorkflowPublicationRequest']['EMAIL_SUBJECT_AWAITINGAPPROVAL'] = 'Por favor, revise e publique a página "%s" no seu site';
 $lang['pt_BR']['WorkflowPublicationRequest']['EMAIL_SUBJECT_AWAITINGEDIT'] = 'Você solicitou uma revisão para a página "%s"';
+$lang['pt_BR']['WorkflowPublicationRequest']['EMAIL_SUBJECT_COMMENT'] = 'Comentário no pedido de publicação: "%s"';
 $lang['pt_BR']['WorkflowPublicationRequest']['EMAIL_SUBJECT_DENIED'] = 'Seu pedido de publicação para a página "%s" foi negado';
 $lang['pt_BR']['WorkflowRequest']['COMPAREDRAFTLIVELINK'] = 'Compra as mudanças entre o publicado e o rascunho';
 $lang['pt_BR']['WorkflowRequest']['EMAILCHANGEDSTATUS'] = '%s mudou o status do workflow em';

@@ -2,11 +2,11 @@
 
 /**
  * German (Germany) language pack
- * @package modules: cms workflow
+ * @package cmsworkflow
  * @subpackage i18n
  */
 
-i18n::include_locale_file('modules: cms workflow', 'en_US');
+i18n::include_locale_file('cmsworkflow', 'en_US');
 
 global $lang;
 
@@ -20,7 +20,9 @@ $lang['de_DE']['DeletionRequestSideReport']['TITLE'] = 'Workflow: Erwarted Lösc
 $lang['de_DE']['MyWorkflowRequestsSideReport']['TITLE'] = 'Arbeitsablauf: Meine offenen Anfragen';
 $lang['de_DE']['PublisherReviewSideReport']['TITLE'] = 'Worflow: Erwartet Veröffentlichung';
 $lang['de_DE']['SiteTree']['EDITANYONE'] = 'Jeder, welcher sich im CMS Einloggen kann';
+$lang['de_DE']['SiteTree']['EDITINHERIT'] = 'Von übergeordneter Seite übernehmen';
 $lang['de_DE']['SiteTree']['EDITONLYTHESE'] = 'Nur folgende Personen (wähle aus der Liste)';
+$lang['de_DE']['SiteTreeCMSWorkflow']['APPROVEHEADER'] = 'Wer kann Anforderungen innerhalb des CMS bestätigen?';
 $lang['de_DE']['SiteTreeCMSWorkflow']['BUTTONDENYPUBLICATION'] = 'Veröffentlichung verweigern';
 $lang['de_DE']['SiteTreeCMSWorkflow']['BUTTONREQUESTPUBLICATION'] = 'Veröffentlichung anfordern';
 $lang['de_DE']['SiteTreeCMSWorkflow']['BUTTONREQUESTREMOVAL'] = 'Löschung anfordern';
@@ -44,18 +46,39 @@ $lang['de_DE']['SiteTreeCMSWorkflow']['REQUEST_PUBLICATION_SUCCESS_MESSAGE'] = '
 $lang['de_DE']['SiteTreeCMSWorkflow']['STATUS_APPROVED'] = 'Bestätigt';
 $lang['de_DE']['SiteTreeCMSWorkflow']['STATUS_AWAITINGAPPROVAL'] = 'Erwartet Bestätigung';
 $lang['de_DE']['SiteTreeCMSWorkflow']['STATUS_AWAITINGEDIT'] = 'Erwartet Bearbeitung';
+$lang['de_DE']['SiteTreeCMSWorkflow']['STATUS_COMPLETED'] = 'Abgeschlossen';
 $lang['de_DE']['SiteTreeCMSWorkflow']['STATUS_DENIED'] = 'Verweigert';
 $lang['de_DE']['SiteTreeCMSWorkflow']['STATUS_OPEN'] = 'Offen';
 $lang['de_DE']['SiteTreeCMSWorkflow']['STATUS_UNKNOWN'] = 'Unbekannt';
+$lang['de_DE']['SiteTreeCMSWorkflow']['WORKFLOWACTION_ACTION'] = 'Änderung veröffentlichen';
+$lang['de_DE']['SiteTreeCMSWorkflow']['WORKFLOWACTION_APPROVE'] = 'Bestätigen';
 $lang['de_DE']['SiteTreeCMSWorkflow']['WORKFLOWTABTITLE'] = 'Arbeitsablauf';
+$lang['de_DE']['SiteTreeCMSWorkflow']['WORKFLOW_ACTION_COMMENT'] = 'Kommentar';
+$lang['de_DE']['SiteTreeCMSWorkflow']['WORKFLOW_ACTION_DENY'] = 'Ablehnen/abbrechen';
+$lang['de_DE']['SiteTreeCMSWorkflow']['WORKFLOW_ACTION_FAILED'] = 'Ein Fehler ist beim Verarbeiten Ihrer Workflow-Anforderung aufgetreten.';
+$lang['de_DE']['SiteTreeCMSWorkflow']['WORKFLOW_ACTION_RESUBMIT'] = 'Nochmals abschicken';
+$lang['de_DE']['WorkflowDeletionRequest']['EMAIL_PARA_APPROVED'] = '%s hat die Anforderung, die Seite "%s" zu löschen genehmigt und von der veröffentlichten Site entfernt.';
+$lang['de_DE']['WorkflowDeletionRequest']['EMAIL_PARA_AWAITINGAPPROVAL'] = '%s hat Sie um Löschung der Seite "%s" ersucht';
+$lang['de_DE']['WorkflowDeletionRequest']['EMAIL_PARA_AWAITINGEDIT'] = '%s hat Sie ersucht, Ihre Anfrage, die Seite "%s" zu löschen, nochmals zu prüfen.';
+$lang['de_DE']['WorkflowDeletionRequest']['EMAIL_PARA_COMMENT'] = '%s hat einen Kommentar auf die Anforderung, die Seite "%s" zu löschen, abgegeben.';
+$lang['de_DE']['WorkflowDeletionRequest']['EMAIL_PARA_DENIED'] = '%s hat die Anforderung, die Seite "%s" zu löschen, abgelehnt.';
 $lang['de_DE']['WorkflowDeletionRequest']['EMAIL_SUBJECT_APPROVED'] = 'Ihr Antrag zum Löschen der Seite "%s" wurde genehmigt';
 $lang['de_DE']['WorkflowDeletionRequest']['EMAIL_SUBJECT_AWAITINGAPPROVAL'] = 'Bitte überprüfen und löschen Sie die Seite "%s" auf Ihrer Website';
 $lang['de_DE']['WorkflowDeletionRequest']['EMAIL_SUBJECT_AWAITINGEDIT'] = 'Sie werden gebeten, die Seite "%s" zu überprüfen';
+$lang['de_DE']['WorkflowDeletionRequest']['EMAIL_SUBJECT_COMMENT'] = 'Kommentar für Löschanforderung: "%s"';
 $lang['de_DE']['WorkflowDeletionRequest']['EMAIL_SUBJECT_DENIED'] = 'Ihr Antrag zum  Löschen der Seite "%s" wurde verweigert';
+$lang['de_DE']['WorkflowPublicationRequest']['EMAIL_PARA_APPROVED'] = '%s hat die Änderungen zur Seite "%s" freigegeben und veröffentlicht.';
+$lang['de_DE']['WorkflowPublicationRequest']['EMAIL_PARA_AWAITINGAPPROVAL'] = '%s hat ersucht, daß Sie die folgenden Änderungen zur Seite "%s" prüfen und veröffentlichen.';
+$lang['de_DE']['WorkflowPublicationRequest']['EMAIL_PARA_AWAITINGEDIT'] = '%s hat Sie ersucht, Ihre Änderungen zur Seite "%s" zu überarbeiten.';
+$lang['de_DE']['WorkflowPublicationRequest']['EMAIL_PARA_COMMENT'] = '%s hat einen Kommentar auf die Änderungsanforderung für die Seite "%s" abgegeben.';
+$lang['de_DE']['WorkflowPublicationRequest']['EMAIL_PARA_DENIED'] = '%s hat die Anforderung, die Seite "%s" zu ändern, abgelehnt.';
 $lang['de_DE']['WorkflowPublicationRequest']['EMAIL_SUBJECT_APPROVED'] = 'Ihre Antrag zum Veröffentlichen der Seite "%s" wurde genehmigt';
 $lang['de_DE']['WorkflowPublicationRequest']['EMAIL_SUBJECT_AWAITINGAPPROVAL'] = 'Bitte überprüfen und veröffentlichen Sie die Seite "%s" auf Ihrer Website';
 $lang['de_DE']['WorkflowPublicationRequest']['EMAIL_SUBJECT_AWAITINGEDIT'] = 'Sie werden gebeten, die Seite "%s" zu prüfen';
+$lang['de_DE']['WorkflowPublicationRequest']['EMAIL_SUBJECT_COMMENT'] = 'Kommentar für Veröffentlichungsanforderung: "%s"';
 $lang['de_DE']['WorkflowPublicationRequest']['EMAIL_SUBJECT_DENIED'] = 'Ihr Antrag zum Veröffentlichen der Seite "%s" wurde verweigert';
+$lang['de_DE']['WorkflowRequest']['CHANGES_HEADING'] = 'Änderungen';
+$lang['de_DE']['WorkflowRequest']['COMMENT_HEADING'] = 'Kommentar';
 $lang['de_DE']['WorkflowRequest']['COMPAREDRAFTLIVELINK'] = 'Vergleiche Änderungen zwischen Live-Website und dem geändertem Entwurf';
 $lang['de_DE']['WorkflowRequest']['EMAILCHANGEDSTATUS'] = '%s hat seinen Arbeitsablaufstatus auf';
 $lang['de_DE']['WorkflowRequest']['EMAILDENIEDDELETION'] = '%s hat die Löschanfrage verweigert';
