@@ -18,12 +18,13 @@ Object::add_extension('SiteConfig', 'SiteConfigTwoStepWorkflow');
 // Object::add_extension('SiteTree', 'SiteTreeCMSThreeStepWorkflow');
 // Object::add_extension('SiteConfig', 'SiteConfigThreeStepWorkflow');
 // Object::add_extension('LeftAndMain', 'LeftAndMainCMSThreeStepWorkflow');
+// unset(CMSBatchActionHandler::$batch_actions['publish']);
 
 Director::addRules(200, array(
 	'admin/changes.rss' => '->admin/cms/changes.rss',
 	'admin/cms/changes.rss' => array('Controller' => 'CMSChangeTracker', 'Data' => 'all'),
 ));
 
-unset(CMSBatchActionHandler::$batch_actions['publish']);
+
 
 ?>
