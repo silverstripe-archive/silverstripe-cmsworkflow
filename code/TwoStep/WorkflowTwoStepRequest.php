@@ -65,7 +65,7 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 			$this->owner->Page()->Title
 		);
 		
-		if (WorkflowRequest::should_send_alert($this->owner->class, 'request', 'publisher')) {
+		if (WorkflowRequest::should_send_alert($this->owner->class, 'publish', 'publisher')) {
 			$publishers = $this->owner->Page()->PublisherMembers();
 			foreach($publishers as $publisher){
 				// Notify publishers other than the one who is logged in 
@@ -82,7 +82,7 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 			}
 		}
 
-		if (WorkflowRequest::should_send_alert($this->owner->class, 'request', 'author')) {
+		if (WorkflowRequest::should_send_alert($this->owner->class, 'publish', 'author')) {
 			$this->owner->sendNotificationEmail(
 				Member::currentUser(), // sender
 				$author, // recipient
