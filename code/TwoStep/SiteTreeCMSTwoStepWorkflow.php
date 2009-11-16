@@ -106,7 +106,7 @@ class SiteTreeCMSTwoStepWorkflow extends SiteTreeCMSWFDecorator {
 		// check against parent page (default to FALSE if there is no parent page)
 		if($this->owner->CanPublishType == 'Inherit') {
 			if ($this->owner->Parent()->exists()) {
-				if (!$this->owner->Parent()->getExtensionInstance('SiteTreeCMSTwoStepWorkflow')->canPublish($member)) return false;
+				if (!$this->owner->Parent()->canPublish($member)) return false;
 			} else { return false; }
 		}
 		
