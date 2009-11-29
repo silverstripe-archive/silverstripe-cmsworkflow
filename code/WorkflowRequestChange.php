@@ -73,8 +73,12 @@ class WorkflowRequestChange extends DataObject {
 		$toVersion = $this->PageDraftVersion;
 		
 		if ($fromVersion == 0) return false;
-		
-		return "admin/compareversions/$page->ID/?From={$fromVersion}&To={$toVersion}";
+
+		$link = "admin/compareversions/$page->ID/?From={$fromVersion}&To={$toVersion}";
+		if (Object::has_extension('SiteTree', 'Translatable')) {
+			$link .= '&locale=' . Translatable::get_current_locale();
+		}
+		return $link;
 	}
 	
 	/**
@@ -89,7 +93,11 @@ class WorkflowRequestChange extends DataObject {
 		$fromVersion = $firstChange->PageDraftVersion;
 		$toVersion = $this->PageDraftVersion;
 		
-		return "admin/compareversions/$page->ID/?From={$fromVersion}&To={$toVersion}";
+		$link = "admin/compareversions/$page->ID/?From={$fromVersion}&To={$toVersion}";
+		if (Object::has_extension('SiteTree', 'Translatable')) {
+			$link .= '&locale=' . Translatable::get_current_locale();
+		}
+		return $link;
 	}
 	
 	/**
@@ -108,7 +116,11 @@ class WorkflowRequestChange extends DataObject {
 		if(!$latestPublished) return false;
 		$toVersion = $latestPublished->Version;
 		
-		return "admin/compareversions/$page->ID/?From={$fromVersion}&To={$toVersion}";
+		$link = "admin/compareversions/$page->ID/?From={$fromVersion}&To={$toVersion}";
+		if (Object::has_extension('SiteTree', 'Translatable')) {
+			$link .= '&locale=' . Translatable::get_current_locale();
+		}
+		return $link;
 	}
 	
 	/**
@@ -126,7 +138,11 @@ class WorkflowRequestChange extends DataObject {
 		if(!$latestPublished) return false;
 		$toVersion = $latestPublished->Version;
 		
-		return "admin/compareversions/$page->ID/?From={$fromVersion}&To={$toVersion}";
+		$link = "admin/compareversions/$page->ID/?From={$fromVersion}&To={$toVersion}";
+		if (Object::has_extension('SiteTree', 'Translatable')) {
+			$link .= '&locale=' . Translatable::get_current_locale();
+		}
+		return $link;
 	}
 	
 	/**
