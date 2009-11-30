@@ -15,6 +15,9 @@ CMSWorkflow = {
 	 */
 	submitWithPromptedMessage : function(form, button, msgVar, msgPrompt) {
 		var messageEl = CMSWorkflow.createPromptElement(msgVar, msgPrompt);
+		if (!messageEl) {
+			return;
+		}
 		form.appendChild(messageEl);
 
 		Ajax.SubmitForm(form, button, {
@@ -28,6 +31,10 @@ CMSWorkflow = {
 	
 	createPromptElement: function(varName, promptText) {
 		var message = prompt(promptText, "");
+		if (message === null) {
+			// User canceled prompt box
+			return null;
+		}
 		var messageEl = document.createElement("input");
 		messageEl.type = "hidden";
 		messageEl.name = varName;
