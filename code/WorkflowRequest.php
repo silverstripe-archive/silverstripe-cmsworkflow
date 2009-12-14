@@ -360,28 +360,6 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		return $this->Status == 'AwaitingApproval';
 	}
 	
-	/**
-	 * Notify the author of a request once a page has been approved.
-	 * Whether this means the reuqest has been actioned depends on
-	 * the approval path.
-	 */
-	public function notifyApproved($comment) {
-		$author = $this->Author();
-		$subject = sprintf(
-			_t("{$this->class}.EMAIL_SUBJECT_APPROVED"),
-			$this->owner->Page()->Title
-		);
-
-		if (self::should_send_alert(__CLASS__, 'approve', 'author')) {
-			$this->owner->sendNotificationEmail(
-				Member::currentUser(), // sender
-				$author, // recipient
-				$comment,
-				_t('WorkflowRequest.APPROVED_CHANGES', 'approved changes')
-			);
-		}
-	}
-	
 	function notifyDenied($comment) {
 		$publisher = Member::currentUser();
 		$author = $this->Author();
