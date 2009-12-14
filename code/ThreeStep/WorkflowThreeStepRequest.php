@@ -81,10 +81,8 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 					$this->owner->sendNotificationEmail(
 						Member::currentUser(), // sender
 						$publisher, // recipient
-						_t("{$this->owner->class}.EMAIL_SUBJECT_APPROVED_FOR_PUBLISHING"),
-						_t("{$this->owner->class}.EMAIL_PARA_APPROVED_FOR_PUBLISHING"),
 						$comment,
-						'WorkflowGenericEmail'
+						_t('WorkflowRequest.APPROVED_CHANGES', 'approved changes')
 					);
 				}
 			}
@@ -94,10 +92,8 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 			$this->owner->sendNotificationEmail(
 				Member::currentUser(), // sender
 				$author, // recipient
-				_t("{$this->owner->class}.EMAIL_SUBJECT_APPROVED_FOR_PUBLISHING"),
-				_t("{$this->owner->class}.EMAIL_PARA_APPROVED_FOR_PUBLISHING"),
 				$comment,
-				'WorkflowGenericEmail'
+				_t('WorkflowRequest.APPROVED_CHANGES', 'approved changes')
 			);
 		}
 	}
@@ -113,10 +109,8 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 					$this->owner->sendNotificationEmail(
 						Member::currentUser(), // sender
 						$publisher, // recipient
-						_t("{$this->owner->class}.EMAIL_SUBJECT_PUBLISHED"),
-						_t("{$this->owner->class}.EMAIL_PARA_PUBLISHED"),
 						$comment,
-						'WorkflowGenericEmail'
+						_t('WorkflowRequest.PUBLISHED_CHANGES', 'published changes')
 					);
 				}
 			}
@@ -129,7 +123,7 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 				_t("{$this->owner->class}.EMAIL_SUBJECT_PUBLISHED"),
 				_t("{$this->owner->class}.EMAIL_PARA_PUBLISHED"),
 				$comment,
-				'WorkflowGenericEmail'
+				_t('WorkflowRequest.PUBLISHED_CHANGES', 'published changes')
 			);
 		}
 	}
@@ -151,10 +145,8 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 			$this->owner->sendNotificationEmail(
 				Member::currentUser(), // sender
 				$recipient, // recipient
-				_t("{$this->owner->owner->class}.EMAIL_SUBJECT_COMMENT"),
-				_t("{$this->class}.EMAIL_PARA_COMMENT"),
 				$comment,
-				'WorkflowGenericEmail'
+				_t('WorkflowRequest.ADDED_COMMENT', 'added a comment')
 			);
 		}
 	}
@@ -172,10 +164,10 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 				$this->owner->sendNotificationEmail(
 					$author, // sender
 					$publisher, // recipient
-					_t("{$this->class}.EMAIL_SUBJECT_AWAITINGAPPROVAL"),
-					_t("{$this->class}.EMAIL_PARA_AWAITINGAPPROVAL"),
 					$comment,
-					'WorkflowGenericEmail'
+					$this->owner->class == 'WorkflowDeletionRequest' ? 
+						_t('WorkflowRequest.REQUESTED_DELETION', 'requested deletion') :
+						_t('WorkflowRequest.REQUESTED_PUBLICATION', 'requested publication')
 				);
 			}
 		}

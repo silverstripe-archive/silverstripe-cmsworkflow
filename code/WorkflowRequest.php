@@ -376,10 +376,8 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 			$this->owner->sendNotificationEmail(
 				Member::currentUser(), // sender
 				$author, // recipient
-				_t("{$this->class}.EMAIL_SUBJECT_APPROVED"),
-				_t("{$this->class}.EMAIL_PARA_APPROVED"),
 				$comment,
-				'WorkflowGenericEmail'
+				_t('WorkflowRequest.APPROVED_CHANGES', 'approved changes')
 			);
 		}
 	}
@@ -392,10 +390,8 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 			$this->sendNotificationEmail(
 				$publisher, // sender
 				$author, // recipient
-				_t("{$this->class}.EMAIL_SUBJECT_DENIED"),
-				_t("{$this->class}.EMAIL_PARA_DENIED"),
 				$comment,
-				'WorkflowGenericEmail'
+				_t('WorkflowRequest.DENIED_REQUEST', 'denied the request')
 			);
 		}
 	}
@@ -408,10 +404,8 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 			$this->sendNotificationEmail(
 				$publisher, // sender
 				$author, // recipient
-				_t("{$this->class}.EMAIL_SUBJECT_CANCELLED"),
-				_t("{$this->class}.EMAIL_PARA_CANCELLED"),
 				$comment,
-				'WorkflowGenericEmail'
+				_t('WorkflowRequest.CANCELLED_REQUEST', 'cancelled changes')
 			);
 		}
 	}
@@ -423,27 +417,20 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$this->sendNotificationEmail(
 			$sender, // sender
 			$author, // recipient
-			_t("{$this->class}.EMAIL_SUBJECT_AWAITINGEDIT"),
-			_t("{$this->class}.EMAIL_PARA_AWAITINGEDIT"),
 			$comment,
-			'WorkflowGenericEmail'
+			_t('WorkflowRequest.REQUESTED_CHANGED', 'requested further changes')
 		);
 	}
 
-	public function sendNotificationEmail($sender, $recipient, $subjectTemplate, $paragraphTemplate, $comment, $template = null) {
+	public function sendNotificationEmail($sender, $recipient, $comment, $requestedAction, $template = null) {
 		$this->addMemberEmailed($recipient);
 
 		if(!$template) {
 			$template = 'WorkflowGenericEmail';
 		}
 		
-		$subject = sprintf($subjectTemplate, 
-				$this->Page()->Title);
+		$subject = sprintf(_t('WorkflowRequest.EMAIL_SUBJECT', 'CMS Workflow: %s - Page: %s - Status: %s'), SiteConfig::current_site_config()->Title, $this->Page()->Title, self::get_status_description($this->Status));
 
-		$paragraph = sprintf($paragraphTemplate, 
-				$sender->FirstName . ' ' . $sender->Surname,
-				$this->Page()->Title);
-		
 		$email = new Email();
 		$email->setTo($recipient->Email);
 		$email->setFrom(($sender->Email) ? $sender->Email : Email::getAdminEmail());
@@ -458,7 +445,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 			"LiveSiteLink"	=> $this->Page()->Link()."?stage=live",
 			"Workflow" => $this,
 			"Comment" => $comment,
-			"Paragraph" => $paragraph,
+			'RequestedAction' => strtolower($requestedAction)
 		));
 		return $email->send();
 	}
@@ -495,11 +482,43 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	}
 		
 	/**
-	 * Returns a {@link DataDifferencer} object representing the changes.
+	 * Returns a {@link DataDifferencer} object representing the changes. Has
+	 * some nasty logic to make it so that only changes that are made through
+	 * fields that are exposed by the CMS are tracked.
 	 */
 	public function Diff() {
 		$diff = new DataDifferencer($this->fromRecord(), $this->toRecord());
-		$diff->ignoreFields('AuthorID', 'LastEdited', 'Status');
+		
+		// $dataObjectFields = array_flip($this->fromRecord()->record);
+		// asort($dataObjectFields);
+		// $cmsFields = array();
+		// 
+		// $cms = $this->getCMSFields();
+		// var_dump($cms);
+		// 
+		// foreach($this->getCMSFields() as $tab1) {
+		// 	if ($tab1 instanceof TabSet) {
+		// 		echo $tab1->Name().get_class($tab1).' 1<br/>';
+		// 		foreach($tab1->Tabs() as $tab2) {
+		// 			echo $tab2->Name().get_class($tab2).' 2<br/>';
+		// 			if ($tab2 instanceof TabSet) {
+		// 				foreach($tab2->Tabs() as $tab3) {
+		// 					echo $tab3->Name().get_class($tab3).' 3<br/>';
+		// 					foreach($tab3->Fields() as $field) $cmsFields[] = $field->Name();
+		// 				}
+		// 			} else {
+		// 				foreach($tab2->Fields() as $field) $cmsFields[] = $field->Name();
+		// 			}
+		// 		}
+		// 	} else {
+		// 		foreach($tab1->Fields() as $field) $cmsFields[] = $field->Name();
+		// 	}
+		// }
+		// 
+		// print_r($cmsFields);
+		// 
+		// $diff->ignoreFields(array_diff($cmsFields, $dataObjectFields));
+		
 		return $diff;
 	}
 	
