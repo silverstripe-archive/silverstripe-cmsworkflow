@@ -59,7 +59,7 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 			return false;
 		}
 		
-		if ($notify) $this->notifyPublished();
+		if ($notify) $this->notifyPublished($comment);
 		
 		return $this->owner->publish($comment, $member, $notify);
 	}
