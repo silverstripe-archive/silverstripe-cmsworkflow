@@ -252,11 +252,11 @@ var EmbargoExpiry = {
 function action_publish_right(e) {
 	var messageEl = null;
 	if (CMSWorkflow.getOption('noPromptForAdmin')) {
-		var messageEl = document.createElement("input");
+		messageEl = document.createElement("input");
 		messageEl.type = "hidden";
 		messageEl.name = 'WorkflowComment';
 	} else {
-		CMSWorkflow.createPromptElement('WorkflowComment', 'Please comment on this publication, if applicable.');
+		messageEl = CMSWorkflow.createPromptElement('WorkflowComment', 'Please comment on this publication, if applicable.');
 	}
 	$('Form_EditForm').appendChild(messageEl);
 	$('Form_EditForm_action_publish').value = ss.i18n._t('CMSMAIN.PUBLISHING');
