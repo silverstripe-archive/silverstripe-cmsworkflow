@@ -10,6 +10,18 @@ Behaviour.register({
 
 
 CMSWorkflow = {
+	setOption: function(key, value) {
+		if (typeof(this.data) == 'undefined') {
+			this.data = {};
+		}
+		this.data[key] = value;
+	},
+	getOption: function(key) {
+		if (typeof(this.data) != 'undefined' && typeof(this.data[key]) != 'undefined') {
+			return this.data[key];
+		}
+		return null;
+	},
 	/**
 	 * Prompt for input from the user and then submit the given form via ajax.
 	 */
@@ -68,7 +80,7 @@ CMSWorkflow = {
 			return false;
 		}
 	},
-	
+
 	showHideExpiry: {
 		onclick: function() {
 			if ($('deleteImmediate').checked) {
@@ -95,10 +107,11 @@ Behaviour.register({
 // Create these actions
 function action_cms_requestpublication_right(e) {
 	if ($('Form_EditForm').isChanged()) {
-		if(!confirm('You have unsaved changes. You will lose them if you click to continue requesting publication.')) return false;
+		if(!confirm('You have unsaved changes. You will lose them if you click to continue requesting publication.'))
+			return false;
 	}
 	
-	CMSWorkflow.submitWithPromptedMessage(
+	return CMSWorkflow.submitWithPromptedMessage(
 			$('Form_EditForm'), 'action_cms_requestpublication',
 			'WorkflowComment',
 			'Please comment on the change you are asking to have published.'
@@ -237,7 +250,14 @@ var EmbargoExpiry = {
 };
 
 function action_publish_right(e) {
-	var messageEl = CMSWorkflow.createPromptElement('WorkflowComment', 'Please comment on this publication, if applicable.');
+	var messageEl = null;
+	if (CMSWorkflow.getOption('noPromptForAdmin')) {
+		var messageEl = document.createElement("input");
+		messageEl.type = "hidden";
+		messageEl.name = 'WorkflowComment';
+	} else {
+		CMSWorkflow.createPromptElement('WorkflowComment', 'Please comment on this publication, if applicable.');
+	}
 	$('Form_EditForm').appendChild(messageEl);
 	$('Form_EditForm_action_publish').value = ss.i18n._t('CMSMAIN.PUBLISHING');
 	$('Form_EditForm_action_publish').className = 'action loading';

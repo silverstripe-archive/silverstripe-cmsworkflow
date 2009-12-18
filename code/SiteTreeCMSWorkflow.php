@@ -142,7 +142,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	
 	public function updateCMSFields(&$fields) {
 		if($wf = $this->openWorkflowRequest()) {
-			$fields->fieldByName('Root')->insertBefore(new Tab("Workflow",
+			$fields->fieldByName('Root')->insertBefore(new Tab(" Workflow",
 				new LiteralField("WorkflowInfo", $this->owner->renderWith("SiteTreeCMSWorkflow_workflowtab"))
 			), "Content");
 		}
