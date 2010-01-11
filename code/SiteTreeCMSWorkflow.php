@@ -188,6 +188,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			_t('SiteTreeCMSWorkflow.CLOSEDREQUESTSHEADER', 'Closed Requests')
 		));
 		$closedRequests = $this->ClosedWorkflowRequests();
+		// $_REQUEST['showqueries']=1;
 		$closedRequestsTF = new ComplexTableField(
 			$this,
 			'ClosedWorkflowRequests',
@@ -246,7 +247,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	 * 
 	 * @return DataObjectSet Set of WorkflowRequest objects
 	 */
-	public function ClosedWorkflowRequests($filter = "", $sort = "", $join = "", $limit = "") {
+	public function ClosedWorkflowRequests($filter = "", $sort = "Created DESC", $join = "", $limit = "") {
 		$this->componentCache = array();
 		
 		if($filter) $filter .= ' AND ';
