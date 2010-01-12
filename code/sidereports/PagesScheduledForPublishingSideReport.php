@@ -53,6 +53,7 @@ class PagesScheduledForPublishingSideReport extends SideReport {
 			"Title" => array(
 				"source" => array("NestedTitle", array("2")),
 				"link" => true,
+				"reload" => true
 			),
 			"Requester" => array(
 				"prefix" => 'Will be published at ',
