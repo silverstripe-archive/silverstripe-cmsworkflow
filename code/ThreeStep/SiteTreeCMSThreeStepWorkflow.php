@@ -141,7 +141,7 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 		} elseif($this->owner->CanApproveType == 'Inherit') {
 			if ($this->owner->ParentID) {
 				return $this->owner->Parent()->ApproverMembers();
-			} else { return SiteConfig::current_site_config()->ApproverMembers(); }
+			} else { return $this->owner->SiteConfig->ApproverMembers(); }
 		} elseif($this->owner->CanApproveType == 'LoggedInUsers') {
 			return Permission::get_members_by_permission('CMS_ACCESS_CMSMain');
 		} else {
@@ -178,7 +178,7 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 			if ($this->owner->Parent()->exists()) {
 				// if (!$this->owner->Parent()->getExtensionInstance('SiteTreeCMSThreeStepWorkflow')->canApprove($member)) return false;
 				if (!$this->owner->Parent()->canApprove($member)) return false;
-			} else { return SiteConfig::current_site_config()->canApprove($member); }
+			} else { return $this->owner->SiteConfig->canApprove($member); }
 		}
 		
 		// check for any logged-in users
@@ -211,7 +211,7 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 		} elseif($this->owner->CanPublishType == 'Inherit') {
 			if ($this->owner->Parent()->Exists()) {
 				return $this->owner->Parent()->PublisherMembers();
-			} else { return SiteConfig::current_site_config()->PublisherMembers(); }
+			} else { return $this->owner->SiteConfig->PublisherMembers(); }
 		} elseif($this->owner->CanPublishType == 'LoggedInUsers') {
 			return Permission::get_members_by_permission('CMS_ACCESS_CMSMain');
 		} else {
@@ -229,6 +229,8 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 	public function canPublish($member = null) {
 		if(!$member && $member !== FALSE) $member = Member::currentUser();
 
+
+
 		// check for admin permission
 		if(Permission::checkMember($member, 'ADMIN')) return true;
 		
@@ -244,9 +246,8 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 		// check against parent page/site config
 		if($this->owner->CanPublishType == 'Inherit') {
 			if ($this->owner->Parent()->exists()) {
-				// if (!$this->owner->Parent()->getExtensionInstance('SiteTreeCMSTwoStepWorkflow')->canPublish($member)) return false;
 				if (!$this->owner->Parent()->canPublish($member)) return false;
-			} else { return SiteConfig::current_site_config()->canPublish($member); }
+			} else { return $this->owner->SiteConfig->canPublish($member); }
 		}
 		
 		// check for any logged-in users
