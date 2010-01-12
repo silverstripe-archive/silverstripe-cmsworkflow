@@ -120,8 +120,6 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 			$this->owner->sendNotificationEmail(
 				Member::currentUser(), // sender
 				$author, // recipient
-				_t("{$this->owner->class}.EMAIL_SUBJECT_PUBLISHED"),
-				_t("{$this->owner->class}.EMAIL_PARA_PUBLISHED"),
 				$comment,
 				_t('WorkflowRequest.PUBLISHED_CHANGES', 'published changes')
 			);
