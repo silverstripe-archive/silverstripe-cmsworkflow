@@ -126,7 +126,6 @@ function action_cms_requestdeletefromlive_right(e) {
 	);
 }
 
-
 var EmbargoExpiry = {
 	save: function(what, el) {
 		EmbargoExpiry.fieldCheck();
@@ -135,12 +134,8 @@ var EmbargoExpiry = {
 		var ids = EmbargoExpiry.ids(what);
 		
 		if (what == 'embargo') {
-			console.log('embargo date: '+ids.dateField);
-			console.log('embargo time: '+ids.timeField);
 			url += '&EmbargoDate='+escape($(ids.dateField).value)+'&EmbargoTime='+escape($(ids.timeField).value);
 		} else if (what == 'expiry') {
-			console.log('expiry date: '+ids.dateField);
-			console.log('expiry time: '+ids.timeField);
 			url += '&ExpiryDate='+escape($(ids.dateField).value)+'&ExpiryTime='+escape($(ids.timeField).value);
 		}
 		
@@ -218,36 +213,50 @@ var EmbargoExpiry = {
 		}
 	},
 	eButton: function(id) {
-		$(id).className = $(id).className.replace(/disabled/, '');
+		Element.removeClassName(id, 'disabled');
 		$(id).disabled = false;
 	},
 	dButton: function(id) {
-		$(id).className = $(id).className+" disabled";
+		Element.addClassName(id, 'disabled');
 		$(id).disabled = true;
 	},
 	fieldCheck: function() {
 		ids = EmbargoExpiry.ids('embargo');
-
-		if ($(ids.dateField).value == '' || $(ids.timeField).value == '') {
-			EmbargoExpiry.dButton(ids.saveButton);
-			EmbargoExpiry.dButton(ids.resetButton);
-		} else {
-			EmbargoExpiry.eButton(ids.saveButton);
-			EmbargoExpiry.eButton(ids.resetButton);
+		// Only call this logic if the date field & save button exist, otherwise it's unnecessary
+		if($(ids.dateField) && $(ids.saveButton)) {
+			if ($(ids.dateField).value == '' || $(ids.timeField).value == '') {
+				EmbargoExpiry.dButton(ids.saveButton);
+				EmbargoExpiry.dButton(ids.resetButton);
+			} else {
+				EmbargoExpiry.eButton(ids.saveButton);
+				EmbargoExpiry.eButton(ids.resetButton);
+			}
 		}
 		
 		ids = EmbargoExpiry.ids('expiry');
-		if ($(ids.dateField).value == '' || $(ids.timeField).value == '') {
-			EmbargoExpiry.dButton(ids.saveButton);
-			EmbargoExpiry.dButton(ids.resetButton);
-		} else {
-			EmbargoExpiry.eButton(ids.saveButton);
-			EmbargoExpiry.eButton(ids.resetButton);
+		// Only call this logic if the date field & save button exist, otherwise it's unnecessary
+		if($(ids.dateField) && $(ids.saveButton)) {
+			if ($(ids.dateField).value == '' || $(ids.timeField).value == '') {
+				EmbargoExpiry.dButton(ids.saveButton);
+				EmbargoExpiry.dButton(ids.resetButton);
+			} else {
+				EmbargoExpiry.eButton(ids.saveButton);
+				EmbargoExpiry.eButton(ids.resetButton);
+			}
 		}
-
-		window.setTimeout('EmbargoExpiry.fieldCheck();', 1000);
 	}
 };
+
+Behaviour.register({
+	'#EmbargoDate_Date' : { 
+		onchange: EmbargoExpiry.fieldCheck,
+		initialize: EmbargoExpiry.fieldCheck 
+	},
+	'#EmbargoDate_Time' : { onchange: EmbargoExpiry.fieldCheck },
+	'#ExpiryDate_Date' : { onchange: EmbargoExpiry.fieldCheck },
+	'#ExpiryDate_Time' : { onchange: EmbargoExpiry.fieldCheck },
+})
+
 
 function action_publish_right(e) {
 	var messageEl = null;

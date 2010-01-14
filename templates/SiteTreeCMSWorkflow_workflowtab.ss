@@ -112,8 +112,6 @@ div#futurePublishing div.popupdatetime ul {
 	<% end_if %>
 <% end_if %>
 
-<script type="text/javascript">EmbargoExpiry.fieldCheck();</script>
-
 <% end_if %> 
 </div>
 
