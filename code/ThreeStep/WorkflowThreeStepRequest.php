@@ -67,7 +67,7 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 	function saveAndPublish($comment, $member = null, $notify = true) {
 		$this->approve($comment, $member, $notify);
 		$this->publish($comment, $member, $notify);
-		return _t('SiteTreeCMSWorkflow.PUBLISHMESSAGE','Approved request and published changes to live version. Emailed %s.');
+		return _t('WorkflowThreeStepRequest.PUBLISHMESSAGE','Published changes to live version. Emailed %s.');
 	}
 	
 	function notifyApproved($comment) {
