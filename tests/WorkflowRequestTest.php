@@ -344,7 +344,11 @@ class WorkflowRequestTest extends FunctionalTest {
 			'AwaitingApproval',
 			'Denied',
 			'AwaitingApproval',
-			'Approved',
+			( // 2-step completes on approval, 3-step doesn't
+				Object::has_extension('WorkflowRequest', 'WorkflowThreeStepRequest')
+				? 'Approved'
+				: 'Completed'
+			)
 		), $changes->column('Status'));
 	}
 }
