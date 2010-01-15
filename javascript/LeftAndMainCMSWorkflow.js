@@ -254,7 +254,7 @@ Behaviour.register({
 	},
 	'#EmbargoDate_Time' : { onchange: EmbargoExpiry.fieldCheck },
 	'#ExpiryDate_Date' : { onchange: EmbargoExpiry.fieldCheck },
-	'#ExpiryDate_Time' : { onchange: EmbargoExpiry.fieldCheck },
+	'#ExpiryDate_Time' : { onchange: EmbargoExpiry.fieldCheck }
 })
 
 
