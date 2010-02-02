@@ -15,9 +15,6 @@ class SiteTreeCMSTwoStepWorkflow extends SiteTreeCMSWFDecorator {
 			),
 			'many_many' => array(
 				"PublisherGroups" => "Group",
-			),
-			'defaults' => array(
-				"CanPublishType" => "OnlyTheseUsers",
 			)
 		);
 	}
