@@ -36,6 +36,7 @@ Attach the following decorators in your `mysite/_config.php`:
 	Object::remove_extension('SiteTree', 'SiteTreeCMSTwoStepWorkflow');
 	Object::remove_extension('SiteConfig', 'SiteConfigTwoStepWorkflow');
 	// add three-step decorators
+	WorkflowTwoStepRequest::apply_alerts();
 	Object::add_extension('WorkflowRequest', 'WorkflowThreeStepRequest');
 	Object::add_extension('SiteTree', 'SiteTreeCMSThreeStepWorkflow');
 	Object::add_extension('LeftAndMain', 'LeftAndMainCMSThreeStepWorkflow');
