@@ -20,7 +20,7 @@ class SiteTreeCMSTwoStepWorkflow extends SiteTreeCMSWFDecorator {
 	}
 	
 	public function getOpenRequest($workflowClass) {
-		$wf = DataObject::get_one($workflowClass, "PageID = " . (int)$this->owner->ID . " AND Status NOT IN ('Completed', 'Denied', 'Cancelled')");
+		$wf = DataObject::get_one($workflowClass, "\"PageID\" = " . (int)$this->owner->ID . " AND \"Status\" NOT IN ('Completed', 'Denied', 'Cancelled')");
 		if($wf) return $wf;
 		
 		return null;
@@ -143,17 +143,17 @@ class SiteTreeCMSTwoStepWorkflow extends SiteTreeCMSWFDecorator {
 	function onAfterWrite() {
 		if(!$this->owner->EditorGroups()->Count()) {
 			$SQL_group = Convert::raw2sql('site-content-authors');
-			$groupCheckObj = DataObject::get_one('Group', "Code = '{$SQL_group}'");
+			$groupCheckObj = DataObject::get_one('Group', "\"Group\".\"Code\" = '{$SQL_group}'");
 			if($groupCheckObj) $this->owner->EditorGroups()->add($groupCheckObj);
 			
 			$SQL_group = Convert::raw2sql('site-content-publishers');
-			$groupCheckObj = DataObject::get_one('Group', "Code = '{$SQL_group}'");
+			$groupCheckObj = DataObject::get_one('Group', "\"Group\".\"Code\" = '{$SQL_group}'");
 			if($groupCheckObj) $this->owner->EditorGroups()->add($groupCheckObj);
 		}
 		
 		if(!$this->owner->PublisherGroups()->Count()) {
 			$SQL_group = Convert::raw2sql('site-content-publishers');
-			$groupCheckObj = DataObject::get_one('Group', "Code = '{$SQL_group}'");
+			$groupCheckObj = DataObject::get_one('Group', "\"Group\".\"Code\" = '{$SQL_group}'");
 			if($groupCheckObj) $this->owner->PublisherGroups()->add($groupCheckObj);
 		}
 
