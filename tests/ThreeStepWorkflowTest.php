@@ -72,7 +72,7 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		}
 	}
 	
-	static function set_up_once() {
+	function setUpOnce() {
 		StaticPublisher::$disable_realtime = true;
 		self::set_up_extensions();
 		
@@ -84,14 +84,14 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		$dbname = self::create_temp_db();
 		DB::set_alternative_database_name($dbname);
 		
-		parent::set_up_once();
+		parent::setUpOnce();
 	}
 	
-	static function tear_down_once() {
+	function tearDownOnce() {
 		self::tear_down_extensions();
 		self::kill_temp_db();
 		self::create_temp_db();
-		parent::tear_down_once();
+		parent::tearDownOnce();
 	}
 		
 	function testWorkflowPublicationApprovalTransition() {
