@@ -9,19 +9,28 @@ class PublishingReport extends SSReport {
 			'PageTitle' => 'Page Title',
 			'Published' => 'Published',
 			'PublisherEmail' => 'Publisher',
+			'AbsoluteLink' => 'URLs',
+			'ID' => 'Edit',
 		);
 		
 		if (class_exists('Subsite')) {
 			$fields['SubsiteName'] = 'Subsite';
 		}
 		
-		$tlf = new WorkflowRequestTableListField('ReportContent', 'WorkflowPublicationRequest', $fields);
+		$tlf = new WorkflowRequestTableListField('ReportContent', 'SiteTree', $fields);
+			
+		$tlf->setFieldFormatting(array(
+			'AbsoluteLink' => '$value <a href=\"$value?stage=Live\">(live)</a> <a href=\"$value?stage=Stage\">(draft)</a>',
+			'ID' => '<a href=\"admin/show/$value\">Edit</a>',
+		));
 		
-		$q = singleton('WorkflowPublicationRequest')->extendedSQL();
-		$q->select[] = "WorkflowRequest.LastEdited as Published";
-		
-		$q->leftJoin('SiteTree', 'WorkflowRequest.PageID = SiteTree.ID');
+		$q = singleton('SiteTree')->extendedSQL();
 		$q->select[] = 'SiteTree.Title AS PageTitle';
+	
+		$q->leftJoin('WorkflowRequest', 'WorkflowRequest.PageID = SiteTree.ID');
+		$q->select[] = "WorkflowRequest.LastEdited as Published";
+		$q->where[] = "WorkflowRequest.ClassName = 'WorkflowPublicationRequest'";
+		
 		
 		$q->leftJoin('Member', 'WorkflowRequest.PublisherID = Member.ID');
 		$q->select[] = 'Member.Email as PublisherEmail';

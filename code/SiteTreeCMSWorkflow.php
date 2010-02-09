@@ -150,11 +150,11 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		// Check if there is an expiry date...
 		$liveVersion = Versioned::get_one_by_stage('SiteTree', 'Live', "SiteTree_Live.ID = {$this->owner->ID}");
 		if ($liveVersion && $liveVersion->ExpiryDate != null && $liveVersion->ExpiryDate != '0000-00-00 00:00:00') {
-			$fields->addFieldsToTab('Root.Expiry', array(
+			$fields->addFieldsToTab('Root.** Expiry **', array(
 				new LiteralField('ExpiryWarning', "This page is scheduled to expire at ".$liveVersion->ExpiryDate)
 			));
 			if ($this->owner->BackLinkTracking() && $this->owner->BackLinkTracking()->Count() > 0) {
-				$fields->addFieldsToTab('Root.Expiry', array(
+				$fields->addFieldsToTab('Root.** Expiry **', array(
 					new HeaderField("Please check these pages", 2),
 					new LiteralField('ExpiryBacklinkWarning', "This page is scheduled to expire, but the following pages link to it"),
 					$backLinksTable = new TableListField(
@@ -315,7 +315,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		
 		if($this->owner->ReviewPeriodDays) {
 			$this->owner->NextReviewDate = date('Y-m-d', strtotime('+' . $this->owner->ReviewPeriodDays . ' days'));
-			$this->owner->writeWithoutVersion();
+			$this->owner->write();
 		}
 	}
 	
