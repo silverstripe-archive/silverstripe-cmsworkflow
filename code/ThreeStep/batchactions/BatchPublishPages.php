@@ -9,15 +9,14 @@ class BatchPublishPages extends CMSBatchAction {
 	}
 
 	function run(DataObjectSet $pages) {
-		$pageIDs = $pages->column('ID');		
-		foreach($pageIDs as $pageID) FormResponse::add("$('Form_EditForm').reloadIfSetTo($pageID);");
+		$pageIDs = $pages->column('ID');
 		
 		foreach($pageIDs as $pageID) FormResponse::add("$('Form_EditForm').reloadIfSetTo($pageID);");
 		
 		$this->batchaction($pages, 'batchPublish',
 			_t('BatchPublishPages.PUBLISHED_PAGES', 'Published %d pages, %d failures')
 		);
-		
+
 		return FormResponse::respond();
 	}
 }
