@@ -132,13 +132,13 @@ var EmbargoExpiry = {
 		
 		var url = 'admin/cms_setembargoexpiry?wfRequest='+$('WorkflowRequest_ID').value;
 		var ids = EmbargoExpiry.ids(what);
-		
+
 		if (what == 'embargo') {
 			url += '&EmbargoDate='+escape($(ids.dateField).value)+'&EmbargoTime='+escape($(ids.timeField).value);
 		} else if (what == 'expiry') {
 			url += '&ExpiryDate='+escape($(ids.dateField).value)+'&ExpiryTime='+escape($(ids.timeField).value);
 		}
-		
+
 		if ($(ids.dateField).value == '' || $(ids.timeField).value == '') {
 			alert('You must fill out the '+what+' date and time fields');
 			return;
