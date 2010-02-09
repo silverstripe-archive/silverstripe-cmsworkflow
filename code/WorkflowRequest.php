@@ -532,11 +532,15 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * 
 	 * @return string URL
 	 */
-	protected function getDiffLinkToLastPublished() {		
-		// Get the completed request change and ask it
-		$completedChange = DataObject::get_one('WorkflowRequestChange', "WorkflowRequestID = {$this->ID} AND Status = 'Completed'");
-		if (!$completedChange) return false;
-		return $completedChange->getDiffLinkToLastPublished();
+	protected function getDiffLinkToLastPublished() {
+		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+		$page = $this->Page();
+		if (!$page) return;
+		$fromVersion = $page->Version;
+		$latestPublished = Versioned::get_one_by_stage($page->class, 'Live', "{$bt}SiteTree_Live{$bt}.ID = {$page->ID}", true, "Created DESC");
+		if(!$latestPublished) return false;
+		
+		return "admin/compareversions/$page->ID/?From={$fromVersion}&To={$latestPublished->Version}";
 	}
 	
 	/**
