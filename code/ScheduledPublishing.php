@@ -30,6 +30,8 @@ class ScheduledPublishing extends BuildTask {
 		Cookie::$report_errors = false;
 		if (class_exists('Subsite')) Subsite::$disable_subsite_filter = true;
 
+		if (class_exists('Subsite')) Subsite::$disable_subsite_filter = true;
+		
 		// Look for changes that need to be published
 		$wfRequests = DataObject::get('WorkflowRequest', "\"Status\" = 'Scheduled' AND \"EmbargoDate\" <= '".SS_Datetime::now()->getValue()."'");
 		$admin = Security::findAnAdministrator();
