@@ -96,6 +96,7 @@ div#futurePublishing div.popupdatetime ul {
 <% end_if %>
 
 <% if CanChangeEmbargoExpiry %>
+	$TZConverter
 	<% if EmbargoField %>
 		<p>
 			$EmbargoField
