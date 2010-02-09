@@ -9,8 +9,31 @@ class ThreeStepWorkflowPublicationRequestsNeedingPublishingSideReport extends Si
 	function title() {
 		return _t('ThreeStepWorkflowPublicationRequestsNeedingPublishingSideReport.TITLE',"Publication requests I need to publish");
 	}
+
 	function group() {
 		return "Workflow reports";
+	}
+	
+	function records() {
+		$res = WorkflowThreeStepRequest::get_by_publisher(
+			'WorkflowPublicationRequest',
+			Member::currentUser(),
+			array('Approved')
+		);
+		$doSet = new DataObjectSet();
+		foreach ($res as $result) {
+			if ($wf = $result->openWorkflowRequest()) {
+				if (!$result->canPublish()) continue;
+				$result->WFAuthorID = $wf->AuthorID;
+				$result->WFApproverEmail = $wf->Approver()->Email;
+				$result->WFApprovedWhen = $wf->ApprovalDate();
+				$result->WFApproverID = $wf->ApproverID;
+				$result->WFPublisherID = $wf->PublisherID;
+				if (isset($_REQUEST['OnlyMine']) && $result->WFApproverID != Member::currentUserID()) continue;
+				$doSet->push($result);
+			}
+		}
+		return $doSet;
 	}
 	function sort() {
 		return 300;

@@ -71,6 +71,34 @@ class ThreeStepWorkflowPublicationRequestsNeedingApprovalSideReport extends Side
 			);
 		}
 	}
+}
+
+class ThreeStepWorkflowPublicationRequestsNeedingApprovalSideReport_AllSubsites extends SideReport {
+	function title() {
+		return _t('ThreeStepWorkflowPublicationRequestsNeedingApprovalSideReport.ALLSUBSITES',"Workflow: publication requests I need to approve (all subsites)");
+	}
+	function records() {
+		if (ClassInfo::exists('Subsite')) Subsite::$disable_subsite_filter = true;
+		$res = WorkflowThreeStepRequest::get_by_approver(
+			'WorkflowPublicationRequest',
+			Member::currentUser(),
+			array('AwaitingApproval')
+		);
+		$doSet = new DataObjectSet();
+		if ($res) {
+			foreach ($res as $result) {
+				if ($wf = $result->openWorkflowRequest()) {
+					if (!$result->canApprove()) continue;
+					$result->WFRequestedWhen = $wf->Created;
+					$result->WFAuthorID = $wf->AuthorID;
+					$result->WFAuthorEmail = $wf->Author()->Email;
+					$result->WFApproverID = $wf->ApproverID;
+					$result->WFPublisherID = $wf->PublisherID;
+					$doSet->push($result);
+				}
+			}
+		}
+	}
 	function canView() {
 		return Object::has_extension('SiteTree', 'SiteTreeCMSThreeStepWorkflow');
 	}
