@@ -341,7 +341,7 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 			$bt = defined('DB::USE_ANSI_SQL') ? "\"" : "`";
 
 			$page = DataObject::get_by_id("SiteTree", $id);
-			if(!$page) $page = Versioned::get_one_by_stage("SiteTree", "Live", "{$bt}SiteTree{$bt}.ID = $id");
+			if(!$page) $page = Versioned::get_one_by_stage("SiteTree", "Live", "{$bt}SiteTree{$bt}.{$bt}ID{$bt} = $id");
 			if(!$page) return new HTTPResponse("Can't find Page #$id", 400);
 		} else {
 			return new HTTPResponse("Bad ID", 400);
