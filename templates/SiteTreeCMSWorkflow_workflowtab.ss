@@ -113,6 +113,7 @@ div#futurePublishing div.popupdatetime ul {
 <% end_if %>
 
 <% end_if %> 
+
 </div>
 
 

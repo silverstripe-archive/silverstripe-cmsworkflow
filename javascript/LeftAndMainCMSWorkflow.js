@@ -257,7 +257,6 @@ Behaviour.register({
 	'#ExpiryDate_Time' : { onchange: EmbargoExpiry.fieldCheck }
 })
 
-
 function action_publish_right(e) {
 	var messageEl = null;
 	if (CMSWorkflow.getOption('noPromptForAdmin')) {
