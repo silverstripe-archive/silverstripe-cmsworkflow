@@ -157,17 +157,28 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 				$fields->addFieldsToTab('Root.Expiry', array(
 					new HeaderField("Please check these pages", 2),
 					new LiteralField('ExpiryBacklinkWarning', "This page is scheduled to expire, but the following pages link to it"),
-					new TableListField(
+					$backLinksTable = new TableListField(
 						'BackLinkTracking',
 						'SiteTree',
 						array(
-							'Title' => 'Title'
+							'Title' => 'Title',
+							'AbsoluteLink' => 'URL'
 						),
 						'"ChildID" = ' . $this->owner->ID,
 						'',
 						'LEFT JOIN "SiteTree_LinkTracking" ON "SiteTree"."ID" = "SiteTree_LinkTracking"."SiteTreeID"'
 					)
 				));
+
+				$backLinksTable->setFieldFormatting(array(
+					'Title' => '<a href=\"admin/show/$ID\">$Title</a>',
+					'AbsoluteLink' => '<a href=\"$value\">$value</a>',
+				));
+				$backLinksTable->setPermissions(array(
+					'show',
+					'export'
+				));
+				
 			}
 		}
 		
