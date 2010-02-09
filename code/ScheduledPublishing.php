@@ -35,13 +35,14 @@ class ScheduledPublishing extends BuildTask {
 		$admin = Security::findAnAdministrator();
 		$admin->logIn();
 		
+		
 		if (count($wfRequests)) {
 			foreach($wfRequests as $request) {
 				// Use a try block to prevent one bad request
 				// taking down the whole queue
 				try {
 					if (!$this->suppressOutput) echo "\n<br />Attempting to publish ".$request->Page()->Title.": ";
-					$request->publish('Page was embargoed. Automatically published.', $admin, false);
+					$request->publish('Page was embargoed. Automatically published.', WorkflowSystemMember::get(), false);
 					if (!$this->suppressOutput) echo "ok.";
 				} catch (Exception $e) {
 					// Log it?
