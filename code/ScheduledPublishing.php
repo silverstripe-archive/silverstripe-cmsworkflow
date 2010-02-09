@@ -34,7 +34,6 @@ class ScheduledPublishing extends BuildTask {
 		$wfRequests = DataObject::get('WorkflowRequest', "Status = 'Scheduled' AND EmbargoDate <= '".SS_Datetime::now()->getValue()."'");
 		$admin = Security::findAnAdministrator();
 		$admin->logIn();
-		
 		if (count($wfRequests)) {
 			foreach($wfRequests as $request) {
 				// Use a try block to prevent one bad request
@@ -53,7 +52,7 @@ class ScheduledPublishing extends BuildTask {
 		}
 		
 		// Look for live pages that need to be expired
-		$pagesToExpire = Versioned::get_by_stage('SiteTree', 'Live', "ExpiryDate <= '".SS_Datetime::now()->getValue()."'");
+		$pagesToExpire = Versioned::get_by_stage('SiteTree', 'Live', "ExpiryDate <= '".SSDatetime::now()->getValue()."'");
 		if (count($pagesToExpire)) {
 			foreach($pagesToExpire as $page) {
 				// Use a try block to prevent one bad request
