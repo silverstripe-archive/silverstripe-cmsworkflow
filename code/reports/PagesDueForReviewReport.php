@@ -15,6 +15,7 @@ class PagesDueForReviewReport extends SSReport {
 			'Title' => 'Page Title',
 			'NextReviewDate' => 'Review Date',
 			'Owner.Title' => 'Owner',
+			'LastEditedBy.Title' => 'Last edited by',
 			'OwnerID' => 'Owner ID',
 			'AbsoluteLink' => 'URL',
 			'ID' => 'Edit'

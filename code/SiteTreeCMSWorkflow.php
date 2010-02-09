@@ -300,6 +300,13 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		}
 	}
 	
+	function LastEditedBy() {
+		$latestVersion = Versioned::get_latest_version('SiteTree', $this->owner->ID);
+		if (!$latestVersion || !$latestVersion->AuthorID) return;
+		
+		return DataObject::get_by_id('Member', $latestVersion->AuthorID);
+	}
+	
 	// Event handlers for the built-in actions will tidy up any open workflow that's leftover.
 	// If a workflow action is calling publish/delete/etc, the workflow object should be cleaned up
 	// *before* the action is called.
