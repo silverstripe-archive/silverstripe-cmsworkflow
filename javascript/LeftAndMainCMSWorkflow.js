@@ -140,8 +140,19 @@ var EmbargoExpiry = {
 		}
 		
 		if ($(ids.dateField).value == '' || $(ids.timeField).value == '') {
-			alert('You must fill out the '+what+' date and time fields');
-			return;
+			// Try to find and copy from a TZ converter called EmbargoExpiryTZConverter
+			if ($('EmbargoExpiryTZConverter')) {
+				var data = $('EmbargoExpiryTZConverter').getData();
+				if (data) {
+					$(ids.dateField).value = data.popupdatetime.split(' ')[0];
+					$(ids.timeField).value = data.popupdatetime.split(' ')[1];
+				}
+			}
+			
+			if ($(ids.dateField).value == '' || $(ids.timeField).value == '') {
+				alert('You must fill out the '+what+' date and time fields');
+				return;
+			}
 		}
 		
 		$(el.id).className = 'action loading';
@@ -221,6 +232,7 @@ var EmbargoExpiry = {
 		$(id).disabled = true;
 	},
 	fieldCheck: function() {
+		return;
 		ids = EmbargoExpiry.ids('embargo');
 		// Only call this logic if the date field & save button exist, otherwise it's unnecessary
 		if($(ids.dateField) && $(ids.saveButton)) {
@@ -257,6 +269,7 @@ Behaviour.register({
 	'#ExpiryDate_Time' : { onchange: EmbargoExpiry.fieldCheck }
 })
 
+EmbargoExpiry.fieldCheck();
 
 function action_publish_right(e) {
 	var messageEl = null;
