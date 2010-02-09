@@ -96,7 +96,6 @@ div#futurePublishing div.popupdatetime ul {
 <% end_if %>
 
 <% if CanChangeEmbargoExpiry %>
-	$TZConverter
 	<% if EmbargoField %>
 		<p>
 			$EmbargoField
@@ -116,13 +115,6 @@ div#futurePublishing div.popupdatetime ul {
 <% end_if %> 
 </div>
 
-<% control Page %>
-<% if BackLinkTracking %>
-<% if BackLinkTracking.Count %>
-<p>There are $BackLinkTracking.Count page(s) that link to here.</p>
-<% end_if %>
-<% end_if %>
-<% end_control %>
 
 <h2>Actions</h2>
 <p>

@@ -219,15 +219,15 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 		// check for admin permission
 		if (Permission::checkMember($approver, 'ADMIN') || Permission::checkMember($approver, 'IS_WORKFLOW_ADMIN')) {
 			// Admins can approve/publish anything
-			$filter = "{$bt}WorkflowRequest{$bt}.{$bt}ClassName{$bt} IN ('$classesSQL')";
+			$filter = "{$bt}WorkflowRequest{$bt}.ClassName IN ('$classesSQL')";
 		} else {
-			$filter = "{$bt}WorkflowRequest_Approvers{$bt}.{$bt}MemberID{$bt} = {$approver->ID} 
-				AND {$bt}WorkflowRequest{$bt}.{$bt}ClassName{$bt} IN ('$classesSQL')
+			$filter = "{$bt}WorkflowRequest_Approvers{$bt}.MemberID = {$approver->ID} 
+				AND {$bt}WorkflowRequest{$bt}.ClassName IN ('$classesSQL')
 			";
 		}
 		
 		if($status) {
-			$filter .= "AND {$bt}WorkflowRequest{$bt}.{$bt}Status{$bt} IN (" . $statusStr . ")";
+			$filter .= "AND {$bt}WorkflowRequest{$bt}.Status IN (" . $statusStr . ")";
 		} 
 
 		$onDraft = Versioned::get_by_stage(
@@ -235,8 +235,8 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 			"Stage",
 			$filter, 
 			"{$bt}SiteTree{$bt}.{$bt}LastEdited{$bt} DESC",
-			"LEFT JOIN {$bt}WorkflowRequest{$bt} ON {$bt}WorkflowRequest{$bt}.{$bt}PageID{$bt} = {$bt}SiteTree{$bt}.ID " .
-			"LEFT JOIN {$bt}WorkflowRequest_Approvers{$bt} ON {$bt}WorkflowRequest{$bt}.{$bt}ID{$bt} = {$bt}WorkflowRequest_Approvers{$bt}.{$bt}WorkflowRequestID{$bt}"
+			"LEFT JOIN {$bt}WorkflowRequest{$bt} ON {$bt}WorkflowRequest{$bt}.PageID = {$bt}SiteTree{$bt}.ID " .
+			"LEFT JOIN {$bt}WorkflowRequest_Approvers{$bt} ON {$bt}WorkflowRequest{$bt}.ID = {$bt}WorkflowRequest_Approvers{$bt}.WorkflowRequestID"
 		);
 		
 		$onLive = Versioned::get_by_stage(
@@ -244,8 +244,8 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 			"Live",
 			$filter, 
 			"{$bt}SiteTree_Live{$bt}.{$bt}LastEdited{$bt} DESC",
-			"LEFT JOIN {$bt}WorkflowRequest{$bt} ON {$bt}WorkflowRequest{$bt}.{$bt}PageID{$bt} = {$bt}SiteTree_Live{$bt}.{$bt}ID{$bt} " .
-			"LEFT JOIN {$bt}WorkflowRequest_Approvers{$bt} ON {$bt}WorkflowRequest{$bt}.{$bt}ID{$bt} = {$bt}WorkflowRequest_Approvers{$bt}.{$bt}WorkflowRequestID{$bt}"
+			"LEFT JOIN {$bt}WorkflowRequest{$bt} ON {$bt}WorkflowRequest{$bt}.PageID = {$bt}SiteTree_Live{$bt}.ID " .
+			"LEFT JOIN {$bt}WorkflowRequest_Approvers{$bt} ON {$bt}WorkflowRequest{$bt}.ID = {$bt}WorkflowRequest_Approvers{$bt}.WorkflowRequestID"
 		);
 
 		$return = new DataObjectSet();
@@ -266,9 +266,9 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 		$classesSQL = implode("','", $classes);
 		
 		// build filter
-		$filter = "{$bt}WorkflowRequest{$bt}.{$bt}ClassName{$bt} IN ('$classesSQL') ";
+		$filter = "{$bt}WorkflowRequest{$bt}.ClassName IN ('$classesSQL') ";
 		if($status) {
-			$filter .= "AND {$bt}WorkflowRequest{$bt}.{$bt}Status{$bt} IN (" . $statusStr . ")";
+			$filter .= "AND {$bt}WorkflowRequest{$bt}.Status IN (" . $statusStr . ")";
 		} 
 		
 		$onDraft = Versioned::get_by_stage(
@@ -276,7 +276,7 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 			"Stage",
 			$filter, 
 			"{$bt}SiteTree{$bt}.{$bt}LastEdited{$bt} DESC",
-			"LEFT JOIN {$bt}WorkflowRequest{$bt} ON {$bt}WorkflowRequest{$bt}.{$bt}PageID{$bt} = {$bt}SiteTree{$bt}.{$bt}ID{$bt} "
+			"LEFT JOIN {$bt}WorkflowRequest{$bt} ON {$bt}WorkflowRequest{$bt}.PageID = {$bt}SiteTree{$bt}.ID "
 		);
 		
 		$onLive = Versioned::get_by_stage(
@@ -284,7 +284,7 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 			"Live",
 			$filter, 
 			"{$bt}SiteTree_Live{$bt}.{$bt}LastEdited{$bt} DESC",
-			"LEFT JOIN {$bt}WorkflowRequest{$bt} ON {$bt}WorkflowRequest{$bt}.{$bt}PageID{$bt} = {$bt}SiteTree_Live{$bt}.{$bt}ID{$bt} "
+			"LEFT JOIN {$bt}WorkflowRequest{$bt} ON {$bt}WorkflowRequest{$bt}.PageID = {$bt}SiteTree_Live{$bt}.ID "
 		);
 
 		$objects = new DataObjectSet();

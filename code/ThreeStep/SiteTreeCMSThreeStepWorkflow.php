@@ -27,7 +27,7 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 	}
 	
 	function getOpenRequest($workflowClass) {
-		$wf = DataObject::get_one($workflowClass, "\"PageID\" = " . (int)$this->owner->ID . " AND \"Status\" NOT IN ('Completed', 'Denied', 'Cancelled')");
+		$wf = DataObject::get_one($workflowClass, "PageID = " . (int)$this->owner->ID . " AND Status NOT IN ('Completed', 'Denied', 'Cancelled')");
 		if($wf) return $wf;
 		
 		return null;
@@ -267,23 +267,23 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 	function onAfterWrite() {
 		if(!$this->owner->EditorGroups()->Count()) {
 			$SQL_group = Convert::raw2sql('site-content-authors');
-			$groupCheckObj = DataObject::get_one('Group', "\"Code\" = '{$SQL_group}'");
+			$groupCheckObj = DataObject::get_one('Group', "Code = '{$SQL_group}'");
 			if($groupCheckObj) $this->owner->EditorGroups()->add($groupCheckObj);
 			
 			$SQL_group = Convert::raw2sql('site-content-publishers');
-			$groupCheckObj = DataObject::get_one('Group', "\"Code\" = '{$SQL_group}'");
+			$groupCheckObj = DataObject::get_one('Group', "Code = '{$SQL_group}'");
 			if($groupCheckObj) $this->owner->EditorGroups()->add($groupCheckObj);
 		}
 		
 		if(!$this->owner->ApproverGroups()->Count()) {
 			$SQL_group = Convert::raw2sql('site-content-approvers');
-			$groupCheckObj = DataObject::get_one('Group', "\"Code\" = '{$SQL_group}'");
+			$groupCheckObj = DataObject::get_one('Group', "Code = '{$SQL_group}'");
 			if($groupCheckObj) $this->owner->ApproverGroups()->add($groupCheckObj);
 		}
 		
 		if(!$this->owner->PublisherGroups()->Count()) {
 			$SQL_group = Convert::raw2sql('site-content-publishers');
-			$groupCheckObj = DataObject::get_one('Group', "\"Code\" = '{$SQL_group}'");
+			$groupCheckObj = DataObject::get_one('Group', "Code = '{$SQL_group}'");
 			if($groupCheckObj) $this->owner->PublisherGroups()->add($groupCheckObj);
 		}
 	}
@@ -297,7 +297,7 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 		// For 2.3 and 2.4 compatibility
 		$bt = defined('DB::USE_ANSI_SQL') ? "\"" : "`";
 		
-		$query = "SELECT \"ID\" FROM {$bt}Group{$bt} WHERE {$bt}Group{$bt}.{$bt}Code{$bt} = 'site-content-authors'";
+		$query = "SELECT * FROM {$bt}Group{$bt} WHERE {$bt}Group{$bt}.{$bt}Code{$bt} = 'site-content-authors'";
 		if(!DB::query($query)->value()){
 			$authorGroup = Object::create('Group');
 			$authorGroup->Title = 'Site Content Authors';
@@ -308,7 +308,7 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 			if(method_exists('DB', 'alteration_message')) DB::alteration_message("Added site content author group","created");
 		}
 
-		$query = "SELECT \"ID\" FROM {$bt}Group{$bt} WHERE {$bt}Group{$bt}.{$bt}Code{$bt} = 'site-content-approvers'";
+		$query = "SELECT * FROM {$bt}Group{$bt} WHERE {$bt}Group{$bt}.{$bt}Code{$bt} = 'site-content-approvers'";
 		if(!DB::query($query)->value()){
 			$approversGroup = Object::create('Group');
 			$approversGroup->Title = 'Site Content Approvers';
@@ -320,7 +320,7 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 			if(method_exists('DB', 'alteration_message')) DB::alteration_message("Added site content approver group","created");
 		}
 		
-		$query = "SELECT \"ID\" FROM {$bt}Group{$bt} WHERE {$bt}Group{$bt}.{$bt}Code{$bt} = 'site-content-publishers'";
+		$query = "SELECT * FROM {$bt}Group{$bt} WHERE {$bt}Group{$bt}.{$bt}Code{$bt} = 'site-content-publishers'";
 		if(!DB::query($query)->value()){
 			$actionersGroup = Object::create('Group');
 			$actionersGroup->Title = 'Site Content Publishers';

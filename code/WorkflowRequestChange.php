@@ -25,7 +25,7 @@ class WorkflowRequestChange extends DataObject {
 		'Comment',
 	);
 	
-	static $sort = "\"Created\" ASC";
+	static $sort = 'Created ASC';
 	
 	static $casting = array(
 		'StatusDescription' => 'Varchar', 
@@ -40,7 +40,7 @@ class WorkflowRequestChange extends DataObject {
 	 */
 	function PreviousChange() {
 		//$createdDate = $this->obj('Created')->Format();
-		$changes = $this->WorkflowRequest()->Changes("Created < '{$this->Created}'", "\"Created\" DESC", null, 1);
+		$changes = $this->WorkflowRequest()->Changes("Created < '{$this->Created}'", 'Created DESC', null, 1);
 		return ($changes) ? $changes->First() : null;
 	}
 	
@@ -48,7 +48,7 @@ class WorkflowRequestChange extends DataObject {
 	 * @return WorkflowRequestChange
 	 */
 	function NextChange() {
-		$changes = $this->WorkflowRequest()->Changes("Created > '{$this->Created}'", "\"Created\" DESC", null, 1);
+		$changes = $this->WorkflowRequest()->Changes("Created > '{$this->Created}'", 'Created DESC', null, 1);
 		return ($changes) ? $changes->First() : null;
 	}
 	
@@ -112,7 +112,7 @@ class WorkflowRequestChange extends DataObject {
 
 		$page = $this->WorkflowRequest()->Page();
 		$fromVersion = $page->Version;
-		$latestPublished = Versioned::get_one_by_stage($page->class, 'Live', "{$bt}SiteTree_Live{$bt}.{$bt}ID{$bt} = {$page->ID}", true, "\"Created\" DESC");
+		$latestPublished = Versioned::get_one_by_stage($page->class, 'Live', "{$bt}SiteTree_Live{$bt}.ID = {$page->ID}", true, "Created DESC");
 		if(!$latestPublished) return false;
 		$toVersion = $latestPublished->Version;
 		
@@ -134,7 +134,7 @@ class WorkflowRequestChange extends DataObject {
 
 		$page = $this->WorkflowRequest()->Page();
 		$fromVersion = $this->PageDraftVersion;
-		$latestPublished = Versioned::get_one_by_stage($page->class, 'Live', "{$bt}SiteTree_Live{$bt}.{$bt}ID{$bt} = {$page->ID}", true, "\"Created\" DESC");
+		$latestPublished = Versioned::get_one_by_stage($page->class, 'Live', "{$bt}SiteTree_Live{$bt}.ID = {$page->ID}", true, "Created DESC");
 		if(!$latestPublished) return false;
 		$toVersion = $latestPublished->Version;
 		

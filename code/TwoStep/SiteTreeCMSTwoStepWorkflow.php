@@ -163,7 +163,7 @@ class SiteTreeCMSTwoStepWorkflow extends SiteTreeCMSWFDecorator {
 		// For 2.3 and 2.4 compatibility
 		$bt = defined('DB::USE_ANSI_SQL') ? "\"" : "`";
 		
-		$query = "SELECT \"ID\" FROM {$bt}Group{$bt} WHERE {$bt}Group{$bt}.{$bt}Code{$bt} = 'site-content-authors'";
+		$query = "SELECT * FROM {$bt}Group{$bt} WHERE {$bt}Group{$bt}.{$bt}Code{$bt} = 'site-content-authors'";
 		if(!DB::query($query)->value()){
 			$authorGroup = Object::create('Group');
 			$authorGroup->Title = 'Site Content Authors';
@@ -175,7 +175,7 @@ class SiteTreeCMSTwoStepWorkflow extends SiteTreeCMSWFDecorator {
 			if(method_exists('DB', 'alteration_message')) DB::alteration_message("Added site content author group","created");
 		}
 
-		$query = "SELECT \"ID\" FROM {$bt}Group{$bt} WHERE {$bt}Group{$bt}.{$bt}Code{$bt} = 'site-content-publishers'";
+		$query = "SELECT * FROM {$bt}Group{$bt} WHERE {$bt}Group{$bt}.{$bt}Code{$bt} = 'site-content-publishers'";
 		if(!DB::query($query)->value()){
 			$publishersGroup = Object::create('Group');
 			$publishersGroup->Title = 'Site Content Publishers';

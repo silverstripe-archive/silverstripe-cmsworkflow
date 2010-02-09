@@ -157,28 +157,17 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 				$fields->addFieldsToTab('Root.Expiry', array(
 					new HeaderField("Please check these pages", 2),
 					new LiteralField('ExpiryBacklinkWarning', "This page is scheduled to expire, but the following pages link to it"),
-					$backLinksTable = new TableListField(
+					new TableListField(
 						'BackLinkTracking',
 						'SiteTree',
 						array(
-							'Title' => 'Title',
-							'AbsoluteLink' => 'URL'
+							'Title' => 'Title'
 						),
 						'"ChildID" = ' . $this->owner->ID,
 						'',
 						'LEFT JOIN "SiteTree_LinkTracking" ON "SiteTree"."ID" = "SiteTree_LinkTracking"."SiteTreeID"'
 					)
 				));
-
-				$backLinksTable->setFieldFormatting(array(
-					'Title' => '<a href=\"admin/show/$ID\">$Title</a>',
-					'AbsoluteLink' => '<a href=\"$value\">$value</a>',
-				));
-				$backLinksTable->setPermissions(array(
-					'show',
-					'export'
-				));
-				
 			}
 		}
 		
@@ -262,7 +251,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		$this->componentCache = array();
 		
 		if($filter) $filter .= ' AND ';
-		$filter .= "\"Status\" IN ('Completed','Denied')";
+		$filter .= "Status IN ('Completed','Denied')";
 		return $this->owner->getComponents(
 			'WorkflowRequests',
 			$filter,

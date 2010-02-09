@@ -31,14 +31,17 @@ class ScheduledPublishing extends BuildTask {
 		if (class_exists('Subsite')) Subsite::$disable_subsite_filter = true;
 
 		// Look for changes that need to be published
-		$wfRequests = DataObject::get('WorkflowRequest', "\"Status\" = 'Scheduled' AND \"EmbargoDate\" <= '".SSDatetime::now()->getValue()."'");
+		$wfRequests = DataObject::get('WorkflowRequest', "Status = 'Scheduled' AND EmbargoDate <= '".SS_Datetime::now()->getValue()."'");
+		$admin = Security::findAnAdministrator();
+		$admin->logIn();
+		
 		if (count($wfRequests)) {
 			foreach($wfRequests as $request) {
 				// Use a try block to prevent one bad request
 				// taking down the whole queue
 				try {
 					if (!$this->suppressOutput) echo "\n<br />Attempting to publish ".$request->Page()->Title.": ";
-					$request->publish('Scheduled publishing', WorkflowSystemMember::get(), false);
+					$request->publish('Page was embargoed. Automatically published.', $admin, false);
 					if (!$this->suppressOutput) echo "ok.";
 				} catch (Exception $e) {
 					// Log it?
@@ -50,7 +53,7 @@ class ScheduledPublishing extends BuildTask {
 		}
 		
 		// Look for live pages that need to be expired
-		$pagesToExpire = Versioned::get_by_stage('SiteTree', 'Live', "\"ExpiryDate\" <= '".SSDatetime::now()->getValue()."'");
+		$pagesToExpire = Versioned::get_by_stage('SiteTree', 'Live', "ExpiryDate <= '".SS_Datetime::now()->getValue()."'");
 		if (count($pagesToExpire)) {
 			foreach($pagesToExpire as $page) {
 				// Use a try block to prevent one bad request
@@ -61,7 +64,7 @@ class ScheduledPublishing extends BuildTask {
 					// Close any existing workflows
 					if ($wf = $page->openWorkflowRequest()) {
 						if (!$this->suppressOutput) echo "closing ".$wf->Status." workflow request: ";
-						$wf->deny('Page automatically expired. Removing from Live site.', WorkflowSystemMember::get());
+						$wf->deny('Page automatically expired. Removing from Live site.', $admin);
 						if (!$this->suppressOutput) echo "ok, unpublishing: ";
 					}
 
