@@ -336,6 +336,11 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	function ExpiryField() {
 		return new PopupDateTimeField('ExpiryDate', 'Expiry Date', $this->ExpiryDate);
 	}
+	function TZConverter() {
+		$tz = new TimeZoneConverterField('CMSWFTZConvert');
+		$tz->setForm(new Form($this, 'Blarg', new FieldSet(), new FieldSet()));
+		return $tz->FieldHolder();
+	}
 	
 	function getEmbargoDate() {
 		return $this->getField('EmbargoDate') != '0000-00-00 00:00:00' && $this->getField('EmbargoDate') != null ? $this->getField('EmbargoDate') : null;

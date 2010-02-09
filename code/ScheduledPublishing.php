@@ -32,15 +32,14 @@ class ScheduledPublishing extends BuildTask {
 
 		// Look for changes that need to be published
 		$wfRequests = DataObject::get('WorkflowRequest', "Status = 'Scheduled' AND EmbargoDate <= '".SS_Datetime::now()->getValue()."'");
-		$admin = Security::findAnAdministrator();
-		$admin->logIn();
+
 		if (count($wfRequests)) {
 			foreach($wfRequests as $request) {
 				// Use a try block to prevent one bad request
 				// taking down the whole queue
 				try {
 					if (!$this->suppressOutput) echo "\n<br />Attempting to publish ".$request->Page()->Title.": ";
-					$request->publish('Page was embargoed. Automatically published.', $admin, false);
+					$request->publish('Scheduled publishing', WorkflowSystemMember::get(), false);
 					if (!$this->suppressOutput) echo "ok.";
 				} catch (Exception $e) {
 					// Log it?
@@ -63,7 +62,7 @@ class ScheduledPublishing extends BuildTask {
 					// Close any existing workflows
 					if ($wf = $page->openWorkflowRequest()) {
 						if (!$this->suppressOutput) echo "closing ".$wf->Status." workflow request: ";
-						$wf->deny('Page automatically expired. Removing from Live site.', $admin);
+						$wf->deny('Page automatically expired. Removing from Live site.', WorkflowSystemMember::get());
 						if (!$this->suppressOutput) echo "ok, unpublishing: ";
 					}
 
