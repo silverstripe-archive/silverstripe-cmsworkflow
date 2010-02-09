@@ -28,7 +28,7 @@ class CMSChangeTracker extends Controller {
 			
 			case 'page':
 				if((int)$params['PageID']) {
-					$changes = $this->changes("{$bt}SiteTree{$bt}.ID = " . (int)$params['PageID']);
+					$changes = $this->changes("{$bt}SiteTree{$bt}.{$bt}ID{$bt} = " . (int)$params['PageID']);
 				} else {
 					return new HTTPResponse("<h1>Bad Page ID</h1><p>Bad page ID when getting RSS feed of changes to a page.</p>", 400);
 				}
@@ -114,10 +114,10 @@ HTML;
 		Versioned::reading_stage($origStage);
 
 		if($SQL_filter) $versionedQuery->where[] = $SQL_filter;
-		$versionedQuery->select[] = "{$bt}SiteTree{$bt}.RecordID AS ID";
+		$versionedQuery->select[] = "{$bt}SiteTree{$bt}.{$bt}RecordID{$bt} AS {$bt}ID{$bt}";
 
 		foreach($versionedQuery->from as $k => $v) {
-			$versionedQuery->renameTable($k, $k . '_versions');
+			$versionedQuery->renameTable($k, "\"{$k}_versions\"");
 		}
 		
 		$versionedQuery->groupby = null;

@@ -251,7 +251,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		$this->componentCache = array();
 		
 		if($filter) $filter .= ' AND ';
-		$filter .= "Status IN ('Completed','Denied')";
+		$filter .= "\"Status\" IN ('Completed','Denied')";
 		return $this->owner->getComponents(
 			'WorkflowRequests',
 			$filter,

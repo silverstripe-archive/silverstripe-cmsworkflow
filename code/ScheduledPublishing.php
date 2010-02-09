@@ -31,8 +31,7 @@ class ScheduledPublishing extends BuildTask {
 		if (class_exists('Subsite')) Subsite::$disable_subsite_filter = true;
 
 		// Look for changes that need to be published
-		$wfRequests = DataObject::get('WorkflowRequest', "Status = 'Scheduled' AND EmbargoDate <= '".SS_Datetime::now()->getValue()."'");
-
+		$wfRequests = DataObject::get('WorkflowRequest', "\"Status\" = 'Scheduled' AND \"EmbargoDate\" <= '".SSDatetime::now()->getValue()."'");
 		if (count($wfRequests)) {
 			foreach($wfRequests as $request) {
 				// Use a try block to prevent one bad request
@@ -51,7 +50,7 @@ class ScheduledPublishing extends BuildTask {
 		}
 		
 		// Look for live pages that need to be expired
-		$pagesToExpire = Versioned::get_by_stage('SiteTree', 'Live', "ExpiryDate <= '".SSDatetime::now()->getValue()."'");
+		$pagesToExpire = Versioned::get_by_stage('SiteTree', 'Live', "\"ExpiryDate\" <= '".SSDatetime::now()->getValue()."'");
 		if (count($pagesToExpire)) {
 			foreach($pagesToExpire as $page) {
 				// Use a try block to prevent one bad request
