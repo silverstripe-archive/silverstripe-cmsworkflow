@@ -16,6 +16,7 @@ class PagesScheduledForPublishingSideReport extends SideReport {
 		return 900;
 	}
 	function records() {
+
 		if (ClassInfo::exists('Subsite') && isset($this->params['AllSubsites'])) {
 			$oldSSFilterState = Subsite::$disable_subsite_filter;
 			Subsite::$disable_subsite_filter = true;
