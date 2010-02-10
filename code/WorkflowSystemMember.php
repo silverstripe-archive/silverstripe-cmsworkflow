@@ -15,7 +15,7 @@ class WorkflowSystemMember extends Member {
 			$su->Surname = 'Workflow';
 			$su->write();
 			Group::addToGroupByName($su, 'administrators');
-			Database::alteration_message("Added CMS Workflow user","created");
+			SS_Database::alteration_message("Added CMS Workflow user","created");
 		}
 	}
 }
