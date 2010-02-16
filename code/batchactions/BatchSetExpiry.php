@@ -23,6 +23,20 @@ class BatchSetExpiry extends CMSBatchAction {
 			new TZDateTimeField('ExpiryDate_Batch')
 		);
 	}
+	
+	function confirmationDialog($ids) {
+		$pagesWithBacklinks = array();
+		foreach($ids as $id) {
+			$page = DataObject::get_by_id('SiteTree', $id);
+			if ($page->BacklinkTracking()->Count()) $pagesWithBacklinks[] = $page->AbsoluteLink();
+		}
+		
+		return array(
+			'alert' => count($pagesWithBacklinks) ? true : false,
+			'content' => 'The following pages will create broken links when they expire:'."\n\n".
+							join("\n", $pagesWithBacklinks)."\n\nProceed?"
+		);
+	}
 
 	function applicablePages($ids) {
 		return $this->applicablePagesHelper($ids, 'canChangeExpiry', true, true);
