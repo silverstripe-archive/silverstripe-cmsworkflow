@@ -105,13 +105,15 @@ class SiteTreeFutureState extends DataObjectDecorator {
 	public static function on_db_reset() {
 		// Drop all temporary tables
 		$db = DB::getConn();
-		foreach(self::$temp_tables as $tableName) {
-			if(method_exists($db, 'dropTable')) $db->dropTable($tableName);
-			else $db->query("DROP TABLE \"$tableName\"");
+		if($db->isActive()) {
+			foreach(self::$temp_tables as $tableName) {
+				if(method_exists($db, 'dropTable')) $db->dropTable($tableName);
+				else $db->query("DROP TABLE \"$tableName\"");
+			}
 		}
 
 		// Remove references to them
-		self::$$temp_tables = array();
+		self::$temp_tables = array();
 	}
 
 	/**
@@ -124,16 +126,18 @@ class SiteTreeFutureState extends DataObjectDecorator {
 	 * @param string $date The date.
 	 */
 	protected static function requireFutureStateTempTable($baseTable, $date = null) {
-		if(!isset(self::$temp_tables[$baseTable])) {
-			self::$temp_tables[$baseTable] = DB::createTable("_FutureState$baseTable", array(
+		$tmpID = "_FutureState{$baseTable}_" . str_replace(array(' ','-',':'),'',$date);
+
+		if(!isset(self::$temp_tables[$tmpID])) {
+			self::$temp_tables[$tmpID] = DB::createTable($tmpID, array(
 				"ID" => "INT NOT NULL",
 				"Version" => "INT NOT NULL",
 			), null, array('temporary' => true));
 		}
 		
-		if(!DB::query("SELECT COUNT(*) FROM \"" . self::$temp_tables[$baseTable] . "\"")->value()) {
+		if(!DB::query("SELECT COUNT(*) FROM \"" . self::$temp_tables[$tmpID] . "\"")->value()) {
 			$SQL_date = Convert::raw2sql($date);
-			$tempTable = self::$temp_tables[$baseTable];
+			$tempTable = self::$temp_tables[$tmpID];
 			
 			// Insert current live data
 			DB::query("INSERT INTO \"$tempTable\"
@@ -158,7 +162,7 @@ class SiteTreeFutureState extends DataObjectDecorator {
 				WHERE \"WorkflowRequest\" .\"Status\" = 'Scheduled' AND \"WorkflowRequest\" .\"EmbargoDate\" <= '$SQL_date'");
 		}
 		
-		return self::$temp_tables[$baseTable];
+		return self::$temp_tables[$tmpID];
 	}
 }
 
