@@ -72,7 +72,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 				if (count(explode('/', $date)) != 3) return false;
 				list($day, $month, $year) = explode('/', $date);
 				$timestamp = strtotime("$year-$month-$day $time");
-				if ($timestamp && $timestamp > time()) {
+				if ($timestamp && $timestamp > SSDatetime::now()->getValue()) {
 					$wf->EmbargoDate = $timestamp;
 					$wf->write();
 					return true;
