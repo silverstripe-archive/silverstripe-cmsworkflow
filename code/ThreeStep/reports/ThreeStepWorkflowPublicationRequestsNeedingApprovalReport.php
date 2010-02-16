@@ -57,13 +57,9 @@ class ThreeStepWorkflowPublicationRequestsNeedingApprovalReport extends SSReport
 				'casting' => 'SSDatetime->Full'
 			),
 			'HasEmbargoOrExpiry' => 'Embargo or expiry dates set',
-			'ID' => array(
-				'title' => 'Actions',
-				'formatting' => '<a href=\"admin/show/$value\">Edit in CMS</a>'
-			),
 			'AbsoluteLink' => array(
 				'title' => 'Links',
-				'formatting' => '$value <a href=\"$value?stage=Live\">(live)</a> <a href=\"$value?stage=Stage\">(draft)</a>'
+				'formatting' => '<a href=\"admin/show/$ID\" title=\"Edit page\">$value</a> " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'
 			)
 		);
 		
