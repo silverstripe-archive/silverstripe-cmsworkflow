@@ -11,12 +11,11 @@ class ThreeStepWorkflowPublicationRequestsNeedingApprovalReport extends SSReport
 	}
 	
 	function sourceRecords($params, $sort, $limit) {
-		
 		if(!empty($params['Subsites'])) {
 			// 'any' wasn't selected
 			$subsiteIds = array();
-			foreach($params['Subsites'] as $subsite) {
-				if(is_numeric($subsite)) $subsiteIds[] = $subsite;
+			foreach(explode(',', $params['Subsites']) as $subsite) {
+				if(is_numeric(trim($subsite))) $subsiteIds[] = trim($subsite);
 			}
 			Subsite::$force_subsite = join(',', $subsiteIds);
 		}
@@ -87,9 +86,8 @@ class ThreeStepWorkflowPublicationRequestsNeedingApprovalReport extends SSReport
 		$params = new FieldSet();
 		
 		if (class_exists('Subsite') && $subsites = DataObject::get('Subsite')) {
-			$options = $subsites->toDropdownMap('ID', 'Title');
-			array_unshift($options, 'Main site');
-			$params->push(new CheckboxSetField('Subsites', 'Sites', $options));
+			$options = $subsites->toDropdownMap('ID', 'Title', 'All sites');
+			$params->push(new TreeMultiselectField('Subsites', 'Sites', $options));
 		}
 		
 		return $params;

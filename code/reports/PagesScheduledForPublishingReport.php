@@ -19,7 +19,7 @@ class PagesScheduledForPublishingReport extends SSReport {
 		if(!empty($params['Subsites'])) {
 			// 'any' wasn't selected
 			$subsiteIds = array();
-			foreach($params['Subsites'] as $subsite) {
+			foreach(explode(',', $params['Subsites']) as $subsite) {
 				if(is_numeric($subsite)) $subsiteIds[] = $subsite;
 			}
 			$wheres[] = 'SubsiteID IN(' . implode(',' , $subsiteIds) . ')';
@@ -108,8 +108,7 @@ class PagesScheduledForPublishingReport extends SSReport {
 		
 		if (class_exists('Subsite') && $subsites = DataObject::get('Subsite')) {
 			$options = $subsites->toDropdownMap('ID', 'Title');
-			array_unshift($options, 'Main site');
-			$params->push(new CheckboxSetField('Subsites', 'Sites', $options));
+			$params->push(new TreeMultiselectField('Subsites', 'Sites', $options));
 		}
 		
 		$params->push(new PopupDateTimeField('StartDate', 'Start date'));
