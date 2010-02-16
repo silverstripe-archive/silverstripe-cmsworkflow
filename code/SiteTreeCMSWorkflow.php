@@ -96,7 +96,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 				list($day, $month, $year) = explode('/', $date);
 				$timestamp = strtotime("$year-$month-$day $time");
 				if ($timestamp) {
-					if ($wf->EmbargoDate && $timestamp > $wf->EmbargoDate) return false;
+					if ($wf->EmbargoDate && $timestamp < strtotime($wf->EmbargoDate)) return false;
 					$this->owner->ExpiryDate = $timestamp;
 					$this->owner->write();
 					return true;
@@ -132,6 +132,20 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Can we change the embargo date - only if there is an open workflow request
+	 */
+	function canChangeEmbargo() {
+		return (bool)$this->openWorkflowRequest();
+	}
+
+	/**
+	 * Can we change the embargo date - only if there is an open workflow request
+	 */
+	function canChangeExpiry() {
+		return (bool)$this->openWorkflowRequest();
 	}
 	
 	/**
