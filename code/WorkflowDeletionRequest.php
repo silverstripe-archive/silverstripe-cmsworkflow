@@ -116,6 +116,7 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 	 */
 	public function Page() {
 		$page = Versioned::get_one_by_stage('SiteTree', 'Live', 'SiteTree_Live.ID = '.$this->PageID);
+		if(!$page) $page = Versioned::get_one_by_stage('SiteTree', 'Stage', 'SiteTree.ID = '.$this->PageID);
 		return $page;
 	}
 	
