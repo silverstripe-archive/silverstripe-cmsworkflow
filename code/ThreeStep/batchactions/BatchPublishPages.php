@@ -32,6 +32,7 @@ class BatchPublishPages extends CMSBatchAction {
 
 			} else {
 				$count[$type . '_FAILURE']++;
+				FormResponse::add("\$('sitetree').addNodeClassByIdx('$page->ID', 'failed');");
 			}
 			
 			$page->destroy();
