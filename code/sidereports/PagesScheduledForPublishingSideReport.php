@@ -7,15 +7,8 @@
  */
 class PagesScheduledForPublishingSideReport extends SideReport {
 	function title() {
-		return _t('PagesScheduledForPublishingSideReport.TITLE',"Pages scheduled for publishing");
+		return _t('PagesScheduledForPublishingSideReport.TITLE',"Workflow: pages scheduled for publishing");
 	}
-	function group() {
-		return "Workflow reports";
-	}
-	function sort() {
-		return 900;
-	}
-
 	function records() {
 		if (ClassInfo::exists('Subsite') && isset($this->params['AllSubsites'])) {
 			$oldSSFilterState = Subsite::$disable_subsite_filter;
@@ -31,7 +24,7 @@ class PagesScheduledForPublishingSideReport extends SideReport {
 		} else if (!$startDate && $endDate) {
 			$where = "EmbargoDate <= '".Convert::raw2sql($endDate)."'";
 		} else {
-			$where = "EmbargoDate >= '".SS_Datetime::now()->URLDate()."'";
+			$where = "EmbargoDate >= '".SSDatetime::now()->URLDate()."'";
 		}
 		
 		$res = DataObject::get('SiteTree', '"WorkflowRequest"."Status" = \'Scheduled\' AND '.$where, null, "LEFT JOIN WorkflowRequest on WorkflowRequest.PageID = SiteTree.ID");
@@ -54,7 +47,6 @@ class PagesScheduledForPublishingSideReport extends SideReport {
 			"Title" => array(
 				"source" => array("NestedTitle", array("2")),
 				"link" => true,
-				"reload" => true
 			),
 			"Requester" => array(
 				"prefix" => 'Will be published at ',
@@ -63,9 +55,11 @@ class PagesScheduledForPublishingSideReport extends SideReport {
 		);
 	}
 	function getParameterFields() {
-		return new FieldSet(
+		$fieldset = new FieldSet(
 			new DateField('StartDate', 'Start date (YYYY-MM-DD HH:mm:ss)'),
 			new DateField('EndDate', 'End date (YYYY-MM-DD HH:mm:ss)')
 		);
+		if (ClassInfo::exists('Subsite')) $fieldset->push(new CheckboxField('AllSubsites', 'All subsites'));
+		return $fieldset;
 	}
 }

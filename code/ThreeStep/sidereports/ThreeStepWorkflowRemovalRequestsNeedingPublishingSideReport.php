@@ -46,6 +46,7 @@ class ThreeStepWorkflowRemovalRequestsNeedingPublishingSideReport extends SideRe
 		
 		return $doSet;
 	}
+	
 	function fieldsToShow() {
 		return array(
 			"Title" => array(
@@ -64,6 +65,7 @@ class ThreeStepWorkflowRemovalRequestsNeedingPublishingSideReport extends SideRe
 			)
 		);
 	}
+
 	function getParameterFields() {
 		if (ClassInfo::exists('Subsite')) {
 			return new FieldSet(
@@ -71,6 +73,7 @@ class ThreeStepWorkflowRemovalRequestsNeedingPublishingSideReport extends SideRe
 			);
 		}
 	}
+
 	function canView() {
 		return Object::has_extension('SiteTree', 'SiteTreeCMSThreeStepWorkflow');
 	}

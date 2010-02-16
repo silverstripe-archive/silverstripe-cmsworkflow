@@ -58,46 +58,11 @@ class PagesScheduledForDeletionSideReport extends SideReport {
 		);
 	}
 	function getParameterFields() {
-		return new FieldSet(
+		$fieldset = new FieldSet(
 			new DateField('StartDate', 'Start date (YYYY-MM-DD HH:mm:ss)'),
 			new DateField('EndDate', 'End date (YYYY-MM-DD HH:mm:ss)')
 		);
+		if (ClassInfo::exists('Subsite')) $fieldset->push(new CheckboxField('AllSubsites', 'All subsites'));
+		return $fieldset;
 	}
 }
-
-class PagesScheduledForDeletionSideReport_AllSubsites extends SideReport {
-	function title() {
-		return _t('PagesScheduledForDeletionSideReport.TITLE_ALLSUBSITES',"Workflow: pages scheduled for deletion (all subsites)");
-	}
-	function records($params = null) {
-		if (ClassInfo::exists('Subsite')) Subsite::$disable_subsite_filter = true;
-		if (ClassInfo::exists('Subsite') && isset($this->params['AllSubsites'])) {
-			Subsite::$disable_subsite_filter = $oldSSFilterState;
-		}
-		
-		return $doSet;
-	}
-	function fieldsToShow() {
-		return array(
-			"Title" => array(
-				"source" => array("NestedTitle", array("2")),
-				"link" => true,
-				"reload" => true
-			),
-			"Requester" => array(
-				"prefix" => 'Will be deleted at ',
-				"source" => "ExpiryDate",
-			),
-			"HasBacklinks" => array(
-				'source' => 'HasBacklinks'
-			)
-		);
-	}
-	function getParameterFields() {
-		return new FieldSet(
-			new DateField('StartDate', 'Start date (YYYY-MM-DD HH:mm:ss)'),
-			new DateField('EndDate', 'End date (YYYY-MM-DD HH:mm:ss)')
-		);
-	}
-}
-	

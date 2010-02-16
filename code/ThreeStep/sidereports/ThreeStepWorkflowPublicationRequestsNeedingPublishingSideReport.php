@@ -13,6 +13,11 @@ class ThreeStepWorkflowPublicationRequestsNeedingPublishingSideReport extends Si
 		return "Workflow reports";
 	}
 	function records() {
+		if (ClassInfo::exists('Subsite') && isset($this->params['AllSubsites'])) {
+			$oldSSFilterState = Subsite::$disable_subsite_filter;
+			Subsite::$disable_subsite_filter = true;
+		}
+		
 		$res = WorkflowThreeStepRequest::get_by_publisher(
 			'WorkflowPublicationRequest',
 			Member::currentUser(),
@@ -31,11 +36,17 @@ class ThreeStepWorkflowPublicationRequestsNeedingPublishingSideReport extends Si
 				$doSet->push($result);
 			}
 		}
+		
+		if (ClassInfo::exists('Subsite') && isset($this->params['AllSubsites'])) {
+			Subsite::$disable_subsite_filter = $oldSSFilterState;
+		}
+		
 		return $doSet;
 	}
 	function sort() {
 		return 300;
 	}
+
 	function records() {
 		if (ClassInfo::exists('Subsite') && isset($this->params['AllSubsites'])) {
 			$oldSSFilterState = Subsite::$disable_subsite_filter;
@@ -67,6 +78,7 @@ class ThreeStepWorkflowPublicationRequestsNeedingPublishingSideReport extends Si
 		
 		return $doSet;
 	}
+
 	function fieldsToShow() {
 		return array(
 			"Title" => array(
@@ -85,6 +97,7 @@ class ThreeStepWorkflowPublicationRequestsNeedingPublishingSideReport extends Si
 			)
 		);
 	}
+	
 	function getParameterFields() {
 		$fieldset = new FieldSet(
 			new CheckboxField('OnlyMine', 'Only requests I approved')
@@ -94,6 +107,7 @@ class ThreeStepWorkflowPublicationRequestsNeedingPublishingSideReport extends Si
 		}
 		return $fieldset;
 	}
+
 	function canView() {
 		return Object::has_extension('SiteTree', 'SiteTreeCMSThreeStepWorkflow');
 	}
