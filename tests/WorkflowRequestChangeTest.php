@@ -5,16 +5,19 @@
  */
 class WorkflowRequestChangeTest extends FunctionalTest {
 	static $fixture_file = 'cmsworkflow/tests/SiteTreeCMSWorkflowTest.yml';
-	
-	static function set_up_once() {
-		StaticPublisher::$disable_realtime = true;
-		parent::set_up_once();
-	}
-	
-	static function tear_down_once() {		
-		parent::tear_down_once();
-	}
-	
+
+	protected $requiredExtensions = array(
+		'SiteTree' => array('SiteTreeCMSTwoStepWorkflow'),
+		'WorkflowRequest' => array('WorkflowTwoStepRequest'),
+	);
+
+	protected $illegalExtensions = array(
+		'SiteTree' => array('SiteTreeCMSThreeStepWorkflow'),
+		'WorkflowRequest' => array('WorkflowThreeStepRequest'),
+		'LeftAndMain' => array('LeftAndMainCMSThreeStepWorkflow'),
+		'SiteConfig' => array('SiteConfigThreeStepWorkflow'),
+	);
+		
 	function testChangesAreTracked() {
 		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
 

@@ -7,92 +7,22 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 	
 	static $fixture_file = 'cmsworkflow/tests/SiteTreeCMSWorkflowTest.yml';
 	static $origSettings = array();
-	
-	// These extensions will be reapplied when the time comes
-	// if they were applied.	
-	static $extensionsToRemove = array(
-		'SiteTree' => array(
-			'SiteTreeCMSTwoStepWorkflow',
-			'SiteTreeCMSThreeStepWorkflow'
-		), 'WorkflowRequest' => array(
-			'WorkflowTwoStepRequest',
-			'WorkflowThreeStepRequest'
-		), 'LeftAndMain' => array(
-			'LeftAndMainCMSThreeStepWorkflow'
-		)
+
+	protected $illegalExtensions = array(
+		'SiteTree' => array('SiteTreeCMSTwoStepWorkflow'),
+		'WorkflowRequest' => array('WorkflowTwoStepRequest'),
 	);
-	
-	static $extensionsToApply = array(
-		'SiteTree' => array(
-			'SiteTreeCMSThreeStepWorkflow'
-		), 'WorkflowRequest' => array(
-			'WorkflowThreeStepRequest'
-		), 'LeftAndMain' => array(
-			'LeftAndMainCMSThreeStepWorkflow'
-		), 'SiteConfig' => array(
-			'SiteConfigThreeStepWorkflow'
-		)
+
+	protected $requiredExtensions = array(
+		'SiteTree' => array('SiteTreeCMSThreeStepWorkflow'),
+		'WorkflowRequest' => array('WorkflowThreeStepRequest'),
+		'LeftAndMain' => array('LeftAndMainCMSThreeStepWorkflow'),
+		'SiteConfig' => array('SiteConfigThreeStepWorkflow'),
 	);
 	
 	static $extensionsToReapply = array();
+	static $extensionsToRemoveAfter = array();
 	
-	static function set_up_extensions() {
-		// Save the state of existing extensions, then remove them
-		foreach(self::$extensionsToRemove as $class => $extensions) {
-			self::$extensionsToReapply[$class] = array();
-			foreach($extensions as $extension) {
-				if (singleton($class)->hasExtension($extension)) {
-					self::$extensionsToReapply[$class][] = $extension;
-					Object::remove_extension($class, $extension);
-				}
-			}
-		}
-		
-		// Apply the ones needed for this test
-		foreach(self::$extensionsToApply as $class => $extensions) {
-			foreach($extensions as $extension) {
-				Object::add_extension($class, $extension);
-			}
-		}
-	}
-	
-	static function tear_down_extensions() {
-		// Remove extensions added for testing
-		foreach(self::$extensionsToApply as $class => $extensions) {
-			foreach($extensions as $extension) {
-				Object::remove_extension($class, $extension);
-			}
-		}
-		
-		// Reapply ones removed
-		foreach(self::$extensionsToReapply as $class => $extensions) {
-			foreach($extensions as $extension) {
-				Object::add_extension($class, $extension);
-			}
-		}
-	}
-	
-	function setUpOnce() {
-		StaticPublisher::$disable_realtime = true;
-		self::set_up_extensions();
-		
-		// clear singletons, they're caching old extension info which is used in DatabaseAdmin->doBuild()
-		global $_SINGLETONS;
-		$_SINGLETONS = array();
-
-		// recreate database with new settings
-		$dbname = self::create_temp_db();
-		DB::set_alternative_database_name($dbname);
-		
-		parent::setUpOnce();
-	}
-	
-	function tearDownOnce() {
-		self::tear_down_extensions();
-		self::kill_temp_db();
-		self::create_temp_db();
-		parent::tearDownOnce();
-	}
 		
 	function testWorkflowPublicationApprovalTransition() {
 		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
