@@ -10,7 +10,7 @@ class PagesScheduledForPublishingReport extends SSReport {
 		return _t('PagesScheduledForPublishingReport.TITLE',"Approved pages with Embargo on");
 	}
 		
-	function sourceQuery($params) {
+	function sourceRecords($params, $sort, $limit) {
 		$wheres = array();
 		
 		$startDate = !empty($params['StartDate']) ? $params['StartDate'] : null;
@@ -55,7 +55,20 @@ class PagesScheduledForPublishingReport extends SSReport {
 		$query->from[] = "LEFT JOIN Member AS Approver ON WorkflowRequest.ApproverID = Approver.ID";
 		$query->select[] = 'CONCAT(Approver.FirstName, \' \', Approver.Surname) AS ApproverName';
 
-		return $query;
+		
+		// Turn a query into records
+		if($sort) $query->orderby = $sort;
+		$records = singleton('SiteTree')->buildDataObjectSet($query->execute(), 'DataObjectSet', $query);
+
+		// Filter to only those with canEdit permission
+		$filteredRecords = new DataObjectSet();
+		foreach($records as $record) {
+			if($record->canEdit()) $filteredRecords->push($record);
+		}
+		
+		// Apply limit after that filtering.
+		if($limit) return $filteredRecords->getRange($limit['start'], $limit['limit']);
+		else return $filteredRecords;
 	}
 
 	function columns() {
