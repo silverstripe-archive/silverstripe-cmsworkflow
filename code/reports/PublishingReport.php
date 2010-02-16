@@ -1,8 +1,8 @@
 <?php
 
-class PublishingReport extends SSReport {
+class RecentlyPublishedPagesReport extends SSReport {
 	function title() {
-		return 'Publishing activity';
+		return _t('RecentlyPublishedPagesReport.TITLE', 'Recently published pages');
 	}
 	
 	function columns() {
@@ -91,8 +91,7 @@ class PublishingReport extends SSReport {
 		
 		$params->push($startDate = new PopupDateTimeField('StartDate', 'Start date'));
 		$params->push($endDate = new PopupDateTimeField('EndDate', 'End date'));
-		$endDate->setValue(array('Date' => null, 'Time' => '11:59 pm'));
-		$startDate->setValue(array('Date' => null, 'Time' => '12:00 am'));
+		$endDate->defaultToEndOfDay();
 		
 		return $params;
 	}
