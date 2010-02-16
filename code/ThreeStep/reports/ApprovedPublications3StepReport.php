@@ -42,25 +42,23 @@ class ApprovedPublications3StepReport extends SSReport {
 			),
 			"WFApproverEmail" => array(
 				"title" => "Approver",
-				"formatting" => 'Approved by $value',
 				"link" => false,
 			),
 			"WFApprovedWhen" => array(
-				"title" => "When",
-				"formatting" => ' on $value',
+				"title" => "Approved",
 				"link" => false,
+				'casting' => 'SSDatetime->Full'
 			),
 			"WFRequesterEmail" => array(
 				"title" => "Author",
-				"formatting" => 'Requested by $value',
 				"link" => false,
 			),
 			"WFRequestedWhen" => array(
-				"title" => "When",
-				"formatting" => ' on $value',
+				"title" => "Requested",
 				"link" => false,
+				'casting' => 'SSDatetime->Full'
 			),
-			'HasEmbargoOrExpiry' => 'Embargo/expiry set',
+			'HasEmbargoOrExpiry' => 'Scheduled',
 			'AbsoluteLink' => array(
 				'title' => 'URL',
 				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'

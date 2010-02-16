@@ -40,13 +40,12 @@ class UnapprovedDeletions3StepReport extends SSReport {
 			),
 			"WFRequesterEmail" => array(
 				"title" => "Author",
-				"formatting" => 'Requested by $value',
 				"link" => false,
 			),
 			"WFRequestedWhen" => array(
-				"title" => "When",
-				"formatting" => ' on $value',
+				"title" => "Requested",
 				"link" => false,
+				'casting' => 'SSDatetime->Full'
 			),
 			'AbsoluteLink' => array(
 				'title' => 'URL',

@@ -96,8 +96,10 @@ class PagesScheduledForPublishingReport extends SSReport {
 	function parameterFields() {
 		$params = new FieldSet();
 		
-		$params->push(new PopupDateTimeField('StartDate', 'Start date'));
-		$params->push(new PopupDateTimeField('EndDate', 'End date'));
+		$params->push($startDate = new PopupDateTimeField('StartDate', 'Start date'));
+		$params->push($endDate = new PopupDateTimeField('EndDate', 'End date'));
+		$endDate->setValue(array('Date' => null, 'Time' => '11:59 pm'));
+		$startDate->setValue(array('Date' => null, 'Time' => '12:00 am'));
 		
 		return $params;
 	}
