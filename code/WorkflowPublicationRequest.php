@@ -110,11 +110,16 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 		$this->Status = 'Completed';
 		$this->PublisherID = $member->ID;
 		$this->write();
-
-		$page = $this->Page();
-		$page->doPublish();
 		
-		// $this->addNewChange($comment, $this->Status, DataObject::get_by_id('Member', $this->PublisherID));
+		$page = $this->Page();
+		
+		// Only publish the page if it hasn't already been published elsewhere.  This occurs when
+		// SiteTree::doPublish() 'auto-closes' an open workflow
+		if($page->getIsModifiedOnStage()) {
+			$page->doPublish();
+		}
+		
+		$this->addNewChange($comment, $this->Status, DataObject::get_by_id('Member', $this->PublisherID));
 
 		// @todo Coupling to UI :-(
 		$title = Convert::raw2js($page->TreeTitle());
