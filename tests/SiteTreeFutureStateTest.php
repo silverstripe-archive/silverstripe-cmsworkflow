@@ -77,6 +77,23 @@ class SiteTreeFutureStateTest extends SapphireTest {
 		$this->assertEquals("Page not Found", $errorPage->Title);
 	}
 	
+	function testGetOneByStageInFutureState() {
+		$about = $this->objFromFixture('Page', 'about');
+		Versioned::reading_stage('Stage');
+		$about->Title = "New About Us";
+		$about->write();
+		Versioned::reading_stage('Live');
+		
+		SiteTreeFutureState::set_future_datetime('2020-01-03 11:01:00');
+
+		$aboutStage = Versioned::get_one_by_stage("SiteTree", "Stage", "\"SiteTree\".\"ID\" = '$about->ID'");
+		$aboutLive = Versioned::get_one_by_stage("SiteTree", "Live", "\"SiteTree\".\"ID\" = '$about->ID'");
+		
+		$this->assertEquals('New About Us', $aboutStage->Title);
+		$this->assertEquals('About Us', $aboutLive->Title);
+		
+	}
+	
 	function setUp() {
 		parent::setUp();
 		

@@ -69,7 +69,8 @@ class SiteTreeFutureState extends DataObjectDecorator {
 	 * Amend the query to select from a future date if necessary.
 	 */
 	function augmentSQL(SQLQuery &$query) {
-		if($datetime = self::$future_datetime) {
+		$currentStage = Versioned::current_stage();
+		if(($datetime = self::$future_datetime) && ($currentStage == 'Stage' || !$currentStage)) {
 			foreach($query->from as $table => $dummy) {
 				if(!isset($baseTable)) {
 					$baseTable = $table;
@@ -170,6 +171,16 @@ class SiteTreeFutureState extends DataObjectDecorator {
 		
 		return self::$temp_tables[$tmpID];
 	}
+
+	/**
+	 * Return a piece of text to keep DataObject cache keys appropriately specific
+	 */
+	function cacheKeyComponent() {
+		if(self::$future_datetime) {
+			return 'future-'.str_replace(array(' ',':','-'),'',self::$future_datetime);
+		}
+	}
+
 }
 
 class SiteTreeFutureState_SilverStripeNavigatorItem extends SilverStripeNavigatorItem {
