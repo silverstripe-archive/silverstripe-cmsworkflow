@@ -14,19 +14,59 @@ class PagesDueForReviewReport extends SSReport {
 	function parameterFields() {
 		$params = new FieldSet();
 		
-		if (class_exists('Subsite') && $subsites = DataObject::get('Subsite')) {
-			$options = $subsites->toDropdownMap('ID', 'Title');
-			array_unshift($options, 'Any');
+		// We need to be a bit fancier when subsites is enabled
+		if(class_exists('Subsite') && $subsites = DataObject::get('Subsite')) {
+			// javascript for subsite specific owner dropdown
+			Requirements::javascript('cmsworkflow/javascript/PagesDueForReviewReport.js');
+			
+			// Add subsite dropdown
+			$options = $subsites->toDropdownMap('ID', 'Title', 'Any');
 			$params->push(new DropdownField(
-				"subsiteId", 
-				"Subsite", 
+				"SubsiteIDWithOwner", 
+				"Subsite",
 				$options
 			));
+			
+			// Remember current subsite
+			$existingSubsite = Subsite::currentSubsiteID();
+			
+			// Create subsite specific owner dropdowns
+			foreach($options as $option => $dummy) {
+				if($option == 0) {
+					Subsite::$disable_subsite_filter = true;
+				} else {
+					Subsite::changeSubsite($option);
+				}
+				
+				$cmsUsers = Permission::get_members_by_permission(array("CMS_ACCESS_CMSMain", "ADMIN"));
+				$map = $cmsUsers->map('ID', 'Title', '(no owner)');
+				unset($map['']);
+				$map = array('' => 'Any', '-1' => '(no owner)') + $map;
+				
+				$dropdown = new DropdownField("OwnerID" . $option, 'Page owner', $map);
+				$dropdown->addExtraClass('subsiteSpecificOwnerID');
+				$params->push($dropdown);
+				
+				if($option == 0) {
+					Subsite::$disable_subsite_filter = false;
+				}
+			}
+			
+			// Restore current subsite
+			Subsite::changeSubsite($existingSubsite);
+		} else {
+			$cmsUsers = Permission::get_members_by_permission(array("CMS_ACCESS_CMSMain", "ADMIN"));
+			$map = $cmsUsers->map('ID', 'Title', '(no owner)');
+			unset($map['']);
+			$map = array('' => 'Any', '-1' => '(no owner)') + $map;
+			$params->push(new DropdownField("OwnerID", 'Page owner', $map));
 		}
 		
-		$cmsUsers = Permission::get_members_by_permission(array("CMS_ACCESS_CMSMain", "ADMIN"));
-		$params->push(new CalendarDateField('ReviewDate', 'Review date (DD/MM/YYYY)', date('d/m/Y')));
-		$params->push(new DropdownField("OwnerID", 'Page owner', $cmsUsers->map('ID', 'Title', '(no owner)')));
+		$params->push(new LiteralField('ReviewDateNotes', '<p>If no review date range is selected, pages currently due for review will be shown.'));
+		$params->push(new CalendarDateField('ReviewDateAfter', 'Review date after or on (DD/MM/YYY)'));
+		$params->push(new CalendarDateField('ReviewDateBefore', 'Review date before or on (DD/MM/YYYY)'));
+
+		$params->push(new CheckboxField('ShowVirtualPages', 'Show Virtual Pages'));
 		
 		return $params;
 	}
@@ -34,7 +74,10 @@ class PagesDueForReviewReport extends SSReport {
 	function columns() {
 		$fields = array(
 			'Title' => 'Page Title',
-			'NextReviewDate' => 'Review Date',
+			'NextReviewDate' => array(
+				'title' => 'Review Date',
+				'casting' => 'Date->Nice'
+			),
 			'Owner.Title' => 'Owner',
 			'LastEditedBy.Title' => 'Last edited by',
 			'OwnerID' => 'Owner ID',
@@ -48,40 +91,77 @@ class PagesDueForReviewReport extends SSReport {
 			),
 		);
 		
-		if (class_exists('Subsite')) {
+		if(class_exists('Subsite')) {
 			$fields['Subsite.Title'] = 'Subsite';
 		}
 		
 		return $fields;
 	}
 		
-	function records($start, $limit, $params) {
+	function sourceQuery($params) {
 		$wheres = array();
-
-		if(isset($params['ReviewDate']) && $params['ReviewDate']) {
-			list($day, $month, $year) = explode('/', $_REQUEST['ReviewDate']);
-			$reviewDate = "$year-$month-$day";
-			$wheres[] = 'NextReviewDate <= \'' . Convert::raw2sql($reviewDate) . '\'';
-			
-		} else {
+		
+		
+		if(empty($params['ReviewDateBefore']) && empty($params['ReviewDateAfter'])) {
+			// If there's no review dates set, default to all pages due for review now
 			$wheres[] = 'NextReviewDate <= \'' . SSDatetime::now()->URLDate() . '\'';
+		} else {
+			// Review date before
+			if(!empty($params['ReviewDateBefore'])) {
+				list($day, $month, $year) = explode('/', $_REQUEST['ReviewDateBefore']);
+				$reviewDate = "$year-$month-$day";
+				$wheres[] = 'NextReviewDate <= \'' . Convert::raw2sql($reviewDate) . '\'';
+			}
+			
+			// Review date after
+			if(!empty($params['ReviewDateAfter'])) {
+				list($day, $month, $year) = explode('/', $_REQUEST['ReviewDateAfter']);
+				$reviewDate = "$year-$month-$day";
+				$wheres[] = 'NextReviewDate >= \'' . Convert::raw2sql($reviewDate) . '\'';
+			}
 		}
 		
-		if(isset($params['Owner']) && $params['Owner']) {
-			$wheres[] = 'OwnerID = ' . (int)$params['Owner'];
+
+		
+		// Show virtual pages?
+		if(empty($params['ShowVirtualPages'])) {
+			$wheres[] = "ClassName != 'VirtualPage' AND ClassName != 'SubsitesVirtualPage'";
 		}
 		
-		if (class_exists('Subsite')) Subsite::$disable_subsite_filter = true;
+		// We use different dropdown depending on the subsite
+		$ownerIdParam = 'OwnerID';
 		
-		$limit = array(
-			'start' => $start,
-			'limit' => $limit,
-		);
+		// If subsites is enabled, we need to either disable the filter, or
+		// change subsite to the subsite selected in the dropdown.
+		if(class_exists('Subsite')) {
+			$existingSubsite = 	Subsite::currentSubsiteID();
+			if(!empty($params['SubsiteIDWithOwner'])) {
+				Subsite::changeSubsite($params['SubsiteIDWithOwner']);
+				$ownerIdParam .= $params['SubsiteIDWithOwner'];
+			} else {
+				Subsite::$disable_subsite_filter = true;
+			}
+		}
 		
-		$records = DataObject::get("SiteTree", join(' AND ', $wheres), "", "", $limit);
+		// Owner dropdown
+		if(!empty($params[$ownerIdParam])) {
+			$ownerID = (int)$params[$ownerIdParam];
+			// We use -1 here to distinguish between No Owner and Any
+			if($ownerID == -1) $ownerID = 0;
+			$wheres[] = 'OwnerID = ' . $ownerID;
+		}
 		
-		if (class_exists('Subsite')) Subsite::$disable_subsite_filter = false;
+		$query = singleton("SiteTree")->extendedSQL(join(' AND ', $wheres));
 		
-		return $records;
+		// Now that we've generated the query, put all our subsite stuff back to
+		// normal.
+		if (class_exists('Subsite')) {
+			Subsite::$disable_subsite_filter = false;
+			Subsite::changeSubsite($existingSubsite);
+		}
+		
+		return $query;
 	}
 }
+
+?>

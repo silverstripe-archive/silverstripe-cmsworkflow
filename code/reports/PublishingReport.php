@@ -1,29 +1,34 @@
 <?php
 
 class PublishingReport extends SSReport {
-	function TreeTitle() {
+	function title() {
 		return 'Publishing activity';
 	}
-	function getReportField() {
+	
+	function columns() {
 		$fields = array(
 			'PageTitle' => 'Page Title',
-			'Published' => 'Published',
+			'Published' => array(
+				'title' => 'Published',
+				'casting' => 'SSDatetime->Nice'
+			),
 			'PublisherEmail' => 'Publisher',
-			'AbsoluteLink' => 'URLs',
-			'ID' => 'Edit',
+			'AbsoluteLink' => array(
+				'title' => 'URLs',
+				'formatting' => '$value <a href=\"$value?stage=Live\">(live)</a> <a href=\"$value?stage=Stage\">(draft)</a>',
+			),
+			'ID' => array(
+				'title' => 'Edit',
+				'formatting' => '<a href=\"admin/show/$value\">Edit</a> ',
+			),
 		);
-		
 		if (class_exists('Subsite')) {
 			$fields['SubsiteName'] = 'Subsite';
 		}
-		
-		$tlf = new WorkflowRequestTableListField('ReportContent', 'SiteTree', $fields);
-			
-		$tlf->setFieldFormatting(array(
-			'AbsoluteLink' => '$value <a href=\"$value?stage=Live\">(live)</a> <a href=\"$value?stage=Stage\">(draft)</a>',
-			'ID' => '<a href=\"admin/show/$value\">Edit</a>',
-		));
-		
+		return $fields;
+	}
+	
+	function sourceQuery($params) {
 		$q = singleton('SiteTree')->extendedSQL();
 		$q->select[] = 'SiteTree.Title AS PageTitle';
 	
@@ -41,18 +46,18 @@ class PublishingReport extends SSReport {
 		}
 		
 		// restrict to member id
-		if (isset($_REQUEST['member']) && DataObject::get_by_id('Member', "Email = '".Convert::raw2sql($_REQUEST['member'])."'")) {
-			$q->where[] = "Member.Email = '".Convert::raw2sql($_REQUEST['member']."'");
+		if (!empty($params['member']) && DataObject::get_by_id('Member', "Email = '".Convert::raw2sql($params['member'])."'")) {
+			$q->where[] = "Member.Email = '".Convert::raw2sql($params['member']."'");
 		}
 		
 		// restrict to subsite id
-		if (class_exists('Subsite') && isset($_REQUEST['subsiteId']) && DataObject::get_by_id('Subsite', $_REQUEST['subsiteId'])) {
-			$q->where[] = "SiteTree.SubsiteID = ".Convert::raw2sql($_REQUEST['subsiteId']);
+		if (class_exists('Subsite') && !empty($params['subsiteId']) && DataObject::get_by_id('Subsite', $params['subsiteId'])) {
+			$q->where[] = "SiteTree.SubsiteID = ".Convert::raw2sql($params['subsiteId']);
 		}
 		
 		// restrict by time period
-		if (isset($_REQUEST['howFarBack'])) {
-			switch ($_REQUEST['howFarBack']) {
+		if (!empty ($params['howFarBack'])) {
+			switch ($params['howFarBack']) {
 				case '1hour':
 					$q->where[] = "WorkflowRequest.LastEdited >= '".date('Y-m-d', time()-3600)."'";
 					break;
@@ -65,19 +70,14 @@ class PublishingReport extends SSReport {
 			}
 		}
 		
-		$tlf->setCustomQuery($q);
-		$tlf->actions = array();
-		$tlf->disableSorting(true);
-		return $tlf;
+		return $q;
 	}
 	
-	function getCMSFields() {
-		$fields = parent::getCMSFields();
-		$fields->insertBefore($params = new Tab('Search Parameters'), 'Report');
+	function parameterFields() {
+		$params = new FieldSet();
 		
 		if (class_exists('Subsite') && $subsites = DataObject::get('Subsite')) {
-			$options = $subsites->toDropdownMap('ID', 'Title');
-			array_unshift($options, 'Any');
+			$options = $subsites->toDropdownMap('ID', 'Title', 'Any');
 			$params->push(new DropdownField(
 				"subsiteId", 
 				"Subsite", 
@@ -85,8 +85,7 @@ class PublishingReport extends SSReport {
 			));
 		}
 		
-		$options = DataObject::get('Member')->toDropdownMap('ID', 'Name');
-		array_unshift($options, 'Any');
+		$options = DataObject::get('Member')->toDropdownMap('ID', 'Name', 'Any');
 		$params->push(new DropdownField(
 			"memberId", 
 			"Member", 
@@ -103,12 +102,6 @@ class PublishingReport extends SSReport {
 			)
 		));
 		
-		return $fields;
-	}
-	
-	function getCMSActions() {
-		$actions = parent::getCMSActions();
-		$actions->push(new FormAction('updatereport', 'Search'));
-		return $actions;
+		return $params;
 	}
 }

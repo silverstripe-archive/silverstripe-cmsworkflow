@@ -191,6 +191,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 					'Title' => '<a href=\"admin/show/$ID\">$Title</a>',
 					'AbsoluteLink' => '<a href=\"$value\">$value</a>',
 				));
+
 				$backLinksTable->setPermissions(array(
 					'show',
 					'export'
@@ -231,6 +232,9 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		$closedRequestsTF->setPermissions(array('show'));
 		$closedRequestsTF->setFieldFormatting(array(
 			"DiffLinkToLastPublished" => '<a href=\"$value\" target=\"_blank\" class=\"externallink\">' . $diffLinkTitle . '</a>'
+		));
+		$closedRequestsTF->setFieldCasting(array(
+			'Created' => 'SSDatetime->Nice'
 		));
 		$closedRequestsTF->setCustomSourceItems($closedRequests);
 		$fields->push($closedRequestsTF);
