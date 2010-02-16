@@ -19,7 +19,6 @@ Object::add_extension('SiteConfig', 'SiteConfigTwoStepWorkflow');
 // Object::add_extension('SiteTree', 'SiteTreeCMSThreeStepWorkflow');
 // Object::add_extension('SiteConfig', 'SiteConfigThreeStepWorkflow');
 // Object::add_extension('LeftAndMain', 'LeftAndMainCMSThreeStepWorkflow');
-// unset(CMSBatchActionHandler::$batch_actions['publish']);
 
 Director::addRules(200, array(
 	'admin/changes.rss' => '->admin/cms/changes.rss',
@@ -56,9 +55,9 @@ if(class_exists('Subsite')) {
 // Register site reports
 
 // 2 Step
-SS_Report::register('SideReport', 'MyTwoStepDeletionRequestsSideReport', 20);
-SS_Report::register('SideReport', 'MyTwoStepPublicationRequestsSideReport', 20);
-SS_Report::register('SideReport', 'MyTwoStepWorkflowRequestsSideReport', 20);
+SS_Report::register('SideReport', 'MyTwoStepDeletionRequests', 20);
+SS_Report::register('SideReport', 'MyTwoStepPublicationRequests', 20);
+SS_Report::register('SideReport', 'MyTwoStepWorkflowRequests', 20);
 
 // 3 Step
 SS_Report::register('SideReport', 'SideReportWrapper("ThreeStepMyPublicationRequestsSideReport")', 20);
