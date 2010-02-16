@@ -81,10 +81,13 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 			}
 		}
 		
+		// Optional method
+		$isPublishable = $page->hasMethod('isPublishable') ? $page->isPublishable() : true;
 		
 		if(
 			!$openRequest
 			&& $page->canEdit() 
+			&& $isPublishable
 			&& $page->stagesDiffer('Stage', 'Live')
 			&& $page->Version > 1 // page has been saved at least once
 			&& !$page->IsDeletedFromStage
