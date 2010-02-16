@@ -184,11 +184,12 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	}
 	
 	public function ViewExpiredLink() {
+		$link = Director::absoluteBaseURL();
+		
 		if(class_exists('Subsite') && $this->owner->SubsiteID) {
-			$link = 'http://' . $this->owner->Subsite()->domain();
-		} else {
-			$link = Director::absoluteBaseURL();
+			$link = preg_replace('/\/\/[^\/]+\//', '//' .  $this->owner->Subsite()->domain() . '/', $link);
 		}
+		
 		return $link . '?futureDate=' . $this->owner->dbObject('ExpiryDate')->URLDatetime();
 	}
 	
