@@ -124,13 +124,23 @@ class PagesDueForReviewReport extends SSReport {
 		$query->select[] = Member::get_title_sql('Owner').' AS OwnerName';
 		$query->from[] = 'LEFT JOIN "Member" AS "Owner" ON "SiteTree"."OwnerID" = "Owner"."ID"';
 		
-		$query->select[] = Member::get_title_sql('LastEditedBy').' AS LastEditedByName';
-		$query->from[] = 'LEFT JOIN "Member" AS "LastEditedBy" ON "SiteTree"."LastEditedByID" = "LastEditedBy"."ID"';
-		
 		// Turn a query into records
-		if($sort) $query->orderby = $sort;
+		if($sort) {
+			$parts = explode(' ', $sort);
+			$field = $parts[0];
+			$direction = $parts[1];
+			
+			if($field != "LastEditedByName") {
+				$query->orderby = $sort;
+			}
+		}
 		$records = singleton('SiteTree')->buildDataObjectSet($query->execute(), 'DataObjectSet', $query);
-
+		foreach($records as $record) {
+			$record->LastEditedByName = $record->LastEditedBy()->Title;
+		}
+		
+		if($sort && $field != "LastEditedByName") $records->sort($sort);
+		
 		// Apply limit after that filtering.
 		if($limit && $records) return $records->getRange($limit['start'], $limit['limit']);
 		else return $records;
