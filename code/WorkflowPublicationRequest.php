@@ -111,7 +111,7 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 	
 	public function ViewExpiredLink() {
 		if(class_exists('Subsite') && $this->Page()->SubsiteID) {
-			$link = 'http://' . $this->owner->Subsite()->domain();
+			$link = 'http://' . $this->Page()->Subsite()->domain();
 		} else {
 			$link = Director::absoluteBaseURL();
 		}
