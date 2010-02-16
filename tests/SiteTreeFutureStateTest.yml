@@ -1,0 +1,80 @@
+Group:
+   editors:
+      Title: Editors
+   admins:
+      Title: Administrators
+      
+Permission:
+   admins:
+      Code: ADMIN
+      Group: =>Group.admins
+   editors:
+      Code: CMS_ACCESS_CMSMain
+      Group: =>Group.editors
+      
+Member:
+   editor:
+      FirstName: Test
+      Surname: Editor
+      Groups: =>Group.editors
+   admin:
+      FirstName: Test
+      Surname: Administrator
+      Groups: =>Group.admins
+
+Page:
+    home:
+        Title: Home
+    about:
+        Title: About Us
+    staff:
+        Title: Staff
+        URLSegment: my-staff
+        Parent: =>Page.about
+    staffduplicate:
+        Title: Staff
+        URLSegment: my-staff
+        Parent: =>Page.about
+    products:
+        Title: Products
+    product1:
+        Title: Product 1
+        Parent: =>Page.products
+        Sort: 1
+    product2:
+        Title: Product 2   
+        Parent: =>Page.products
+        ExpiryDate: 2020-01-01 11:00:00
+        Sort: 2
+    product3:
+        Title: Product 3
+        Parent: =>Page.products
+        Sort: 3
+    product4:
+        Title: Product 4
+        Parent: =>Page.products
+        Sort: 4
+    contact:
+        Title: Contact Us
+        
+ErrorPage:
+    404:
+        Title: Page not Found
+        ErrorCode: 404
+        
+WorkflowPublicationRequest:
+   product3:
+      Author: =>Member.admin
+      Approver: =>Member.admin
+      Publisher: =>Member.admin
+      Page: =>Page.product3
+      Status: Scheduled
+      EmbargoDate: 2020-01-03 11:00:00
+   product4:
+      Author: =>Member.admin
+      Approver: =>Member.admin
+      Publisher: =>Member.admin
+      Page: =>Page.product4
+      Status: Scheduled
+      EmbargoDate: 2020-01-01 10:00:00
+   
