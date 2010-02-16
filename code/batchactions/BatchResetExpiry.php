@@ -12,4 +12,8 @@ class BatchResetExpiry extends CMSBatchAction {
 		return $this->batchaction($pages, 'resetExpiry',
 			_t('BatchResetExpiry.ACTIONED_PAGES', 'Reset expiry date on %d pages, %d failures'));
 	}
+
+	function applicablePages($ids) {
+		return $this->applicablePagesHelper($ids, 'canChangeExpiry', true, true);
+	}
 }

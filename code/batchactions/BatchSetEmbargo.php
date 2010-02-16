@@ -19,4 +19,8 @@ class BatchSetEmbargo extends CMSBatchAction {
 			new PopupDateTimeField('EmbargoDate_Batch')
 		);
 	}
+
+	function applicablePages($ids) {
+		return $this->applicablePagesHelper($ids, 'canChangeEmbargo', true, true);
+	}
 }

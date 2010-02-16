@@ -19,4 +19,8 @@ class BatchSetExpiry extends CMSBatchAction {
 			new PopupDateTimeField('ExpiryDate_Batch')
 		);
 	}
+
+	function applicablePages($ids) {
+		return $this->applicablePagesHelper($ids, 'canChangeExpiry', true, true);
+	}
 }

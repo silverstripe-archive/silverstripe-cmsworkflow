@@ -12,4 +12,8 @@ class BatchResetEmbargo extends CMSBatchAction {
 		return $this->batchaction($pages, 'resetEmbargo',
 			_t('BatchResetEmbargo.ACTIONED_PAGES', 'Reset embargo date on %d pages, %d failures'));
 	}
+
+	function applicablePages($ids) {
+		return $this->applicablePagesHelper($ids, 'canChangeEmbargo', true, true);
+	}
 }
