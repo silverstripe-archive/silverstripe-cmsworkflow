@@ -71,7 +71,4 @@ class ThreeStepWorkflowPublicationRequestsNeedingApprovalSideReport extends Side
 			);
 		}
 	}
-	function canView() {
-		return Object::has_extension('SiteTree', 'SiteTreeCMSThreeStepWorkflow');
-	}
 }
