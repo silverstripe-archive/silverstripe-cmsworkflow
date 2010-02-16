@@ -57,8 +57,8 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 					if (isset($data['ExpiryDate'])) {
 						// Only doing parsing here to make sure we are not rolling over
 						// in to another day.
-						list($day, $month, $year) = explode('/', $data['EmbargoDate']['Date']);
-						$expiryTimestamp = strtotime("$year-$month-$day {$data['EmbargoDate']['Time']}");
+						list($day, $month, $year) = explode('/', $data['ExpiryDate']['Date']);
+						$expiryTimestamp = strtotime("$year-$month-$day {$data['ExpiryDate']['Time']}");
 						if ((int)$day != (int)date('d', $expiryTimestamp)) $expiryTimestamp = false;
 						else {
 							$expiryField->setValue($data['ExpiryDate']);
