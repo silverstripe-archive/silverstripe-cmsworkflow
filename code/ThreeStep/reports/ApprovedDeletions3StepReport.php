@@ -9,7 +9,7 @@ class ApprovedDeletions3StepReport extends SSReport {
 	function title() {
 		return _t('ApprovedDeletions3StepReport.TITLE',"Approved deletions I need to publish");
 	}
-	function sourceRecords($params) {
+	function sourceRecords($params, $sort, $limit) {
 		$res = WorkflowThreeStepRequest::get_by_publisher(
 			'WorkflowDeletionRequest',
 			Member::currentUser(),
@@ -32,7 +32,19 @@ class ApprovedDeletions3StepReport extends SSReport {
 			}
 		}
 		
-		return $doSet;
+		if($sort) {
+			$parts = explode(' ', $sort);
+			$field = $parts[0];
+			$direction = $parts[1];
+			
+			if($field == 'AbsoluteLink') $sort = 'URLSegment ' . $direction;
+			if($field == 'Subsite.Title') $sort = 'SubsiteID ' . $direction;
+			
+			$doSet->sort($sort);
+		}
+		
+		if($limit && $limit['limit']) return $doSet->getRange($limit['start'], $limit['limit']);
+		else return $doSet;
 	}
 	function columns() {
 		return array(
