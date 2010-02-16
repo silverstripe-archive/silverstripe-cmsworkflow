@@ -53,6 +53,9 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 						}
 					}
 					
+					$wfRequest->Page()->ExpiryDate = is_numeric($wfRequest->Page()->ExpiryDate) ? $wfRequest->Page()->ExpiryDate : strtotime($wfRequest->Page()->ExpiryDate);
+					$wfRequest->EmbargoDate = is_numeric($wfRequest->EmbargoDate) ? $wfRequest->EmbargoDate : strtotime($wfRequest->EmbargoDate);
+					
 					// Validation time
 					$error = false;
 					if (isset($data['EmbargoDate']) && !$embargoTimestamp) {
@@ -62,9 +65,9 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 					} else if (isset($data['EmbargoDate']) && $wfRequest->EmbargoDate < time()) {
 						$error = "Embargo date must be AFTER the current server time";
 					} else if (isset($data['ExpiryDate']) && $wfRequest->Page()->ExpiryDate < time()) {
-						$error = "Embargo date must be AFTER the current server time";
+						$error = "Expiry date must be AFTER the current server time";
 					} else if ($wfRequest->EmbargoDate && $wfRequest->Page()->ExpiryDate && $wfRequest->EmbargoDate > $wfRequest->Page()->ExpiryDate) {
-						$error = "Embargo date must be AFTER the expiry date";
+						$error = "Embargo date must be BEFORE the expiry date";
 					} else {
 						if ($embargoTimestamp && $wfRequest->EmbargoField()) $wfRequest->write();
 						if ($expiryTimestamp && $wfRequest->ExpiryField()) $wfRequest->Page()->write();
