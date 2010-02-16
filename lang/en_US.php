@@ -3,11 +3,11 @@
 global $lang;
 
 $lang['en_US']['BatchApprovePages']['APPROVED_PAGES'] = 'Approved %d pages';
-$lang['en_US']['BatchApprovePages']['APPROVE_PAGES'] = 'CMS Workflow Approve pages';
+$lang['en_US']['BatchApprovePages']['APPROVE_PAGES'] = 'Approve';
 $lang['en_US']['BatchApprovePages']['APPROVING_PAGES'] = 'Approving pages';
 $lang['en_US']['BatchPublishPages']['PUBLISHED_PAGES'] = 'Published %d pages';
 $lang['en_US']['BatchPublishPages']['PUBLISHING_PAGES'] = 'Publishing pages';
-$lang['en_US']['BatchPublishPages']['PUBLISH_PAGES'] = 'CMS Workflow Publish pages';
+$lang['en_US']['BatchPublishPages']['PUBLISH_PAGES'] = 'Publish';
 $lang['en_US']['BatchResetEmbargo']['ACTIONED_PAGES'] = 'Reset embargo date on %d pages';
 $lang['en_US']['BatchResetEmbargo']['ACTION_TITLE'] = 'Reset embargo date';
 $lang['en_US']['BatchResetEmbargo']['DOING_TEXT'] = 'Resetting embargo date';

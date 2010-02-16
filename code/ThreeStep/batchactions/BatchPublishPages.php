@@ -2,7 +2,7 @@
 
 class BatchPublishPages extends CMSBatchAction {
 	function getActionTitle() {
-		return _t('BatchPublishPages.PUBLISH_PAGES', 'CMS Workflow Publish pages');
+		return _t('BatchPublishPages.PUBLISH_PAGES', 'Publish');
 	}
 	function getDoingText() {
 		return _t('BatchPublishPages.PUBLISHING_PAGES', 'Publishing pages');
@@ -66,7 +66,18 @@ class BatchPublishPages extends CMSBatchAction {
 	function applicablePages($ids) {
 		return $this->applicablePagesHelper($ids, 'canBatchPublish', true, true);
 	}
-
 }
 
+class BatchForcePublishPages extends CMSBatchAction_Publish {
+	function getActionTitle() {
+		return _t('BatchPublishPages.FORCE_PUBLISH', 'Force publish');
+	}
 
+	/**
+	 * Only workflow admins should have access to this action
+	 */
+	function canView() {
+		return Permission::check('IS_WORKFLOW_ADMIN');
+	}
+	
+}

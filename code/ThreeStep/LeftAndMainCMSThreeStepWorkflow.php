@@ -12,6 +12,7 @@ class LeftAndMainCMSThreeStepWorkflow extends LeftAndMainDecorator {
 		parent::init();
 		CMSBatchActionHandler::register('batchCmsWorkflowPublish', 'BatchPublishPages');
 		CMSBatchActionHandler::register('batchCmsWorkflowApprove', 'BatchApprovePages');
+		CMSBatchActionHandler::register('forcepublish', 'BatchForcePublishPages');
 	}
 	public function cms_publish($data, $form) {
 		return $this->owner->workflowAction('WorkflowRequest', 'publish', $data['ID'], $data['WorkflowComment']);
