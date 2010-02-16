@@ -18,4 +18,8 @@ class BatchApprovePages extends CMSBatchAction {
 		
 		return FormResponse::respond();
 	}
+
+	function applicablePages($ids) {
+		return $this->applicablePagesHelper($ids, 'canBatchApprove', true, true);
+	}
 }

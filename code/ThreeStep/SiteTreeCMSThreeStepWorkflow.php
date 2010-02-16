@@ -55,6 +55,22 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 		} else { return false; }
 	}
 	
+	/**
+	 * Returns true if a batch publication action can be triggered on this page
+	 */
+	function canBatchPublish($member = null) {
+		$request = $this->owner->openWorkflowRequest();
+		return $request && $request->Status == 'Approved' && $this->owner->canPublish($member);
+	}
+
+	/**
+	 * Returns true if a batch approval action can be triggered on this page
+	 */
+	function canBatchApprove($member = null) {
+		$request = $this->owner->openWorkflowRequest();
+		return $request && $request->Status == 'AwaitingApproval' && $this->owner->canPublish($member);
+	}
+	
 	function canDenyRequests() {
 		return true;
 	}
@@ -228,8 +244,6 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 	 */
 	public function canPublish($member = null) {
 		if(!$member && $member !== FALSE) $member = Member::currentUser();
-
-
 
 		// check for admin permission
 		if(Permission::checkMember($member, 'ADMIN')) return true;

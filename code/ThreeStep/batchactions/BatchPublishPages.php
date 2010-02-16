@@ -62,6 +62,11 @@ class BatchPublishPages extends CMSBatchAction {
 
 		return FormResponse::respond();
 	}
+
+	function applicablePages($ids) {
+		return $this->applicablePagesHelper($ids, 'canBatchPublish', true, true);
+	}
+
 }
 
 
