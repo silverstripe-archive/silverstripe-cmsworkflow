@@ -19,21 +19,36 @@ class ThreeStepMyDeletionRequestsSideReport extends SSReport {
 		// Set stage, otherwise, we won't get any results
 		$currentStage = Versioned::current_stage();
 		Versioned::reading_stage(Versioned::get_live_stage());
-		$result = WorkflowThreeStepRequest::get_by_author(
+		$res = WorkflowThreeStepRequest::get_by_author(
 			'WorkflowDeletionRequest',
 			Member::currentUser(),
 			array('AwaitingApproval', 'Approved')
 		);
 		// Reset stage back to what it was
 		Versioned::reading_stage($currentStage);
-		return $result;
+
+		// Add WFRequestedWhen column
+		$doSet = new DataObjectSet();
+		if ($res) {
+			foreach ($res as $result) {
+				if ($wf = $result->openWorkflowRequest()) {
+					$result->WFRequestedWhen = $wf->Created;
+					$doSet->push($result);
+				}
+			}
+		}
+	
+		return $doSet;
 	}
 	function columns() {
 		return array(
 			"Title" => array(
-				"title" => "Title",
 				"link" => true,
-			)
+			),
+			"WFRequestedWhen" => array(
+				"formatting" => 'Requested on $value',
+				'casting' => 'SSDatetime->Full'
+			),
 		);
 	}
 	function canView() {

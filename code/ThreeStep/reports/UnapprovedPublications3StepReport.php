@@ -56,6 +56,24 @@ class UnapprovedPublications3StepReport extends SSReport {
 		
 		return $fields;
 	}
+
+	/**
+	 * This alternative columns method is picked up by SideReportWrapper
+	 */
+	function sideReportColumns() {
+		return array(
+			'Title' => array(
+				'link' => 'true',
+			),
+			'AuthorTitle' => array(
+				'formatting' => 'Requested by $value'
+			),
+			'RequestedAt' => array(
+				'formatting' => ' on $value',
+				'casting' => 'SSDatetime->Full'
+			),
+		);
+	}
 	
 	function sortColumns() {
 		return array(

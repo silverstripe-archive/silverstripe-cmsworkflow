@@ -16,17 +16,33 @@ class ThreeStepMyPublicationRequestsSideReport extends SSReport {
 		return -200;
 	}
 	function sourceRecords($params) {
-		return WorkflowThreeStepRequest::get_by_author(
+		$res = WorkflowThreeStepRequest::get_by_author(
 			'WorkflowPublicationRequest',
 			Member::currentUser(),
 			array('AwaitingApproval', 'Approved')
 		);
+		
+		// Add WFRequestedWhen column
+		$doSet = new DataObjectSet();
+		if ($res) {
+			foreach ($res as $result) {
+				if ($wf = $result->openWorkflowRequest()) {
+					$result->WFRequestedWhen = $wf->Created;
+					$doSet->push($result);
+				}
+			}
+		}
+	
+		return $doSet;
 	}
 	function columns() {
 		return array(
 			"Title" => array(
-				"title" => "Title",
 				"link" => true,
+			),
+			"WFRequestedWhen" => array(
+				"formatting" => 'Requested on $value',
+				'casting' => 'SSDatetime->Full'
 			),
 		);
 	}

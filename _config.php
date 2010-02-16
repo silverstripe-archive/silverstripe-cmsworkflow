@@ -58,12 +58,12 @@ SSReport::register('SideReport', 'MyTwoStepPublicationRequestsSideReport', 20);
 SSReport::register('SideReport', 'MyTwoStepWorkflowRequestsSideReport', 20);
 
 // 3 Step
-SSReport::register('SideReport', 'ThreeStepMyPublicationRequestsSideReport', 20);
-SSReport::register('SideReport', 'ThreeStepMyDeletionRequestsSideReport', 20);
-SSReport::register('SideReport', 'UnapprovedPublications3StepReport', 20);
-SSReport::register('SideReport', 'ApprovedPublications3StepReport', 20);
-SSReport::register('SideReport', 'UnapprovedDeletions3StepReport', 20);
-SSReport::register('SideReport', 'ApprovedDeletions3StepReport', 20);
+SSReport::register('SideReport', 'SideReportWrapper("ThreeStepMyPublicationRequestsSideReport")', 20);
+SSReport::register('SideReport', 'SideReportWrapper("ThreeStepMyDeletionRequestsSideReport")', 20);
+SSReport::register('SideReport', 'SideReportWrapper("UnapprovedPublications3StepReport")', 20);
+SSReport::register('SideReport', 'SideReportWrapper("ApprovedPublications3StepReport")', 20);
+SSReport::register('SideReport', 'SideReportWrapper("UnapprovedDeletions3StepReport")', 20);
+SSReport::register('SideReport', 'SideReportWrapper("ApprovedDeletions3StepReport")', 20);
 
 
 ?>

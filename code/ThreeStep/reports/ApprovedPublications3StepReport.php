@@ -42,20 +42,16 @@ class ApprovedPublications3StepReport extends SSReport {
 			),
 			"WFApproverEmail" => array(
 				"title" => "Approver",
-				"link" => false,
 			),
 			"WFApprovedWhen" => array(
 				"title" => "Approved",
-				"link" => false,
 				'casting' => 'SSDatetime->Full'
 			),
 			"WFRequesterEmail" => array(
 				"title" => "Author",
-				"link" => false,
 			),
 			"WFRequestedWhen" => array(
 				"title" => "Requested",
-				"link" => false,
 				'casting' => 'SSDatetime->Full'
 			),
 			'HasEmbargoOrExpiry' => 'Scheduled',
@@ -65,6 +61,28 @@ class ApprovedPublications3StepReport extends SSReport {
 			)
 		);
 	}
+	
+	/**
+	 * This alternative columns method is picked up by SideReportWrapper
+	 */
+	function sideReportColumns() {
+		return array(
+			"Title" => array(
+				"title" => "Title",
+				"link" => true,
+			),
+			"WFApproverEmail" => array(
+				"title" => "Approver",
+				"formatting" => 'Approved by $value',
+			),
+			"WFApprovedWhen" => array(
+				"title" => "When",
+				"formatting" => ' on $value',
+				'casting' => 'SSDatetime->Full'
+			),
+		);
+	}
+	
 	function parameterFields() {
 		$params = new FieldSet();
 		

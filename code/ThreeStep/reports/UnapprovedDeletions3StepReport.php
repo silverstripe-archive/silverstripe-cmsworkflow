@@ -40,17 +40,34 @@ class UnapprovedDeletions3StepReport extends SSReport {
 			),
 			"WFRequesterEmail" => array(
 				"title" => "Author",
-				"link" => false,
 			),
 			"WFRequestedWhen" => array(
 				"title" => "Requested",
-				"link" => false,
-				'casting' => 'SSDatetime->Full'
+				'casting' => 'SSDatetime->Full',
 			),
 			'AbsoluteLink' => array(
 				'title' => 'URL',
 				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'
 			)
+		);
+	}
+
+	
+	/**
+	 * This alternative columns method is picked up by SideReportWrapper
+	 */
+	function sideReportColumns() {
+		return array(
+			"Title" => array(
+				"link" => true,
+			),
+			"WFRequesterEmail" => array(
+				"formatting" => 'Requested by $value',
+			),
+			"WFRequestedWhen" => array(
+				"formatting" => ' on $value',
+				'casting' => 'SSDatetime->Full'
+			),
 		);
 	}
 	function canView() {
