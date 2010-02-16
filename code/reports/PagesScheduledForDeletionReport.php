@@ -108,7 +108,7 @@ class PagesScheduledForDeletionReport extends SSReport {
 		}
 		
 		// Apply limit after that filtering.
-		if($limit) return $filteredRecords->getRange($limit['start'], $limit['limit']);
+		if($limit && $limit['limit']) return $filteredRecords->getRange($limit['start'], $limit['limit']);
 		else return $filteredRecords;
 	}
 }
