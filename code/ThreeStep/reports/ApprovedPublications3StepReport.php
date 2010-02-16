@@ -60,7 +60,7 @@ class ApprovedPublications3StepReport extends SSReport {
 				"formatting" => ' on $value',
 				"link" => false,
 			),
-			'HasEmbargoOrExpiry' => 'Embargo or expiry dates set',
+			'HasEmbargoOrExpiry' => 'Embargo/expiry set',
 			'AbsoluteLink' => array(
 				'title' => 'URL',
 				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'

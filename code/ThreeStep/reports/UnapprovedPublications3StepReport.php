@@ -47,7 +47,7 @@ class UnapprovedPublications3StepReport extends SSReport {
 				'title' => 'Requested at',
 				'casting' => 'SSDatetime->Full'
 			),
-			'HasEmbargoOrExpiry' => 'Embargo or expiry dates set',
+			'HasEmbargoOrExpiry' => 'Embargo/expiry set',
 			'AbsoluteLink' => array(
 				'title' => 'Links',
 				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'
