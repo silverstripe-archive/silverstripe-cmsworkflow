@@ -128,7 +128,7 @@
 			<% if BackLinkTracking %>
 				<% if BackLinkTracking.Count %>
 					<div class="warningBox">
-					<p>There are $BackLinkTracking.Count page that link to here:</p>
+						<p>There are $BackLinkTracking.Count page(s) that link to here:</p>
 					<ul>
 					<% control BackLinkTracking %>
 						<li><a href="admin/show/$ID">$AbsoluteLink</a>
