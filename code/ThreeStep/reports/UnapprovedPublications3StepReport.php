@@ -17,11 +17,16 @@ class UnapprovedPublications3StepReport extends SSReport {
 			array('AwaitingApproval')
 		);
 		
+		SiteTree::prepopuplate_permission_cache('CanApproveType', $res->column('ID'), 
+			"SiteTreeCMSThreeStepWorkflow::can_approve_multiple");
+		SiteTree::prepopuplate_permission_cache('CanEditType', $res->column('ID'),
+			"SiteTree::can_edit_multiple");
+
 		$doSet = new DataObjectSet();
 		if ($res) {
 			foreach ($res as $result) {
+				if (!$result->canApprove()) continue;
 				if ($wf = $result->openWorkflowRequest()) {
-					if (!$result->canApprove()) continue;
 					if(ClassInfo::exists('Subsite')) $result->SubsiteTitle = $result->Subsite()->Title;
 					$result->RequestedAt = $wf->Created;
 					$result->WFAuthorTitle = $wf->Author()->Title;

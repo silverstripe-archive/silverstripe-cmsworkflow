@@ -15,11 +15,18 @@ class UnapprovedDeletions3StepReport extends SSReport {
 			Member::currentUser(),
 			array('AwaitingApproval')
 		);
+
+		
+		SiteTree::prepopuplate_permission_cache('CanApproveType', $res->column('ID'), 
+			"SiteTreeCMSThreeStepWorkflow::can_approve_multiple");
+		SiteTree::prepopuplate_permission_cache('CanEditType', $res->column('ID'),
+			"SiteTree::can_edit_multiple");
+
 		$doSet = new DataObjectSet();
 		if ($res) {
 			foreach ($res as $result) {
+				if (!$result->canApprove()) continue;
 				if ($wf = $result->openWorkflowRequest()) {
-					if (!$result->canApprove()) continue;
 					$result->WFAuthorTitle = $wf->Author()->Title;
 					$result->WFAuthorID = $wf->AuthorID;
 					$result->WFRequestedWhen = $wf->Created;

@@ -17,10 +17,16 @@ class ApprovedPublications3StepReport extends SSReport {
 			Member::currentUser(),
 			array('Approved')
 		);
+		
+		SiteTree::prepopuplate_permission_cache('CanPublishType', $res->column('ID'), 
+			"SiteTreeCMSThreeStepWorkflow::can_publish_multiple");
+		SiteTree::prepopuplate_permission_cache('CanEditType', $res->column('ID'),
+			"SiteTree::can_edit_multiple");
+
 		$doSet = new DataObjectSet();
 		foreach ($res as $result) {
+			if (!$result->canPublish()) continue;
 			if ($wf = $result->openWorkflowRequest()) {
-				if (!$result->canPublish()) continue;
 				$result->WFAuthorID = $wf->AuthorID;
 				$result->WFApproverTitle = $wf->Approver()->Title;
 				$result->WFAuthorTitle = $wf->Author()->Title;
@@ -44,7 +50,7 @@ class ApprovedPublications3StepReport extends SSReport {
 			
 			$doSet->sort($sort);
 		}
-		
+
 		if($limit && $limit['limit']) return $doSet->getRange($limit['start'], $limit['limit']);
 		else return $doSet;
 	}

@@ -191,8 +191,12 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 		
 		if ($this->canPublish($member)) return true;
 		
-		$results = SiteTree::batch_permission_check(array($this->owner->ID), $memberID, 'CanApproveType', 'SiteTree_ApproverGroups', 'canApprove');
+		$results = self::can_approve_multiple(array($this->owner->ID), $memberID);
 		return isset($results[$this->owner->ID]) ? $results[$this->owner->ID] : false;
+	}
+	
+	static function can_approve_multiple($ids, $memberID, $useCached = true) {
+		return SiteTree::batch_permission_check($ids, $memberID, 'CanApproveType', 'SiteTree_ApproverGroups', 'canApprove', null, $useCached);
 	}
 	
 	/**
@@ -250,8 +254,12 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 		// check for (workflow)admin permission
 		if(Permission::checkMember($member, array('ADMIN', 'IS_WORKFLOW_ADMIN'))) return true;
 		
-		$results = SiteTree::batch_permission_check(array($this->owner->ID), $memberID, 'CanPublishType', 'SiteTree_PublisherGroups', 'canPublish');
+		$results = self::can_publish_multiple(array($this->owner->ID), $memberID);
 		return isset($results[$this->owner->ID]) ? $results[$this->owner->ID] : false;
+	}
+
+	static function can_publish_multiple($ids, $memberID, $useCached = true) {
+		return SiteTree::batch_permission_check($ids, $memberID, 'CanPublishType', 'SiteTree_PublisherGroups', 'canPublish', null, $useCached);
 	}
 	
 	/**
