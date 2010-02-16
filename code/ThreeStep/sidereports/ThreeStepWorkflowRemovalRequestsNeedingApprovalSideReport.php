@@ -26,9 +26,9 @@ class UnapprovedDeletions3StepReport extends SSReport {
 			foreach ($res as $result) {
 				if ($wf = $result->openWorkflowRequest()) {
 					if (!$result->canApprove()) continue;
-					$result->WFRequestedWhen = $wf->Created;
 					$result->WFAuthorID = $wf->AuthorID;
-					$result->WFAuthorEmail = $wf->Author()->Email;
+					$result->WFRequesterEmail = $wf->Author()->Email;
+					$result->WFRequestedWhen = $wf->Created;
 					$result->WFApproverID = $wf->ApproverID;
 					$result->WFPublisherID = $wf->PublisherID;
 					$doSet->push($result);
@@ -44,14 +44,19 @@ class UnapprovedDeletions3StepReport extends SSReport {
 				"title" => "Title",
 				"link" => true,
 			),
-			"WFAuthorEmail" => array(
+			"WFRequesterEmail" => array(
+				"title" => "Author",
 				"formatting" => 'Requested by $value',
-				"source" => "Requester",
+				"link" => false,
 			),
 			"WFRequestedWhen" => array(
-				"formatting" => ' on $value',
 				"title" => "When",
+				"formatting" => ' on $value',
 				"link" => false,
+			),
+			'AbsoluteLink' => array(
+				'title' => 'URL',
+				'formatting' => '<a href=\"admin/show/$ID\" title=\"Edit page\">$value</a> " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>',
 			)
 		);
 	}

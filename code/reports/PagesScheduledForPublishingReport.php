@@ -45,6 +45,8 @@ class PagesScheduledForPublishingReport extends SSReport {
 		} else {
 			$wheres[] = "EmbargoDate >= '".SSDatetime::now()->URLDate()."'";
 		}
+
+		$wheres[] = "WorkflowRequest.Status = 'Scheduled'";
 		
 		$query = singleton("SiteTree")->extendedSQL(join(' AND ', $wheres), null, null, 
 			"LEFT JOIN WorkflowRequest on WorkflowRequest.PageID = SiteTree.ID"

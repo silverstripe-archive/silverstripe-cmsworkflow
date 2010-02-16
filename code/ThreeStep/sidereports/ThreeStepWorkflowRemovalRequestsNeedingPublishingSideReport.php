@@ -27,7 +27,9 @@ class ApprovedDeletions3StepReport extends SSReport {
 				if (!$result->canDeleteFromLive()) continue;
 				$result->WFAuthorID = $wf->AuthorID;
 				$result->WFApproverEmail = $wf->Approver()->Email;
+				$result->WFRequesterEmail = $wf->Author()->Email;
 				$result->WFApprovedWhen = $wf->ApprovalDate();
+				$result->WFRequestedWhen = $wf->Created;
 				$result->WFApproverID = $wf->ApproverID;
 				$result->WFPublisherID = $wf->PublisherID;
 				if (isset($_REQUEST['OnlyMine']) && $result->WFApproverID != Member::currentUserID()) continue;
@@ -45,12 +47,28 @@ class ApprovedDeletions3StepReport extends SSReport {
 				"link" => true,
 			),
 			"WFApproverEmail" => array(
+				"title" => "Approver",
 				"formatting" => 'Approved by $value',
-				"title" => "Author",
+				"link" => false,
 			),
 			"WFApprovedWhen" => array(
-				"formatting" => ' on $value',
 				"title" => "When",
+				"formatting" => ' on $value',
+				"link" => false,
+			),
+			"WFRequesterEmail" => array(
+				"title" => "Author",
+				"formatting" => 'Requested by $value',
+				"link" => false,
+			),
+			"WFRequestedWhen" => array(
+				"title" => "When",
+				"formatting" => ' on $value',
+				"link" => false,
+			),
+			'AbsoluteLink' => array(
+				'title' => 'URL',
+				'formatting' => '<a href=\"admin/show/$ID\" title=\"Edit page\">$value</a> " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>',
 			)
 		);
 	}

@@ -75,6 +75,7 @@ class PagesScheduledForDeletionReport extends SSReport {
 		$query = singleton("SiteTree")->extendedSQL(join(' AND ', $wheres), null, null, 
 			"LEFT JOIN WorkflowRequest on WorkflowRequest.PageID = SiteTree.ID"
 		);
+
 		
 		$query->from[] = "LEFT JOIN Member AS Approver ON WorkflowRequest.ApproverID = Approver.ID";
 		$query->select[] = 'CONCAT(Approver.FirstName, \' \', Approver.Surname) AS ApproverName';
