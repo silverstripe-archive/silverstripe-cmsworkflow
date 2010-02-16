@@ -22,7 +22,7 @@ class ThreeStepWorkflowRemovalRequestsNeedingPublishingSideReport extends SideRe
 		}
 		
 		$res = WorkflowThreeStepRequest::get_by_publisher(
-			'WorkflowRemovalRequest',
+			'WorkflowDeletionRequest',
 			Member::currentUser(),
 			array('Approved')
 		);

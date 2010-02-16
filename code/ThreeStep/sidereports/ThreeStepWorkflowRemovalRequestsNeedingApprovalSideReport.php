@@ -22,7 +22,7 @@ class ThreeStepWorkflowRemovalRequestsNeedingApprovalSideReport extends SideRepo
 		}
 		
 		$res = WorkflowThreeStepRequest::get_by_approver(
-			'WorkflowRemovalRequest',
+			'WorkflowDeletionRequest',
 			Member::currentUser(),
 			array('AwaitingApproval')
 		);
