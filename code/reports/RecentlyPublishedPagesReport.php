@@ -95,7 +95,7 @@ class RecentlyPublishedPagesReport extends SSReport {
 			if($field == 'AbsoluteLink') {
 				$sort = 'URLSegment ' . $direction;
 			} elseif($field == 'Subsite.Title') {
-				$query->from[] = 'LEFT JOIN "Subsite" ON "Subsite"."ID" = "SiteTree"."SubsiteID"';
+				$q->from[] = 'LEFT JOIN "Subsite" ON "Subsite"."ID" = "SiteTree"."SubsiteID"';
 			}
 		
 			$q->orderby = $sort;
