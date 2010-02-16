@@ -341,5 +341,11 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			$wf->deny(_t('SiteTreeCMSWorkflow.AUTO_DENIED', "(automatically denied)"));
 		}
 	}
+
+	function providePermissions() {
+		return array(
+			"EDIT_CONTENT_REVIEW_FIELDS" => "Set content owners and review dates",
+		);
+	}
 }
 ?>
