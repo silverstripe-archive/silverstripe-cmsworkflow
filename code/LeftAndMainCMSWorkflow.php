@@ -82,8 +82,8 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 						$result = array(
 							'status' => 'success',
 							'message' => array(
-								'embargo' => $embargoTimestamp ? date('Y-m-d H:i:s', $embargoTimestamp) : null,
-								'expiry' => $expiryTimestamp ? date('Y-m-d H:i:s', $expiryTimestamp) : null
+								'embargo' => $embargoTimestamp ? date('j M Y g:ia', $embargoTimestamp) : null,
+								'expiry' => $expiryTimestamp ? date('j M Y g:ia', $expiryTimestamp) : null
 							)
 						);
 					}
