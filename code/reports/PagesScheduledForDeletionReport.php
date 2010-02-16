@@ -32,6 +32,7 @@ class PagesScheduledForDeletionReport extends SSReport {
 				'title' => 'Will be deleted at',
 				'casting' => 'SSDatetime->Full'
 			),
+			'ApproverName' => 'Approved by',
 			'ID' => array(
 				'title' => 'Actions',
 				'formatting' => '<a href=\"admin/show/$value\">Edit in CMS</a>'
@@ -43,7 +44,7 @@ class PagesScheduledForDeletionReport extends SSReport {
 		);
 		
 		if(class_exists('Subsite')) {
-			$fields['Subsite.Title'] = 'Subsite';
+			$fields['SubsiteTitle'] = 'Subsite';
 		}
 		
 		return $fields;
@@ -97,7 +98,20 @@ class PagesScheduledForDeletionReport extends SSReport {
 			$wheres[] = "ExpiryDate >= '".SSDatetime::now()->URLDate()."'";
 		}
 		
-		$query = singleton("SiteTree")->extendedSQL(join(' AND ', $wheres));
+		$query = singleton("SiteTree")->extendedSQL(join(' AND ', $wheres), null, null, 
+			"LEFT JOIN WorkflowRequest on WorkflowRequest.PageID = SiteTree.ID"
+		);
+		
+		$query->from[] = "LEFT JOIN Member AS Approver ON WorkflowRequest.ApproverID = Approver.ID";
+		$query->select[] = 'CONCAT(Approver.FirstName, \' \', Approver.Surname) AS ApproverName';
+
+		// Manually manage the subsite filtering
+		if(ClassInfo::exists('Subsite')) {
+			$query->from[] = "LEFT JOIN Subsite ON SiteTree.SubsiteID = Subsite.ID";
+			// $query->select[] = "CASE WHEN Subsite.Title IS NOT '0' THEN Subsite.Title ELSE 'Main site' END AS SubsiteTitle";
+			$query->select[] = "Subsite.Title AS SubsiteTitle";
+			Subsite::$disable_subsite_filter = false;
+		}
 		
 		// Manually manage the subsite filtering
 		if(ClassInfo::exists('Subsite')) Subsite::$disable_subsite_filter = false;

@@ -58,10 +58,22 @@ class PagesScheduledForPublishingReport extends SSReport {
 			$wheres[] = "EmbargoDate >= '".SSDatetime::now()->URLDate()."'";
 		}
 		
-		$query = singleton("SiteTree")->extendedSQL(join(' AND ', $wheres), null, null, "LEFT JOIN WorkflowRequest on WorkflowRequest.PageID = SiteTree.ID");
+		$query = singleton("SiteTree")->extendedSQL(join(' AND ', $wheres), null, null, 
+			"LEFT JOIN WorkflowRequest on WorkflowRequest.PageID = SiteTree.ID"
+		);
 		
+		$query->select[] = "WorkflowRequest.EmbargoDate AS EmbargoDate";
+		
+		$query->from[] = "LEFT JOIN Member AS Approver ON WorkflowRequest.ApproverID = Approver.ID";
+		$query->select[] = 'CONCAT(Approver.FirstName, \' \', Approver.Surname) AS ApproverName';
+
 		// Manually manage the subsite filtering
-		if(ClassInfo::exists('Subsite')) Subsite::$disable_subsite_filter = false;
+		if(ClassInfo::exists('Subsite')) {
+			$query->from[] = "LEFT JOIN Subsite ON SiteTree.SubsiteID = Subsite.ID";
+			// $query->select[] = "CASE WHEN Subsite.Title IS NOT '0' THEN Subsite.Title ELSE 'Main site' END AS SubsiteTitle";
+			$query->select[] = "Subsite.Title AS SubsiteTitle";
+			Subsite::$disable_subsite_filter = false;
+		}
 		
 		return $query;
 	}
@@ -69,11 +81,11 @@ class PagesScheduledForPublishingReport extends SSReport {
 	function columns() {
 		$fields = array(
 			'Title' => 'Title',
-			'openWorkflowRequest.EmbargoDate' => array(
+			'EmbargoDate' => array(
 				'title' => 'Will be published at',
 				'casting' => 'SSDatetime->Full'
 			),
-			'openWorkflowRequest.Approver.Title' => 'Approved by',
+			'ApproverName' => 'Approved by',
 			'ID' => array(
 				'title' => 'Actions',
 				'formatting' => '<a href=\"admin/show/$value\">Edit in CMS</a>'
@@ -85,10 +97,19 @@ class PagesScheduledForPublishingReport extends SSReport {
 		);
 		
 		if(class_exists('Subsite')) {
-			$fields['Subsite.Title'] = 'Subsite';
+			$fields['SubsiteTitle'] = 'Subsite';
 		}
 		
 		return $fields;
+	}
+	
+	function sortColumns() {
+		//  sort by site and by time and by approver
+		return array(
+			'Subsite.Title',
+			'openWorkflowRequest.EmbargoDate',
+			'openWorkflowRequest.Approver.Title'
+		);
 	}
 	
 	function parameterFields() {
