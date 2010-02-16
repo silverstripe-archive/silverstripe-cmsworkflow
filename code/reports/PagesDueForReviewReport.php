@@ -51,7 +51,7 @@ class PagesDueForReviewReport extends SSReport {
 		}
 		
 		$params->push($startDate = new CalendarDateField('ReviewDateAfter', 'Review date after or on (DD/MM/YYYY)'));
-		$params->push($endDate = new CalendarDateField('ReviewDateBefore', 'Review date before or on (DD/MM/YYYY)'));
+		$params->push($endDate = new CalendarDateField('ReviewDateBefore', 'Review date before or on (DD/MM/YYYY)', date('d/m/Y', strtotime('midnight'))));
 		$endDate->mustBeAfter($startDate->Name());
 		$startDate->mustBeBefore($endDate->Name());
 
