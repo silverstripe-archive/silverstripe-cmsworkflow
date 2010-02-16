@@ -123,7 +123,19 @@ function action_cms_requestdeletefromlive_right(e) {
 }
 
 var EmbargoExpiry = {
-	originalValues: null,
+	embargoUnsaved: false,
+	expiryUnsaved: false,
+	init: function() {
+		EmbargoExpiry.fieldCheck();
+		
+		$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Date]'] = true;
+		$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Time]'] = true;
+		$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[Date]'] = true;
+		$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[Time]'] = true;
+		
+		EmbargoExpiry.embargoUnsaved = false;
+		EmbargoExpiry.expiryUnsaved = false;
+	},
 	save: function(what, el) {
 		EmbargoExpiry.fieldCheck();
 		
@@ -132,12 +144,10 @@ var EmbargoExpiry = {
 
 		if (what == 'embargo') {
 			url += '&EmbargoDate='+escape($(ids.dateField).value)+'&EmbargoTime='+escape($(ids.timeField).value);
-			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[Date]'] = true;
-			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[Time]'] = true;
+			EmbargoExpiry.embargoUnsaved = false;
 		} else if (what == 'expiry') {
 			url += '&ExpiryDate='+escape($(ids.dateField).value)+'&ExpiryTime='+escape($(ids.timeField).value);
-			$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Date]'] = true;
-			$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Time]'] = true;
+			EmbargoExpiry.expiryUnsaved = false;
 		}
 
 		if ($(ids.dateField).value == '' || $(ids.timeField).value == '') {
@@ -170,12 +180,10 @@ var EmbargoExpiry = {
 		
 		if (what == 'embargo') {
 			url += '&ResetEmbargo';
-			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[Date]'] = true;
-			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[Time]'] = true;
+			EmbargoExpiry.embargoUnsaved = false;
 		} else if (what == 'expiry') {
 			url += '&ResetExpiry';
-			$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Date]'] = true;
-			$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Time]'] = true;
+			EmbargoExpiry.expiryUnsaved = false;
 		}
 		
 		$(el.id).className = 'action loading';
@@ -219,13 +227,11 @@ var EmbargoExpiry = {
 		}
 	},
 	embargoChange: function() {
-		$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[Date]'] = false;
-		$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[Time]'] = false;
+		EmbargoExpiry.embargoUnsaved = true;
 		EmbargoExpiry.fieldCheck();
 	},
 	expiryChange: function() {
-		$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Date]'] = false;
-		$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Time]'] = false;
+		EmbargoExpiry.expiryUnsaved = true;
 		EmbargoExpiry.fieldCheck();
 	},
 	eButton: function(id) {
@@ -237,12 +243,10 @@ var EmbargoExpiry = {
 		$(id).disabled = true;
 	},
 	fieldCheck: function() {
-
 		if (EmbargoExpiry.originalValues === null) {
 			EmbargoExpiry.originalValues = true;
 		}
-		
-		ids = EmbargoExpiry.ids('embargo');
+
 		// Only call this logic if the date field & save button exist, otherwise it's unnecessary
 		if($(ids.dateField) && $(ids.saveButton)) {
 			if ($(ids.dateField).value == '' || $(ids.timeField).value == '') {
@@ -270,7 +274,7 @@ var EmbargoExpiry = {
 
 Behaviour.register({
 	'#EmbargoDate_Time' : {
-		initialize: EmbargoExpiry.fieldCheck,
+		initialize: EmbargoExpiry.init,
 		onchange: EmbargoExpiry.embargoChange
 	},
 	'#EmbargoDate_Date' : { onchange: EmbargoExpiry.embargoChange },
@@ -278,6 +282,15 @@ Behaviour.register({
 	'#ExpiryDate_Time' : { onchange: EmbargoExpiry.expiryChange }
 });
 
+var autoSave_before_tom_fucked_with_it = autoSave;
+autoSave = function(confirmation, callAfter) {
+	if (EmbargoExpiry.embargoUnsaved || EmbargoExpiry.expiryUnsaved) {
+		if (!confirm('Your embargo/expiry date changes have not been saved. Do you wish to continue?')) {
+			return false;
+		}
+	}
+	return autoSave_before_tom_fucked_with_it(confirmation, callAfter);
+}
 
 function action_publish_right(e) {
 	var messageEl = null;
