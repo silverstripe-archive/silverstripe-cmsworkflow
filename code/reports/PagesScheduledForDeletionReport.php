@@ -82,8 +82,11 @@ class PagesScheduledForDeletionReport extends SSReport {
 			$wheres[] = "ExpiryDate >= '".SSDatetime::now()->URLDate()."'";
 		}
 		
+		$stage = Versioned::current_stage();
+		Versioned::reading_stage('Live');
+		
 		$query = singleton("SiteTree")->extendedSQL(join(' AND ', $wheres), null, null, 
-			"LEFT JOIN WorkflowRequest on WorkflowRequest.PageID = SiteTree.ID"
+			"LEFT JOIN WorkflowRequest on WorkflowRequest.PageID = SiteTree_Live.ID"
 		);
 
 		
@@ -95,6 +98,8 @@ class PagesScheduledForDeletionReport extends SSReport {
 		if($sort) $query->orderby = $sort;
 		$records = singleton('SiteTree')->buildDataObjectSet($query->execute(), 'DataObjectSet', $query);
 
+		Versioned::reading_stage($stage);
+		
 		// Filter to only those with canEdit permission
 		$filteredRecords = new DataObjectSet();
 		if($records) foreach($records as $record) {
