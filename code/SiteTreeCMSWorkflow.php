@@ -167,40 +167,46 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		// Check if there is an expiry date...
 		$liveVersion = Versioned::get_one_by_stage('SiteTree', 'Live', "SiteTree_Live.ID = {$this->owner->ID}");
 		if ($liveVersion && $liveVersion->ExpiryDate != null && $liveVersion->ExpiryDate != '0000-00-00 00:00:00') {
-			$fields->addFieldsToTab('Root.** Expiry **', array(
-				new LiteralField('ExpiryWarning', "This page is scheduled to expire at ".$liveVersion->dbObject('ExpiryDate')->Full())
+			$tzConverter = new TZDateTimeField('ExpiryDate', 'Expiry Date', $liveVersion->ExpiryDate, SiteConfig::current_site_config()->Timezone);
+			$fields->addFieldsToTab('Root.Expiry', array(
+				new LiteralField('ExpiryWarning', "This page is scheduled to expire at ".$tzConverter->SSDatetime()->Full().', '.$tzConverter->DefaultTimezoneName().' time.')
 			));
 			if ($this->owner->BackLinkTracking() && $this->owner->BackLinkTracking()->Count() > 0) {
-				$fields->addFieldsToTab('Root.** Expiry **', array(
+				$fields->addFieldsToTab('Root.Expiry', array(
 					new HeaderField("Please check these pages", 2),
 					new LiteralField('ExpiryBacklinkWarning', "This page is scheduled to expire, but the following pages link to it"),
-					$backLinksTable = new TableListField(
-						'BackLinkTracking',
-						'SiteTree',
-						array(
-							'Title' => 'Title',
-							'AbsoluteLink' => 'URL'
-						),
-						'"ChildID" = ' . $this->owner->ID,
-						'',
-						'LEFT JOIN "SiteTree_LinkTracking" ON "SiteTree"."ID" = "SiteTree_LinkTracking"."SiteTreeID"'
-					)
+					$this->BacklinkTable()
 				));
-
-				$backLinksTable->setFieldFormatting(array(
-					'Title' => '<a href=\"admin/show/$ID\">$Title</a>',
-					'AbsoluteLink' => '<a href=\"$value\">$value</a>',
-				));
-
-				$backLinksTable->setPermissions(array(
-					'show',
-					'export'
-				));
-				
 			}
 		}
 		
 		$fields->addFieldsToTab('Root.WorkflowArchive', $this->getWorkflowCMSFields());
+	}
+	
+	function BacklinkTable() {
+	 	$backLinksTable = new TableListField(
+			'BackLinkTracking',
+			'SiteTree',
+			array(
+				'Title' => 'Title',
+				'AbsoluteLink' => 'URL'
+			),
+			'"ChildID" = ' . $this->owner->ID,
+			'',
+			'LEFT JOIN "SiteTree_LinkTracking" ON "SiteTree"."ID" = "SiteTree_LinkTracking"."SiteTreeID"'
+		);
+
+		$backLinksTable->setFieldFormatting(array(
+			'Title' => '<a href=\"admin/show/$ID\">$Title</a>',
+			'AbsoluteLink' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'
+		));
+
+		$backLinksTable->setPermissions(array(
+			'show',
+			'export'
+		));
+		
+		return $backLinksTable;
 	}
 	
 	/**

@@ -170,6 +170,8 @@ var EmbargoExpiry = {
 			onSuccess: function(t) {
 				data = eval('('+t.responseText+')');
 				if (data.status == 'success') {
+					$(ids.wholeMessage).style.display = 'block';
+					$(ids.dateTime).innerHTML = eval('data.message.'+ids.what);
 				} else { EmbargoExpiry.errorAlert(data); }
 			},
 			onFailure: function(t) { EmbargoExpiry.errorAlert(data); },
@@ -220,6 +222,9 @@ var EmbargoExpiry = {
 					dateField: 'ExpiryDate_Date',
 					timeField: 'ExpiryDate_Time',
 					timezoneField: 'ExpiryDate_TimeZone',
+					wholeMessage: 'embargoExpiry-expiryStatus',
+					dateTime: 'expiryDate',
+					what: 'expiry'
 				};
 			case 'embargo':
 				return {
@@ -228,6 +233,9 @@ var EmbargoExpiry = {
 					dateField: 'EmbargoDate_Date',
 					timeField: 'EmbargoDate_Time',
 					timezoneField: 'EmbargoDate_TimeZone',
+					wholeMessage: 'embargoExpiry-embargoStatus',
+					dateTime: 'embargoDate',
+					what: 'embargo'
 				};
 		}
 	},

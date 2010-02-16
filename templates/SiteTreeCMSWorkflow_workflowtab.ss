@@ -22,7 +22,7 @@
 					<% if Status %>
 						<em class="workflowStatusChange">Changed status to $StatusDescription</em>
 					<% end_if %>
-					$Author.FirstName $Author.Surname ($Author.Email) <i>$Created.Nice ($Created.Ago)</i><br />
+					$Author.FirstName $Author.Surname ($Author.Email) <i>$Created.Full ($Created.Ago)</i><br />
 					<div class="workflowComment">$Comment</div>
 				</li>
 			<% end_control %>
@@ -80,19 +80,17 @@
 						<!--<p>These times are in local server time, which is $WorkflowTimezone</p>-->
 					<% end_if %>
 				<% end_if %>
-			
-				<% if Status = Scheduled %>
-					<% if EmbargoField && EmbargoDate %>
-						<p id="embargoExpiry-embargoStatus">
-							This page is currently scheduled to be published at <span id="embargoDate">$EmbargoField.SSDatetime.Full, $EmbargoField.DefaultTimezoneName time.</span>
-						</p>
-					<% end_if %>
+							
+				<% if EmbargoField %>
+					<p id="embargoExpiry-embargoStatus" style="display:<% if EmbargoDate %>block<% else %>none<% end_if %>">
+						This page is currently scheduled to be published at <span id="embargoDate">$EmbargoField.SSDatetime.Full</span>, $ExpiryField.DefaultTimezoneName time.
+					</p>
+				<% end_if %>
 				
-					<% if ExpiryField && ExpiryDate %>
-						<p id="embargoExpiry-expiryStatus">
-							This page is currently scheduled to be unpublished at <span id="expiryDate">$ExpiryField.SSDatetime.Full, $ExpiryField.DefaultTimezoneName time.</span>
-						</p>
-					<% end_if %>
+				<% if ExpiryField %>
+					<p id="embargoExpiry-expiryStatus" style="display:<% if ExpiryDate %>block<% else %>none<% end_if %>">
+						This page is currently scheduled to be unpublished at <span id="expiryDate">$ExpiryField.SSDatetime.Full</span>, $ExpiryField.DefaultTimezoneName time.
+					</p>
 				<% end_if %>
 
 				<% if EmbargoField || ExpiryField %>
@@ -129,7 +127,15 @@
 		<% control Page %>
 			<% if BackLinkTracking %>
 				<% if BackLinkTracking.Count %>
-					<p>There are $BackLinkTracking.Count page(s) that link to here.</p>
+					<p>There are $BackLinkTracking.Count page(s) that link to here:</p>
+					<ul>
+					<% control BackLinkTracking %>
+						<li><a href="admin/show/$ID">$AbsoluteLink</a>
+						<% if AbsoluteLiveLink %><a href="$AbsoluteLiveLink">(live)</a><% end_if %>
+						<a href="$AbsoluteLink?stage=Stage">(draft)</a>
+						</li>
+					<% end_control %>
+					</ul>
 				<% end_if %>
 			<% end_if %>
 		<% end_control %>
