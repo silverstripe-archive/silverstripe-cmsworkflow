@@ -12,19 +12,16 @@ class PublishingReport extends SSReport {
 				'title' => 'Published',
 				'casting' => 'SSDatetime->Full'
 			),
-			'PublisherEmail' => 'Publisher',
+			'PublisherTitle' => 'Publisher',
 			'AbsoluteLink' => array(
-				'title' => 'URLs',
-				'formatting' => '$value <a href=\"$value?stage=Live\">(live)</a> <a href=\"$value?stage=Stage\">(draft)</a>',
+				'title' => 'Links',
+				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'
 			),
-			'ID' => array(
-				'title' => 'Edit',
-				'formatting' => '<a href=\"admin/show/$value\">Edit</a> ',
-			),
+			'ExpiryDate' => array(
+				'title' => 'Expiry on?',
+				'formatting' => '" . ($value && $value != "0000-00-00 00:00:00" ? "yes" : "no") . "'
+			)
 		);
-		if (class_exists('Subsite')) {
-			$fields['SubsiteName'] = 'Subsite';
-		}
 		return $fields;
 	}
 	
@@ -35,39 +32,48 @@ class PublishingReport extends SSReport {
 		$q->leftJoin('WorkflowRequest', 'WorkflowRequest.PageID = SiteTree.ID');
 		$q->select[] = "WorkflowRequest.LastEdited as Published";
 		$q->where[] = "WorkflowRequest.ClassName = 'WorkflowPublicationRequest'";
+		$q->where[] = "WorkflowRequest.Status = 'Completed'";
 		
 		
 		$q->leftJoin('Member', 'WorkflowRequest.PublisherID = Member.ID');
-		$q->select[] = 'Member.Email as PublisherEmail';
-		
-		if (class_exists('Subsite')) {
-			$q->leftJoin('Subsite', 'SiteTree.SubsiteID = Subsite.ID');
-			$q->select[] = 'Subsite.Title as SubsiteName';
-		}
+		$q->select[] = Member::get_title_sql().' as PublisherTitle';
 		
 		// restrict to member id
-		if (!empty($params['member']) && DataObject::get_by_id('Member', "Email = '".Convert::raw2sql($params['member'])."'")) {
-			$q->where[] = "Member.Email = '".Convert::raw2sql($params['member']."'");
+		if (!empty($params['memberId']) && DataObject::get_by_id('Member', $params['memberId'])) {
+			$q->where[] = "Member.ID = ".Convert::raw2sql($params['memberId']);
 		}
 		
-		// restrict to subsite id
-		if (class_exists('Subsite') && !empty($params['subsiteId']) && DataObject::get_by_id('Subsite', $params['subsiteId'])) {
-			$q->where[] = "SiteTree.SubsiteID = ".Convert::raw2sql($params['subsiteId']);
-		}
+		$startDate = isset($params['StartDate']) ? $params['StartDate'] : null;
+		$endDate = isset($params['EndDate']) ? $params['EndDate'] : null;
 		
-		// restrict by time period
-		if (!empty ($params['howFarBack'])) {
-			switch ($params['howFarBack']) {
-				case '1hour':
-					$q->where[] = "WorkflowRequest.LastEdited >= '".date('Y-m-d', time()-3600)."'";
-					break;
-				case '1day':
-					$q->where[] = "WorkflowRequest.LastEdited >= '".date('Y-m-d', time()-3600*24)."'";
-					break;
-				case '1week':
-					$q->where[] = "WorkflowRequest.LastEdited >= '".date('Y-m-d', time()-3600*24*7)."'";
-					break;
+		if($startDate) {
+			if(count(explode('/', $startDate['Date'])) == 3) {
+				list($d, $m, $y) = explode('/', $startDate['Date']);
+				$startDate['Time'] = $startDate['Time'] ? $startDate['Time'] : '00:00:00';
+				$startDate = @date('Y-m-d H:i:s', strtotime("$y-$m-$d {$startDate['Time']}"));
+			} else {
+				$startDate = null;
 			}
+		}
+		
+		if($endDate) {
+			if(count(explode('/', $endDate['Date'])) == 3) {
+				list($d,$m,$y) = explode('/', $endDate['Date']);
+				$endDate['Time'] = $endDate['Time'] ? $endDate['Time'] : '23:59:59';
+				$endDate = @date('Y-m-d H:i:s', strtotime("$y-$m-$d {$endDate['Time']}"));
+			} else {
+				$endDate = null;
+			}
+		}
+		
+		if ($startDate && $endDate) {
+			$q->where[] = "WorkflowRequest.LastEdited >= '".Convert::raw2sql($startDate)."' AND WorkflowRequest.LastEdited <= '".Convert::raw2sql($endDate)."'";
+		} else if ($startDate && !$endDate) {
+			$q->where[] = "WorkflowRequest.LastEdited >= '".Convert::raw2sql($startDate)."'";
+		} else if (!$startDate && $endDate) {
+			$q->where[] = "WorkflowRequest.LastEdited <= '".Convert::raw2sql($endDate)."'";
+		} else {
+			$q->where[] = "WorkflowRequest.LastEdited >= '".SSDatetime::now()->URLDate()."'";
 		}
 		
 		return $q;
@@ -75,16 +81,7 @@ class PublishingReport extends SSReport {
 	
 	function parameterFields() {
 		$params = new FieldSet();
-		
-		if (class_exists('Subsite') && $subsites = DataObject::get('Subsite')) {
-			$options = $subsites->toDropdownMap('ID', 'Title', 'Any');
-			$params->push(new DropdownField(
-				"subsiteId", 
-				"Subsite", 
-				$options
-			));
-		}
-		
+
 		$options = DataObject::get('Member')->toDropdownMap('ID', 'Name', 'Any');
 		$params->push(new DropdownField(
 			"memberId", 
@@ -92,15 +89,10 @@ class PublishingReport extends SSReport {
 			$options
 		));
 		
-		$params->push(new DropdownField(
-			"howFarBack", 
-			"Time period", 
-			array(
-				'1hour' => 'Within the last hour',
-				'1day' => 'Within the last day',
-				'1week' => 'Within the last week'
-			)
-		));
+		$params->push($startDate = new PopupDateTimeField('StartDate', 'Start date'));
+		$params->push($endDate = new PopupDateTimeField('EndDate', 'End date'));
+		$endDate->setValue(array('Date' => null, 'Time' => '11:59 pm'));
+		$startDate->setValue(array('Date' => null, 'Time' => '12:00 am'));
 		
 		return $params;
 	}

@@ -45,7 +45,7 @@ class PagesScheduledForPublishingReport extends SSReport {
 		} else {
 			$wheres[] = "EmbargoDate >= '".SSDatetime::now()->URLDate()."'";
 		}
-
+		
 		$wheres[] = "WorkflowRequest.Status = 'Scheduled'";
 		
 		$query = singleton("SiteTree")->extendedSQL(join(' AND ', $wheres), null, null, 
@@ -57,7 +57,6 @@ class PagesScheduledForPublishingReport extends SSReport {
 		$query->from[] = "LEFT JOIN Member AS Approver ON WorkflowRequest.ApproverID = Approver.ID";
 		$query->select[] = Member::get_title_sql('Approver').' AS ApproverName';
 
-		
 		// Turn a query into records
 		if($sort) $query->orderby = $sort;
 		$records = singleton('SiteTree')->buildDataObjectSet($query->execute(), 'DataObjectSet', $query);
@@ -85,7 +84,7 @@ class PagesScheduledForPublishingReport extends SSReport {
 			),
 			'ApproverName' => 'Approved by',
 			'AbsoluteLink' => array(
-				'title' => 'Links',
+				'title' => 'URL',
 				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'
 			)
 		);
@@ -98,8 +97,7 @@ class PagesScheduledForPublishingReport extends SSReport {
 		
 		$params->push($startDate = new PopupDateTimeField('StartDate', 'Start date'));
 		$params->push($endDate = new PopupDateTimeField('EndDate', 'End date'));
-		$endDate->setValue(array('Date' => null, 'Time' => '11:59 pm'));
-		$startDate->setValue(array('Date' => null, 'Time' => '12:00 am'));
+		$endDate->defaultToEndOfDay();
 		
 		return $params;
 	}

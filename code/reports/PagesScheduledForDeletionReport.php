@@ -15,8 +15,7 @@ class PagesScheduledForDeletionReport extends SSReport {
 		
 		$params->push($startDate = new PopupDateTimeField('StartDate', 'Start date'));
 		$params->push($endDate = new PopupDateTimeField('EndDate', 'End date'));
-		$endDate->setValue(array('Date' => null, 'Time' => '11:59 pm'));
-		$startDate->setValue(array('Date' => null, 'Time' => '12:00 am'));
+		$endDate->defaultToEndOfDay();
 		
 		return $params;
 	}
@@ -33,7 +32,7 @@ class PagesScheduledForDeletionReport extends SSReport {
 			),
 			'ApproverName' => 'Approved by',
 			'AbsoluteLink' => array(
-				'title' => 'Links',
+				'title' => 'URL',
 				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'
 			)
 		);
