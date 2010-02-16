@@ -42,7 +42,8 @@ class UnapprovedPublications3StepReport extends SSReport {
 			$doSet->sort($sort);
 		}
 
-		return $doSet;
+		if($limit && $limit['limit']) return $doSet->getRange($limit['start'], $limit['limit']);
+		else return $doSet;
 	}
 	
 	function columns() {

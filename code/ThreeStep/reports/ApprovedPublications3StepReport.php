@@ -9,7 +9,7 @@ class ApprovedPublications3StepReport extends SSReport {
 	function title() {
 		return _t('ApprovedPublications3StepReport.TITLE',"Approved pages I need to publish");
 	}
-	function sourceRecords($params) {
+	function sourceRecords($params, $sort, $limit) {
 		$res = WorkflowThreeStepRequest::get_by_publisher(
 			'WorkflowPublicationRequest',
 			Member::currentUser(),
@@ -43,7 +43,8 @@ class ApprovedPublications3StepReport extends SSReport {
 			$doSet->sort($sort);
 		}
 		
-		return $doSet;
+		if($limit && $limit['limit']) return $doSet->getRange($limit['start'], $limit['limit']);
+		else return $doSet;
 	}
 	function columns() {
 		return array(
