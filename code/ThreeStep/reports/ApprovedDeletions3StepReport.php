@@ -69,7 +69,7 @@ class ApprovedDeletions3StepReport extends SSReport {
 				"title" => "Title",
 				"link" => true,
 			),
-			"WFApproverEmail" => array(
+			"WFAuthorTitle" => array(
 				"title" => "Approver",
 				"formatting" => 'Approved by $value',
 			),

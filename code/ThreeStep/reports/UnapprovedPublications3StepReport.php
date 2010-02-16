@@ -63,9 +63,9 @@ class UnapprovedPublications3StepReport extends SSReport {
 	function sideReportColumns() {
 		return array(
 			'Title' => array(
-				'link' => 'true',
+				'link' => true,
 			),
-			'AuthorTitle' => array(
+			'WFAuthorTitle' => array(
 				'formatting' => 'Requested by $value'
 			),
 			'RequestedAt' => array(
@@ -78,7 +78,7 @@ class UnapprovedPublications3StepReport extends SSReport {
 	function sortColumns() {
 		return array(
 			'SubsiteTitle',
-			'AuthorTitle',
+			'WFAuthorTitle',
 			'RequestedAt'
 		);
 	}

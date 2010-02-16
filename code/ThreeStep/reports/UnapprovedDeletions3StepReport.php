@@ -61,7 +61,7 @@ class UnapprovedDeletions3StepReport extends SSReport {
 			"Title" => array(
 				"link" => true,
 			),
-			"WFRequesterEmail" => array(
+			"WFAuthorTitle" => array(
 				"formatting" => 'Requested by $value',
 			),
 			"WFRequestedWhen" => array(
