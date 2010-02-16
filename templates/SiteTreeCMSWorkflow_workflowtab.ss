@@ -94,7 +94,7 @@ div#futurePublishing div.popupdatetime ul {
 		<p id="startTimers">You need to click 'Approve' to start these timers in motion.</p>
 	<% end_if %>
 	<% if Status = Approved %>
-		<% if EmbargoDate %><% else %>
+		<% if EmbargoDate %><% else_if ExpiryDate %>
 		<p id="startTimers">You need to click 'Publish changes' to start this timer in motion.</p>
 		<% end_if %>
 	<% end_if %>
