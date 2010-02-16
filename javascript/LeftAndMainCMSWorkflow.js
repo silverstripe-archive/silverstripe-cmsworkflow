@@ -176,11 +176,11 @@ var EmbargoExpiry = {
 		});	
 	},
 	reset: function(what, el) {
-		ids = EmbargoExpiry.ids(what);
+		elIds = EmbargoExpiry.ids(what);
 		var url = 'admin/cms_setembargoexpiry?wfRequest='+$('WorkflowRequest_ID').value;
 		
-		$(ids.dateField).value = '';
-		$(ids.timeField).value = '';
+		$(elIds.dateField).value = '';
+		$(elIds.timeField).value = '';
 
 		EmbargoExpiry.fieldCheck();
 		
@@ -192,12 +192,12 @@ var EmbargoExpiry = {
 			EmbargoExpiry.expiryUnsaved = false;
 		}
 		
-		$(el.id).className = 'action loading';
 		new Ajax.Request(url, {
 			method: 'get',
 			onSuccess: function(t) {
+				data = eval('('+t.responseText+')');
 				if (data.status == 'success') {
-					$(ids.wholeMessage).style.display = 'none';
+					$(elIds.wholeMessage).style.display = 'none';
 				} else {
 					EmbargoExpiry.errorAlert(data);
 				}
