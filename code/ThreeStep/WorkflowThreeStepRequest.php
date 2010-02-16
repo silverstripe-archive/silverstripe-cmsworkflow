@@ -13,6 +13,8 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 			return false;
 		}
 	
+		// Todo - remove UI<->model coupling
+		// See SiteTreeFutureStateTest
 		if ($this->owner->ClassName == 'WorkflowDeletionRequest') {
 			if (isset($_REQUEST['DeletionScheduling']) 
 				&& $_REQUEST['DeletionScheduling'] == 'scheduled'
@@ -25,7 +27,14 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 				$pageID = $this->owner->Page()->ID;
 				
 				if ($expiryTimestamp) {
-					DB::query("UPDATE SiteTree_Live SET ExpiryDate = '$expiryTimestamp' WHERE ID = $pageID");
+					$pageIDs = array($pageID);
+					
+					// Expire virtual pages linked to this also
+					$pageIDs = array_merge($pageIDs, DB::query("SELECT \"ID\" FROM \"VirtualPage_Live\" 
+						WHERE \"CopyContentFromID\" = $pageID")->column());
+					
+					DB::query("UPDATE \"SiteTree_Live\" SET \"ExpiryDate\" = '$expiryTimestamp' 
+						WHERE \"ID\" IN (" . implode(", ", $pageIDs) . ")");
 				}
 
 				$this->owner->ApproverID = $member->ID;

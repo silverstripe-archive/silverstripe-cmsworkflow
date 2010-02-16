@@ -76,33 +76,33 @@ class SiteTreeFutureStateTest extends SapphireTest {
 		// The top-level items have no embargo/expiry, and so should be unaffected by the embargoes
 		// of their children
 		
-		$this->assertEquals(array('Product 1', 'Product 2'),
+		$this->assertEquals(array('Product 1', 'Product 2','Product 5'),
 			$products->Children()->column("Title"));
 
 		// Hasn't changed 1 minute before
 		SiteTreeFutureState::set_future_datetime('2020-01-01 09:59:00');
-		$this->assertEquals(array('Product 1', 'Product 2'),
+		$this->assertEquals(array('Product 1', 'Product 2','Product 5'),
 			$products->Children()->column("Title"));
 
 		// Product 4 appears on exactly its embargo date
 		SiteTreeFutureState::set_future_datetime('2020-01-01 10:00:00');
 		$products->flushCache();
-		$this->assertEquals(array('Product 1', 'Product 2', 'Product 4'),
+		$this->assertEquals(array('Product 1', 'Product 2', 'Product 4','Product 5'),
 			$products->Children()->column("Title"));
 
 		// Product 2 disappears on exactly its expiry date
 		SiteTreeFutureState::set_future_datetime('2020-01-01 10:59:00');
 		$products->flushCache();
-		$this->assertEquals(array('Product 1', 'Product 2', 'Product 4'),
+		$this->assertEquals(array('Product 1', 'Product 2', 'Product 4','Product 5'),
 			$products->Children()->column("Title"));
 		SiteTreeFutureState::set_future_datetime('2020-01-01 11:00:00');
 		$products->flushCache();
-		$this->assertEquals(array('Product 1', 'Product 4'),
+		$this->assertEquals(array('Product 1', 'Product 4', 'Product 5'),
 			$products->Children()->column("Title"));
 
 		SiteTreeFutureState::set_future_datetime('2020-01-03 11:01:00');
 		$products->flushCache();
-		$this->assertEquals(array('Product 1', 'Product 3', 'Product 4'),
+		$this->assertEquals(array('Product 1', 'Product 3', 'Product 4','Product 5'),
 			$products->Children()->column("Title"));
 	}
 	
@@ -141,22 +141,58 @@ class SiteTreeFutureStateTest extends SapphireTest {
 	function testVirtualPageFutureState() {
 		$virtuals = $this->objFromFixture('Page', 'virtuals');
 
-		$this->assertEquals(array('Product 1', 'Product 2'),
+		$this->assertEquals(array('Product 1', 'Product 2', 'Product 5'),
 			$virtuals->Children()->column("Title"));
 
 		// Test embargo - the draft-only VP, Product 4, is *not* auto-published
 		SiteTreeFutureState::set_future_datetime('2020-01-01 10:30:00');
 		$virtuals->flushCache();
 
-		$this->assertEquals(array('Product 1', 'Product 2'),
+		$this->assertEquals(array('Product 1', 'Product 2', 'Product 5'),
 			$virtuals->Children()->column("Title"));
 
 		// Test expiry - Product 2 is auto-removed
 		SiteTreeFutureState::set_future_datetime('2020-01-01 11:30:00');
 		$virtuals->flushCache();
 
-		$this->assertEquals(array('Product 1'),
+		$this->assertEquals(array('Product 1', 'Product 5'),
 			$virtuals->Children()->column("Title"));
+		
+	}
+	
+	/**
+	 * Test that an expiry date set after the virtual page is created is respected in the tes
+	 */
+	function testExpirySetAfterVirtualPageCreated() {
+		Versioned::reading_stage('Stage');
+		$p5 = $this->objFromFixture('Page', 'product5');
+
+		// Create an expiry following the workflow process
+		$req = $p5->openOrNewWorkflowRequest('WorkflowDeletionRequest');
+
+		// Todo - remove UI<->model coupling
+		$_REQUEST['DeletionScheduling'] = 'scheduled';
+		$_REQUEST['ExpiryDate']['Date'] = '01/01/2020';
+		$_REQUEST['ExpiryDate']['Time'] = '12:00';
+		$req->approve('Schedule the deletion');
+
+		Versioned::reading_stage('Live');
+		
+		$pages = DataObject::get("SiteTree")->column("ID");
+		$this->assertContains($this->idFromFixture('Page', 'product5'), $pages);
+		$this->assertContains($this->idFromFixture('VirtualPage', 'vproduct5'), $pages);
+		
+		SiteTreeFutureState::set_future_datetime('2020-01-01 9:00:00');
+
+		$pages = DataObject::get("SiteTree")->column("ID");
+		$this->assertContains($this->idFromFixture('Page', 'product5'), $pages);
+		$this->assertContains($this->idFromFixture('VirtualPage', 'vproduct5'), $pages);
+
+		SiteTreeFutureState::set_future_datetime('2020-01-01 14:00:00');
+
+		$pages = DataObject::get("SiteTree")->column("ID");
+		$this->assertNotContains($this->idFromFixture('Page', 'product5'), $pages);
+		$this->assertNotContains($this->idFromFixture('VirtualPage', 'vproduct5'), $pages);
 		
 	}
 
@@ -213,14 +249,14 @@ class SiteTreeFutureStateTest extends SapphireTest {
 		
 		// Publish all but the embargoed content and switch view to Live
 		$pages = array('home', 'about', 'staff', 'staffduplicate','products', 'product1', 
-			'product2', 'contact', 'virtuals');
+			'product2', 'product5', 'contact', 'virtuals');
 		foreach($pages as $page) $this->objFromFixture('Page', $page)->doPublish();
 
 		$this->objFromFixture('ErrorPage', 404)->doPublish();
 		$this->objFromFixture('VirtualPage', 'vproduct1')->doPublish();
 		$this->objFromFixture('VirtualPage', 'vproduct2')->doPublish();
-
-
+		$this->objFromFixture('VirtualPage', 'vproduct5')->doPublish();
+		
 		Versioned::reading_stage('Live');
 	}
 
