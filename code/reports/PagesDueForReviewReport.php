@@ -68,7 +68,7 @@ class PagesDueForReviewReport extends SSReport {
 				'title' => 'Review Date',
 				'casting' => 'Date->Full'
 			),
-			'OwnerName' => 'Owner',
+			'Owner.Title' => 'Owner',
 			'LastEditedBy.Title' => 'Last edited by',
 			'AbsoluteLink' => array(
 				'title' => 'URL',
@@ -123,7 +123,7 @@ class PagesDueForReviewReport extends SSReport {
 		
 		$query = singleton("SiteTree")->extendedSQL(join(' AND ', $wheres));
 		$query->select[] = Member::get_title_sql('Owner').' AS OwnerName';
-		
+
 		$query->from[] = 'LEFT JOIN "Member" AS "Owner" ON "SiteTree"."OwnerID" = "Owner"."ID"';
 		
 		return $query;
