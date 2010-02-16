@@ -56,10 +56,29 @@ class PagesScheduledForPublishingReport extends SSReport {
 		
 		$query->from[] = "LEFT JOIN Member AS Approver ON WorkflowRequest.ApproverID = Approver.ID";
 		$query->select[] = Member::get_title_sql('Approver').' AS ApproverName';
+		
+		$join = '';
+		if($sort) {
+			$parts = explode(' ', $sort);
+			$field = $parts[0];
+			$direction = $parts[1];
+			
+			if($field == 'AbsoluteLink') {
+				$sort = 'URLSegment ' . $direction;
+			}
+			
+			if($field == 'Subsite.Title') {
+				$query->from[] = 'LEFT JOIN "Subsite" ON "Subsite"."ID" = "SiteTree"."SubsiteID"';
+			}
+		}
+		
 
 		// Turn a query into records
-		if($sort) $query->orderby = $sort;
 		$records = singleton('SiteTree')->buildDataObjectSet($query->execute(), 'DataObjectSet', $query);
+		
+					
+		if($sort) $query->orderby = $sort;
+		
 
 		// Filter to only those with canEdit permission
 		$filteredRecords = new DataObjectSet();
