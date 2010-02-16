@@ -35,7 +35,7 @@ class PagesScheduledForDeletionReport extends SSReport {
 			'ApproverName' => 'Approved by',
 			'AbsoluteLink' => array(
 				'title' => 'URL',
-				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a> <a href=\"/?futureDate=$ExpiryDate\">(view on expiry date)</a>'
+				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a> <a href=\"home?futureDate=$ExpiryDate\">(view site on expiry date)</a>'
 			),
 			"BacklinkCount" => array(
 				"title" => "Incoming links",
