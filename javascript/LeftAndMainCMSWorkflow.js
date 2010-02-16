@@ -136,8 +136,10 @@ var EmbargoExpiry = {
 		
 		$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Date]'] = true;
 		$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Time]'] = true;
+		$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[TimeZone]'] = true;
 		$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[Date]'] = true;
 		$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[Time]'] = true;
+		$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[TimeZone]'] = true;
 		
 		EmbargoExpiry.embargoUnsaved = false;
 		EmbargoExpiry.expiryUnsaved = false;
@@ -148,11 +150,12 @@ var EmbargoExpiry = {
 		var url = 'admin/cms_setembargoexpiry?wfRequest='+$('WorkflowRequest_ID').value;
 		var ids = EmbargoExpiry.ids(what);
 
+		timezone = $(ids.timezoneField).options[$(ids.timezoneField).selectedIndex].value;
 		if (what == 'embargo') {
-			url += '&EmbargoDate='+escape($(ids.dateField).value)+'&EmbargoTime='+escape($(ids.timeField).value);
+			url += '&EmbargoDate[Date]='+escape($(ids.dateField).value)+'&EmbargoDate[Time]='+escape($(ids.timeField).value)+'&EmbargoDate[TimeZone]='+escape(timezone);
 			EmbargoExpiry.embargoUnsaved = false;
 		} else if (what == 'expiry') {
-			url += '&ExpiryDate='+escape($(ids.dateField).value)+'&ExpiryTime='+escape($(ids.timeField).value);
+			url += '&ExpiryDate[Date]='+escape($(ids.dateField).value)+'&ExpiryDate[Time]='+escape($(ids.timeField).value)+'&ExpiryDate[TimeZone]='+escape(timezone);
 			EmbargoExpiry.expiryUnsaved = false;
 		}
 
@@ -167,8 +170,6 @@ var EmbargoExpiry = {
 			onSuccess: function(t) {
 				data = eval('('+t.responseText+')');
 				if (data.status == 'success') {
-					$(ids.wholeMessage).style.display = 'block';
-					$(ids.dateTime).innerHTML = eval('data.message.'+what);
 				} else { EmbargoExpiry.errorAlert(data); }
 			},
 			onFailure: function(t) { EmbargoExpiry.errorAlert(data); },
@@ -218,8 +219,7 @@ var EmbargoExpiry = {
 					saveButton: 'saveExpiryButton',
 					dateField: 'ExpiryDate_Date',
 					timeField: 'ExpiryDate_Time',
-					wholeMessage: 'embargoExpiry-expiryStatus',
-					dateTime: 'expiryDate'
+					timezoneField: 'ExpiryDate_TimeZone',
 				};
 			case 'embargo':
 				return {
@@ -227,8 +227,7 @@ var EmbargoExpiry = {
 					saveButton: 'saveEmbargoButton',
 					dateField: 'EmbargoDate_Date',
 					timeField: 'EmbargoDate_Time',
-					wholeMessage: 'embargoExpiry-embargoStatus',
-					dateTime: 'embargoDate'
+					timezoneField: 'EmbargoDate_TimeZone',
 				};
 		}
 	},

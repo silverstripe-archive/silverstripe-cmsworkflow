@@ -2,8 +2,9 @@
 
 <div id="CMSWorkflowTab">
 	<% control OpenWorkflowRequest %>
-		<h1>Change $StatusDescription</h1>
 		<input type="hidden" id="WorkflowRequest_ID" value="$ID" />
+		<h1>Change $StatusDescription</h1>
+
 		<p>$Author.FirstName $Author.Surname has requested that a change to the site be published.</p>
 
 		<h2>Changes</h2>
@@ -76,20 +77,22 @@
 				<% if ExpiryField || EmbargoField %>
 					<% if Status = AwaitingApproval %>
 						<h2>Embargo Expiry</h2>
-						<p>These times are in local server time, which is $WorkflowTimezone</p>
+						<!--<p>These times are in local server time, which is $WorkflowTimezone</p>-->
 					<% end_if %>
 				<% end_if %>
+			
+				<% if Status = Scheduled %>
+					<% if EmbargoField && EmbargoDate %>
+						<p id="embargoExpiry-embargoStatus">
+							This page is currently scheduled to be published at <span id="embargoDate">$EmbargoField.SSDatetime.Full, $EmbargoField.DefaultTimezoneName time.</span>
+						</p>
+					<% end_if %>
 				
-				<% if EmbargoField %>
-					<p id="embargoExpiry-embargoStatus" style="display:<% if EmbargoDate %>block<% else %>none<% end_if %>">
-						This page is currently scheduled to be published at <span id="embargoDate">$EmbargoDate.Full</span>.
-					</p>
-				<% end_if %>
-				
-				<% if ExpiryField %>
-					<p id="embargoExpiry-expiryStatus" style="display:<% if ExpiryDate %>block<% else %>none<% end_if %>">
-						This page is currently scheduled to be unpublished at <span id="expiryDate">$ExpiryDate.Full</span>.
-					</p>
+					<% if ExpiryField && ExpiryDate %>
+						<p id="embargoExpiry-expiryStatus">
+							This page is currently scheduled to be unpublished at <span id="expiryDate">$ExpiryField.SSDatetime.Full, $ExpiryField.DefaultTimezoneName time.</span>
+						</p>
+					<% end_if %>
 				<% end_if %>
 
 				<% if EmbargoField || ExpiryField %>
@@ -105,7 +108,6 @@
 				<% end_if %>
 
 				<% if CanChangeEmbargoExpiry %>
-					$TZConverter
 					<% if EmbargoField %>
 						<p>
 							$EmbargoField

@@ -37,48 +37,55 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 					);
 				} else {
 					$expiryTimestamp = $embargoTimestamp = null;
-					if (isset($data['EmbargoDate']) && isset($data['EmbargoTime'])) {
-						if (count(explode('/', $data['EmbargoDate'])) >= 3) {
-							list($day, $month, $year) = explode('/', $data['EmbargoDate']);
-							$embargoTimestamp = strtotime("$year-$month-$day {$data['EmbargoTime']}");
-							if ((int)$day != (int)date('d', $embargoTimestamp)) $embargoTimestamp = false;
-							if ($embargoTimestamp) $wfRequest->EmbargoDate = $embargoTimestamp;
+					
+					$embargoField = $wfRequest->EmbargoField();
+					$expiryField = $wfRequest->ExpiryField();
+					
+					if (isset($data['EmbargoDate'])) {
+						// Only doing parsing here to make sure we are not rolling over
+						// in to another day.
+						list($day, $month, $year) = explode('/', $data['EmbargoDate']['Date']);
+						$embargoTimestamp = strtotime("$year-$month-$day {$data['EmbargoDate']['Time']}");
+						if ((int)$day != (int)date('d', $embargoTimestamp)) $embargoTimestamp = false;
+						else {
+							$embargoField->setValue($data['EmbargoDate']);
+							$embargoDate = $embargoField->Value();
+							$embargoTimestamp = strtotime($embargoField->Value());
 						}
 					}
 					
-					if (isset($data['ExpiryDate']) && isset($data['ExpiryTime'])) {
-						if (count(explode('/', $data['ExpiryDate'])) >= 3) {
-							list($day, $month, $year) = explode('/', $data['ExpiryDate']);
-							$expiryTimestamp = strtotime("$year-$month-$day {$data['ExpiryTime']}");
-							if ((int)$day != (int)date('d', $expiryTimestamp)) $expiryTimestamp = false;
-							if ($expiryTimestamp) $wfRequest->Page()->ExpiryDate = $expiryTimestamp;
+					if (isset($data['ExpiryDate'])) {
+						// Only doing parsing here to make sure we are not rolling over
+						// in to another day.
+						list($day, $month, $year) = explode('/', $data['EmbargoDate']['Date']);
+						$expiryTimestamp = strtotime("$year-$month-$day {$data['EmbargoDate']['Time']}");
+						if ((int)$day != (int)date('d', $expiryTimestamp)) $expiryTimestamp = false;
+						else {
+							$expiryField->setValue($data['ExpiryDate']);
+							$expiryDate = $expiryField->Value();
+							$expiryTimestamp = strtotime($expiryField->Value());
 						}
 					}
 					
-					$wfRequest->Page()->ExpiryDate = is_numeric($wfRequest->Page()->ExpiryDate) ? $wfRequest->Page()->ExpiryDate : strtotime($wfRequest->Page()->ExpiryDate);
-					$wfRequest->EmbargoDate = is_numeric($wfRequest->EmbargoDate) ? $wfRequest->EmbargoDate : strtotime($wfRequest->EmbargoDate);
-					
+					$embargoField->saveInto($wfRequest);
+					$expiryField->saveInto($wfRequest->Page());
+		
 					// Validation time
 					$error = false;
 					if (isset($data['EmbargoDate']) && !$embargoTimestamp) {
 						$error = "Embargo date/time is not valid";
 					} else if (isset($data['ExpiryDate']) && !$expiryTimestamp) {
 						$error = "Expiry date/time is not valid";
-					} else if (isset($data['EmbargoDate']) && $wfRequest->EmbargoDate < time()) {
+					} else if (isset($data['EmbargoDate']) && $embargoTimestamp < time()) {
 						$error = "Embargo date/time must be AFTER the current server date/time";
-					} else if (isset($data['ExpiryDate']) && $wfRequest->Page()->ExpiryDate < time()) {
+					} else if (isset($data['ExpiryDate']) && $expiryTimestamp < time()) {
 						$error = "Expiry date/time must be AFTER the current server date/time";
-					} else if ($wfRequest->EmbargoDate && $wfRequest->Page()->ExpiryDate && $wfRequest->EmbargoDate > $wfRequest->Page()->ExpiryDate) {
+					} else if ($embargoTimestamp && $expiryTimestamp && $embargoTimestamp > $expiryTimestamp) {
 						$error = "Embargo date/time must be BEFORE the expiry date/time";
 					} else {
-						if ($embargoTimestamp && $wfRequest->EmbargoField()) $wfRequest->write();
-						if ($expiryTimestamp && $wfRequest->ExpiryField()) $wfRequest->Page()->write();
-					
-						$expiryTimestamp = $wfRequest->getExpiryDate();
-						$embargoTimestamp = $wfRequest->getEmbargoDate();
-						if (!is_numeric($expiryTimestamp)) $expiryTimestamp = strtotime($expiryTimestamp);
-						if (!is_numeric($embargoTimestamp)) $embargoTimestamp = strtotime($embargoTimestamp);
-						
+						$wfRequest->write();
+						$wfRequest->Page()->write();
+
 						$result = array(
 							'status' => 'success',
 							'message' => array(

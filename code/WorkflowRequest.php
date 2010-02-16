@@ -331,10 +331,10 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * returns false if the field cant be used in this context
 	 */
 	function EmbargoField() {
-		return new PopupDateTimeField('EmbargoDate', 'Embargo Date', $this->EmbargoDate);
+		return new TZDateTimeField('EmbargoDate', 'Embargo Date', $this->EmbargoDate, 'America/Los_Angeles');
 	}
 	function ExpiryField() {
-		return new PopupDateTimeField('ExpiryDate', 'Expiry Date', $this->ExpiryDate);
+		return new TZDateTimeField('ExpiryDate', 'Expiry Date', $this->ExpiryDate, 'America/Los_Angeles');
 	}
 	
 	function getEmbargoDate() {
