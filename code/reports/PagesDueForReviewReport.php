@@ -129,7 +129,7 @@ class PagesDueForReviewReport extends SSReport {
 		$records = singleton('SiteTree')->buildDataObjectSet($query->execute(), 'DataObjectSet', $query);
 
 		// Apply limit after that filtering.
-		if($limit) return $records->getRange($limit['start'], $limit['limit']);
+		if($limit && $records) return $records->getRange($limit['start'], $limit['limit']);
 		else return $records;
 	}
 }
