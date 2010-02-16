@@ -88,6 +88,7 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		$request = $page->openOrNewWorkflowRequest('WorkflowPublicationRequest');
 
 		// Asset publisher can approve but author cannot
+		SiteTree::reset();
 		$this->assertFalse($page->canApprove($customauthor));
 		$this->assertTrue($page->canApprove($custompublisher));
 		
@@ -171,6 +172,30 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		$this->assertNull($onLive, 'Page has expired from live');
 		
 		SS_Datetime::clear_mock_now();
+	}
+	
+	function testEmbargoExpiryWithVirtualPages() {
+		$custompublisher = $this->objFromFixture('Member', 'custompublisher');
+		$custompublisher->login();
+		$sourcePage = new Page();
+		$sourcePage->Content = '<p>Pre-embargo</p>';
+		$sourcePage->write();
+		$sourcePage->doPublish();
+		
+		$sourcePage->Content = '<p>Post-embargo</p>';
+		$sourcePage->write();
+		$request = $sourcePage->openOrNewWorkflowRequest('WorkflowPublicationRequest');
+		$sourcePage->setEmbargo('01/06/2050', '3:00pm');
+		$sourcePage->write();
+		$request->approve('all good');
+		
+		$virtualPage = new VirtualPage();
+		$virtualPage->CopyContentFromID = $sourcePage->ID;
+		$virtualPage->write();
+		$virtualPage->doPublish();
+		
+		$liveVirtualPage = Versioned::get_one_by_stage('VirtualPage', 'Live', '"SiteTree"."ID" = ' . $virtualPage->ID);
+		$this->assertEquals($liveVirtualPage->Content, '<p>Pre-embargo</p>');
 	}
 	
 	function testBatchActions() {
