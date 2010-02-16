@@ -28,4 +28,8 @@ Director::addRules(200, array(
 unset(CMSBatchActionHandler::$batch_actions['publish']);
 
 
+SSReport::register('ReportAdmin', 'PagesDueForReviewReport');
+SSReport::register('ReportAdmin', 'PagesScheduledForDeletionReport');
+SSReport::register('ReportAdmin', 'PagesScheduledForPublishingReport');
+
 ?>
