@@ -166,6 +166,7 @@ class SiteTreeFutureStateTest extends SapphireTest {
 	function testEmbargoedEdit() {
 		// Make an edit
 		Versioned::reading_stage('Stage');
+		
 		$product1 = $this->objFromFixture('Page', 'product1');
 		$product1->Title = "New Product 1";
 		$product1->write();
@@ -186,11 +187,19 @@ class SiteTreeFutureStateTest extends SapphireTest {
 		$this->assertEquals('Product 1', $p1->Title);
 		$this->assertEquals('Product 1', $vp1->Title);
 
+		// Verify the the change isn't reflected in future state prior to the embargo date
+		SiteTreeFutureState::set_future_datetime('2019-01-01 9:30:00');
+		singleton('Page')->flushCache();
+
+		$p1 = $this->objFromFixture('Page', 'product1');
+		$vp1 = $this->objFromFixture('VirtualPage', 'vproduct1');
+
+		$this->assertEquals('Product 1', $p1->Title);
+		$this->assertEquals('Product 1', $vp1->Title);
+
 		// Verify the the change is reflected in both the source page and its virtual
 		SiteTreeFutureState::set_future_datetime('2019-01-01 10:30:00');
 		singleton('Page')->flushCache();
-		
-		Debug::message("VProduct1: " . $this->idFromFixture('VirtualPage', 'vproduct1'));
 		
 		$p1 = $this->objFromFixture('Page', 'product1');
 		$vp1 = $this->objFromFixture('VirtualPage', 'vproduct1');
