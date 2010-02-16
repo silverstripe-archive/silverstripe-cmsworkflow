@@ -6,6 +6,48 @@
 class SiteTreeFutureStateTest extends SapphireTest {
 	static $fixture_file = 'cmsworkflow/tests/SiteTreeFutureStateTest.yml';
 
+	function testPagesWithBothEmbargoAndExpiryAreDisplayedCorrectlyInFutureState() {
+		Versioned::reading_stage('Stage');
+		
+		$product5 = $this->objFromFixture('Page', 'embargotest');
+		
+		$product5->publish('Stage', 'Live');
+		
+		$product5->Title = 'New Title';
+		$product5->write();
+		$request = $product5->openOrNewWorkflowRequest('WorkflowPublicationRequest');
+		$product5->setEmbargo('01/06/2020', '3:00pm');
+		$product5->setExpiry('07/06/2020', '3:00pm');
+		$product5->write();
+		
+		$request = $product5->openWorkflowRequest('WorkflowPublicationRequest');
+
+		$request->approve('Looks good.');
+		
+		$prodDraft = DataObject::get_one('SiteTree', 'URLSegment = \'product-5\'');
+		$this->assertEquals($prodDraft->Title, 'New Title', 'Correct page on draft site.');
+		
+		$prodLiveNow = Versioned::get_one_by_stage('SiteTree', 'Live', 'URLSegment = \'product-5\'');
+		$this->assertEquals($prodLiveNow->Title, 'Product 5', 'Correct page on live site.');
+		
+		SiteTreeFutureState::set_future_datetime('2020-06-01 14:00:00');
+		$prodBeforeEmbargo = DataObject::get_one('SiteTree', 'URLSegment = \'product-5\'');
+		$this->assertEquals($prodBeforeEmbargo->Title, 'Product 5', 'Correct page before embargo.');
+		
+		SiteTreeFutureState::set_future_datetime('2020-06-02 16:00:00');
+		$prodAfterEmbargo = DataObject::get_one('SiteTree', 'URLSegment = \'product-5\'');
+		$this->assertEquals($prodAfterEmbargo->Title, 'New Title', 'Correct page after embargo.');
+		
+
+		SiteTreeFutureState::set_future_datetime('2020-06-07 16:00:00');
+		$prodAfterExpiry = DataObject::get_one('SiteTree', 'URLSegment = \'product-5\'');
+		$this->assertFalse($prodAfterExpiry, 'No page after expiry.');
+		
+		
+		Versioned::reading_stage('Live');
+		
+	}
+
 	function testTopLevelPagesArentAffectedByEmbargoedChildren() {
 		// The top-level items have no embargo/expiry, and so should be unaffected by the embargoes
 		// of their children
@@ -28,7 +70,7 @@ class SiteTreeFutureStateTest extends SapphireTest {
 	}
 
 
-	function testEmbargoAndExpiryAffectsRegularDataObjectRequets() {
+	function testEmbargoAndExpiryAffectsRegularDataObjectRequests() {
 		$products = $this->objFromFixture('Page', 'products');
 		
 		// The top-level items have no embargo/expiry, and so should be unaffected by the embargoes

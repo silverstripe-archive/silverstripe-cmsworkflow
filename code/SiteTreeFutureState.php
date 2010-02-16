@@ -139,6 +139,7 @@ class SiteTreeFutureState extends DataObjectDecorator {
 			self::$temp_tables[$tmpID] = DB::createTable($tmpID, array(
 				"ID" => "INT NOT NULL",
 				"Version" => "INT NOT NULL",
+				"ExpiryDate" => "DATETIME"
 			), null, array('temporary' => true));
 		}
 		
@@ -148,13 +149,8 @@ class SiteTreeFutureState extends DataObjectDecorator {
 			
 			// Insert current live data
 			DB::query("INSERT INTO \"$tempTable\"
-				SELECT \"ID\", Version FROM \"{$baseTable}_Live\"");
+				SELECT \"ID\", Version, ExpiryDate FROM \"{$baseTable}_Live\"");
 
-			// Remove expired pages
-			DB::query("DELETE FROM \"$tempTable\" WHERE \"ID\" IN
-				(SELECT \"ID\" FROM \"{$baseTable}_Live\" 
-				WHERE \"ExpiryDate\" IS NOT NULL AND \"ExpiryDate\" <= '$SQL_date')");
-				
 			// Remove pages that will be included by the embargo line below, so that we can update
 			// without duplication
 			DB::query("DELETE FROM \"$tempTable\" WHERE \"ID\" IN
@@ -163,10 +159,13 @@ class SiteTreeFutureState extends DataObjectDecorator {
 
 			// Add/update embargoed pages
 			DB::query("INSERT INTO \"$tempTable\"
-				SELECT \"WorkflowRequest\".\"PageID\", \"$baseTable\".\"Version\"
+				SELECT \"WorkflowRequest\".\"PageID\", \"$baseTable\".\"Version\", \"$baseTable\".\"ExpiryDate\"
 				FROM \"WorkflowRequest\" 
 				INNER JOIN \"$baseTable\" ON \"$baseTable\".\"ID\" = \"WorkflowRequest\".\"PageID\"
 				WHERE \"WorkflowRequest\" .\"Status\" = 'Scheduled' AND \"WorkflowRequest\" .\"EmbargoDate\" <= '$SQL_date'");
+				
+			// Remove expired pages
+			DB::query("DELETE FROM \"$tempTable\" WHERE \"ExpiryDate\" IS NOT NULL AND \"ExpiryDate\" <= '$SQL_date'");
 		}
 		
 		return self::$temp_tables[$tmpID];

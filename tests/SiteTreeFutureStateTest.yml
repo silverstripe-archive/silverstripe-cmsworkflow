@@ -37,6 +37,10 @@ Page:
         Parent: =>Page.about
     products:
         Title: Products
+    embargotest:
+        Title: Product 5
+        URLSegment: product-5
+        Sort: 5
     product1:
         Title: Product 1
         Parent: =>Page.products
