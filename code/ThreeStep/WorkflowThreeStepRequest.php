@@ -167,7 +167,7 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 		$actions = array();
 		
 		if($this->owner->Status == 'Approved' && $this->owner->Page()->canPublish()) {
-			$actions['cms_publish'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_ACTION", "Publish change");
+			$actions['cms_publish'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_ACTION", "Publish changes");
 			if (get_class($this->owner) != 'WorkflowDeletionRequest') $actions['cms_requestedit'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_REQUESTEDIT", "Request edit");
 		} elseif($this->owner->Status == 'Scheduled' && $this->owner->Page()->canApprove()) {
 			$actions['cms_requestedit'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_REQUESTEDIT", "Request edit");
