@@ -65,7 +65,7 @@ class PagesDueForReviewReport extends SSReport {
 				'title' => 'Review Date',
 				'casting' => 'Date->Full'
 			),
-			'Owner.Title' => 'Owner',
+			'OwnerName' => 'Owner',
 			'LastEditedBy.Title' => 'Last edited by',
 			'AbsoluteLink' => array(
 				'title' => 'URL',
@@ -103,7 +103,7 @@ class PagesDueForReviewReport extends SSReport {
 		
 		// Show virtual pages?
 		if(empty($params['ShowVirtualPages'])) {
-			$wheres[] = "ClassName != 'VirtualPage' AND ClassName != 'SubsitesVirtualPage'";
+			$wheres[] = '"SiteTree"."ClassName" != \'VirtualPage\' AND "SiteTree"."ClassName" != \'SubsitesVirtualPage\'';
 		}
 		
 		// We use different dropdown depending on the subsite
@@ -119,7 +119,10 @@ class PagesDueForReviewReport extends SSReport {
 		}
 		
 		$query = singleton("SiteTree")->extendedSQL(join(' AND ', $wheres));
+		$query->select[] = 'CONCAT_WS(\', \', "Owner"."Surname", "Owner"."FirstName") AS OwnerName';
 		$query->select[] = '(SELECT "URLSegment" FROM "SiteTree_Live" WHERE "SiteTree_Live"."ID" = "SiteTree"."ID") AS LiveURLSegment';
+		
+		$query->from[] = 'LEFT JOIN "Member" AS "Owner" ON "SiteTree"."OwnerID" = "Owner"."ID"';
 		
 		return $query;
 	}

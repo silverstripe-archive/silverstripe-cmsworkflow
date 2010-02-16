@@ -86,7 +86,7 @@ class PagesScheduledForDeletionReport extends SSReport {
 
 		// Filter to only those with canEdit permission
 		$filteredRecords = new DataObjectSet();
-		foreach($records as $record) {
+		if($records) foreach($records as $record) {
 			if($record->canEdit()) $filteredRecords->push($record);
 		}
 		
