@@ -68,7 +68,7 @@ class PagesDueForReviewReport extends SSReport {
 				'title' => 'Review Date',
 				'casting' => 'Date->Full'
 			),
-			'Owner.Title' => 'Owner',
+			'OwnerName' => 'Owner',
 			'LastEditedBy.Title' => 'Last edited by',
 			'AbsoluteLink' => array(
 				'title' => 'URL',
