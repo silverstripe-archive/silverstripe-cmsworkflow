@@ -35,3 +35,7 @@
 	float: left;
 	margin-right:3px;
 }
+div.expiryfield, div.embargofield {
+	overflow: hidden;
+}
+
