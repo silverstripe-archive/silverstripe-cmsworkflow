@@ -13,7 +13,7 @@ class PagesScheduledForDeletionReport extends SSReport {
 	function parameterFields() {
 		$params = new FieldSet();
 		
-		if (class_exists('Subsite') && $subsites = DataObject::get('Subsite')) {
+		if (class_exists('Subsite') && $subsites = Subsite::accessible_sites('CMS_ACCESS_CMSMain')) {
 			$options = $subsites->toDropdownMap('ID', 'Title');
 			$params->push(new TreeMultiselectField('Subsites', 'Sites', $options));
 		}

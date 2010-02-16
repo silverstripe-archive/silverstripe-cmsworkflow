@@ -85,8 +85,8 @@ class ThreeStepWorkflowPublicationRequestsNeedingApprovalReport extends SSReport
 	function parameterFields() {
 		$params = new FieldSet();
 		
-		if (class_exists('Subsite') && $subsites = DataObject::get('Subsite')) {
-			$options = $subsites->toDropdownMap('ID', 'Title', 'All sites');
+		if (class_exists('Subsite') && $subsites = Subsite::accessible_sites('CMS_ACCESS_CMSMain')) {
+			$options = $subsites->toDropdownMap('ID', 'Title');
 			$params->push(new TreeMultiselectField('Subsites', 'Sites', $options));
 		}
 		
