@@ -169,7 +169,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		if ($liveVersion && $liveVersion->ExpiryDate != null && $liveVersion->ExpiryDate != '0000-00-00 00:00:00') {
 			$tzConverter = new TZDateTimeField('ExpiryDate', 'Expiry Date', $liveVersion->ExpiryDate, SiteConfig::current_site_config()->Timezone);
 			$fields->addFieldsToTab('Root.Expiry', array(
-				new LiteralField('ExpiryWarning', "This page is scheduled to expire at ".$tzConverter->SSDatetime()->Full().', '.$tzConverter->DefaultTimezoneName().' time.')
+				new LiteralField('ExpiryWarning', "<p>This page is scheduled to expire at ".$tzConverter->SSDatetime()->Full().', '.$tzConverter->DefaultTimezoneName().' time. <a href="' . $this->ViewExpiredLink() . '">View site on date</a></p>')
 			));
 			if ($this->owner->BackLinkTracking() && $this->owner->BackLinkTracking()->Count() > 0) {
 				$fields->addFieldsToTab('Root.Expiry', array(
@@ -181,6 +181,15 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		}
 		
 		$fields->addFieldsToTab('Root.WorkflowArchive', $this->getWorkflowCMSFields());
+	}
+	
+	public function ViewExpiredLink() {
+		if(class_exists('Subsite') && $this->owner->SubsiteID) {
+			$link = 'http://' . $this->owner->Subsite()->domain();
+		} else {
+			$link = Director::absoluteBaseURL();
+		}
+		return $link . '?futureDate=' . $this->owner->dbObject('ExpiryDate')->URLDatetime();
 	}
 	
 	function BacklinkTable() {
