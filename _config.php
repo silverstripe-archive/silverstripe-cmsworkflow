@@ -3,6 +3,9 @@ Object::add_extension('SiteTree', 'SiteTreeCMSWorkflow');
 Object::add_extension('LeftAndMain', 'LeftAndMainCMSWorkflow');
 Object::add_extension('Member', 'WorkflowMemberRole');
 
+Object::add_extension('SiteTree', 'SiteTreeFutureState');
+
+
 SiteTreeCMSWorkflow::register_request('WorkflowPublicationRequest');
 SiteTreeCMSWorkflow::register_request('WorkflowDeletionRequest');
 
