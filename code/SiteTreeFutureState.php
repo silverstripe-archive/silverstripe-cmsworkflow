@@ -184,8 +184,10 @@ class SiteTreeFutureState_SilverStripeNavigatorItem extends SilverStripeNavigato
 	
 	function getMessage($page) {
 		if($datetime = SiteTreeFutureState::get_future_datetime()) {
-		
-			return "<div id=\"SilverStripeNavigatorMessage\" title=\"". _t('ContentControl.NOTEWONTBESHOWN', 'Note: this message will not be shown to your visitors') ."\">". "Viewing site in future at <br>" . $datetime . "</div>";
+			$dateObj = Object::create('Datetime');
+			$dateObj->setValue($datetime);
+			
+			return "<div id=\"SilverStripeNavigatorMessage\" title=\"". _t('ContentControl.NOTEWONTBESHOWN', 'Note: this message will not be shown to your visitors') ."\">". "Viewing site in future at <br>" . $dateObj->Nice() . "</div>";
 		}
 	}
 	
