@@ -31,9 +31,16 @@ class UnapprovedPublications3StepReport extends SSReport {
 			}
 		}
 		
-		if($sort == 'AbsoluteLink') $sort = 'URLSegment';
-		if($sort == 'Subsite.Title') $sort = 'SubsiteID';
-		if ($sort) $doSet->sort($sort);
+		if($sort) {
+			$parts = explode(' ', $sort);
+			$field = $parts[0];
+			$direction = $parts[1];
+			
+			if($field == 'AbsoluteLink') $sort = 'URLSegment ' . $direction;
+			if($field == 'Subsite.Title') $sort = 'SubsiteID ' . $direction;
+			
+			$doSet->sort($sort);
+		}
 
 		return $doSet;
 	}
