@@ -69,7 +69,7 @@ class PagesDueForReviewReport extends SSReport {
 				'casting' => 'Date->Full'
 			),
 			'OwnerName' => 'Owner',
-			'LastEditedBy.Title' => 'Last edited by',
+			'LastEditedByName' => 'Last edited by',
 			'AbsoluteLink' => array(
 				'title' => 'URL',
 				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'
@@ -120,9 +120,12 @@ class PagesDueForReviewReport extends SSReport {
 		}
 		
 		$query = singleton("SiteTree")->extendedSQL(join(' AND ', $wheres));
+		
 		$query->select[] = Member::get_title_sql('Owner').' AS OwnerName';
-
 		$query->from[] = 'LEFT JOIN "Member" AS "Owner" ON "SiteTree"."OwnerID" = "Owner"."ID"';
+		
+		$query->select[] = Member::get_title_sql('LastEditedBy').' AS LastEditedByName';
+		$query->from[] = 'LEFT JOIN "Member" AS "LastEditedBy" ON "SiteTree"."LastEditedByID" = "LastEditedBy"."ID"';
 		
 		// Turn a query into records
 		if($sort) $query->orderby = $sort;
