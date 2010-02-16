@@ -292,6 +292,18 @@ autoSave = function(confirmation, callAfter) {
 	return autoSave_original(confirmation, callAfter);
 }
 
+var save_original = CMSForm.prototype.save;
+CMSForm.prototype.save = function(ifChanged, callAfter, action, publish) {
+	if (EmbargoExpiry.embargoUnsaved || EmbargoExpiry.expiryUnsaved) {
+		if (!confirm('Your embargo/expiry date changes have not been saved. Do you wish to continue?')) {
+			_AJAX_LOADING = false;
+			if($('Form_EditForm_action_save') && $('Form_EditForm_action_save').stopLoading) $('Form_EditForm_action_save').stopLoading();
+			return false;
+		}
+	}
+	return save_original.call(this, ifChanged, callAfter, action, publish);
+}
+
 function action_publish_right(e) {
 	var messageEl = null;
 	if (CMSWorkflow.getOption('noPromptForAdmin')) {
