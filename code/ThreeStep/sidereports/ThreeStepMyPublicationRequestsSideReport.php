@@ -5,7 +5,7 @@
  * @package cmsworkflow
  * @subpackage ThreeStep
  */
-class ThreeStepMyPublicationRequestsSideReport extends SideReport {
+class ThreeStepMyPublicationRequestsSideReport extends SSReport {
 	function title() {
 		return _t('ThreeStepMyPublicationRequestsSideReport.TITLE',"Publication requests I have made");
 	}
@@ -15,17 +15,17 @@ class ThreeStepMyPublicationRequestsSideReport extends SideReport {
 	function sort() {
 		return -200;
 	}
-	function records() {
+	function sourceRecords($params) {
 		return WorkflowThreeStepRequest::get_by_author(
 			'WorkflowPublicationRequest',
 			Member::currentUser(),
 			array('AwaitingApproval', 'Approved')
 		);
 	}
-	function fieldsToShow() {
+	function columns() {
 		return array(
 			"Title" => array(
-				"source" => "Title",
+				"title" => "Title",
 				"link" => true,
 			),
 		);

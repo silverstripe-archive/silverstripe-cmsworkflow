@@ -28,8 +28,30 @@ Director::addRules(200, array(
 unset(CMSBatchActionHandler::$batch_actions['publish']);
 
 
+// Register main reports
 SSReport::register('ReportAdmin', 'PagesDueForReviewReport');
 SSReport::register('ReportAdmin', 'PagesScheduledForDeletionReport');
 SSReport::register('ReportAdmin', 'PagesScheduledForPublishingReport');
+
+SSReport::register('ReportAdmin', 'ThreeStepMyDeletionRequestsSideReport');
+SSReport::register('ReportAdmin', 'ThreeStepMyPublicationRequestsSideReport');
+SSReport::register('ReportAdmin', 'ThreeStepWorkflowPublicationRequestsNeedingApprovalSideReport');
+SSReport::register('ReportAdmin', 'ThreeStepWorkflowPublicationRequestsNeedingPublishingSideReport');
+SSReport::register('ReportAdmin', 'ThreeStepWorkflowRemovalRequestsNeedingApprovalSideReport');
+SSReport::register('ReportAdmin', 'ThreeStepWorkflowRemovalRequestsNeedingPublishingSideReport');
+SSReport::register('ReportAdmin', 'MyTwoStepDeletionRequestsSideReport');
+SSReport::register('ReportAdmin', 'MyTwoStepPublicationRequestsSideReport');
+SSReport::register('ReportAdmin', 'MyTwoStepWorkflowRequestsSideReport');
+
+// Register site reports
+SSReport::register('SideReport', 'ThreeStepMyDeletionRequestsSideReport');
+SSReport::register('SideReport', 'ThreeStepMyPublicationRequestsSideReport');
+SSReport::register('SideReport', 'ThreeStepWorkflowPublicationRequestsNeedingApprovalSideReport');
+SSReport::register('SideReport', 'ThreeStepWorkflowPublicationRequestsNeedingPublishingSideReport');
+SSReport::register('SideReport', 'ThreeStepWorkflowRemovalRequestsNeedingApprovalSideReport');
+SSReport::register('SideReport', 'ThreeStepWorkflowRemovalRequestsNeedingPublishingSideReport');
+SSReport::register('SideReport', 'MyTwoStepDeletionRequestsSideReport');
+SSReport::register('SideReport', 'MyTwoStepPublicationRequestsSideReport');
+SSReport::register('SideReport', 'MyTwoStepWorkflowRequestsSideReport');
 
 ?>

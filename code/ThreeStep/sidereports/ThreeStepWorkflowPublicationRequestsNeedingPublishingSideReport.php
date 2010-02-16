@@ -5,15 +5,15 @@
  * @package cmsworkflow
  * @subpackage ThreeStep
  */
-class ThreeStepWorkflowPublicationRequestsNeedingPublishingSideReport extends SideReport {
+class ThreeStepWorkflowPublicationRequestsNeedingPublishingSideReport extends SSReport {
 	function title() {
 		return _t('ThreeStepWorkflowPublicationRequestsNeedingPublishingSideReport.TITLE',"Publication requests I need to publish");
 	}
 	function group() {
 		return "Workflow reports";
 	}
-	function records() {
-		if (ClassInfo::exists('Subsite') && isset($this->params['AllSubsites'])) {
+	function sourceRecords($params) {
+		if (ClassInfo::exists('Subsite') && isset($params['AllSubsites'])) {
 			$oldSSFilterState = Subsite::$disable_subsite_filter;
 			Subsite::$disable_subsite_filter = true;
 		}
@@ -37,62 +37,31 @@ class ThreeStepWorkflowPublicationRequestsNeedingPublishingSideReport extends Si
 			}
 		}
 		
-		if (ClassInfo::exists('Subsite') && isset($this->params['AllSubsites'])) {
+		if (ClassInfo::exists('Subsite') && isset($params['AllSubsites'])) {
 			Subsite::$disable_subsite_filter = $oldSSFilterState;
 		}
 		
 		return $doSet;
 	}
+
 	function sort() {
 		return 300;
 	}
 
-	function records() {
-		if (ClassInfo::exists('Subsite') && isset($this->params['AllSubsites'])) {
-			$oldSSFilterState = Subsite::$disable_subsite_filter;
-			Subsite::$disable_subsite_filter = true;
-		}
-		
-		$res = WorkflowThreeStepRequest::get_by_publisher(
-			'WorkflowPublicationRequest',
-			Member::currentUser(),
-			array('Approved')
-		);
-		$doSet = new DataObjectSet();
-		foreach ($res as $result) {
-			if ($wf = $result->openWorkflowRequest()) {
-				if (!$result->canPublish()) continue;
-				$result->WFAuthorID = $wf->AuthorID;
-				$result->WFApproverEmail = $wf->Approver()->Email;
-				$result->WFApprovedWhen = $wf->ApprovalDate();
-				$result->WFApproverID = $wf->ApproverID;
-				$result->WFPublisherID = $wf->PublisherID;
-				if (isset($_REQUEST['OnlyMine']) && $result->WFApproverID != Member::currentUserID()) continue;
-				$doSet->push($result);
-			}
-		}
-		
-		if (ClassInfo::exists('Subsite') && isset($this->params['AllSubsites'])) {
-			Subsite::$disable_subsite_filter = $oldSSFilterState;
-		}
-		
-		return $doSet;
-	}
-
-	function fieldsToShow() {
+	function columns() {
 		return array(
 			"Title" => array(
-				"source" => array("NestedTitle", array("2")),
+				"title" => "Title",
 				"link" => true,
 			),
-			"Author" => array(
-				"prefix" => 'Approved by ',
-				"source" => "WFApproverEmail",
+			"WFApproverEmail" => array(
+				"title" => "Author",
+				"formatting" => 'Approved by $value',
 				"link" => false,
 			),
-			"When" => array(
-				"prefix" => ' on ',
-				"source" => "WFApprovedWhen",
+			"WFApprovedWhen" => array(
+				"title" => "When",
+				"formatting" => ' on $value',
 				"link" => false,
 			)
 		);

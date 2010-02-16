@@ -5,7 +5,7 @@
  * @package cmsworkflow
  * @subpackage ThreeStep
  */
-class ThreeStepWorkflowRemovalRequestsNeedingPublishingSideReport extends SideReport {
+class ThreeStepWorkflowRemovalRequestsNeedingPublishingSideReport extends SSReport {
 	function title() {
 		return _t('ThreeStepWorkflowRemovalRequestsNeedingPublishingSideReport.TITLE',"Removal requests I need to publish");
 	}
@@ -15,8 +15,8 @@ class ThreeStepWorkflowRemovalRequestsNeedingPublishingSideReport extends SideRe
 	function sort() {
 		return 400;
 	}
-	function records() {
-		if (ClassInfo::exists('Subsite') && isset($this->params['AllSubsites'])) {
+	function sourceRecords($params) {
+		if (ClassInfo::exists('Subsite') && isset($params['AllSubsites'])) {
 			$oldSSFilterState = Subsite::$disable_subsite_filter;
 			Subsite::$disable_subsite_filter = true;
 		}
@@ -40,33 +40,31 @@ class ThreeStepWorkflowRemovalRequestsNeedingPublishingSideReport extends SideRe
 			}
 		}
 		
-		if (ClassInfo::exists('Subsite') && isset($this->params['AllSubsites'])) {
+		if (ClassInfo::exists('Subsite') && isset($params['AllSubsites'])) {
 			Subsite::$disable_subsite_filter = $oldSSFilterState;
 		}
 		
 		return $doSet;
 	}
-	
-	function fieldsToShow() {
+
+	function columns() {
 		return array(
 			"Title" => array(
-				"source" => array("NestedTitle", array("2")),
+				"title" => "Title",
 				"link" => true,
 			),
-			"Author" => array(
-				"prefix" => 'Approved by ',
-				"source" => "WFApproverEmail",
-				"link" => false,
+			"WFApproverEmail" => array(
+				"formatting" => 'Approved by $value',
+				"title" => "Author",
 			),
-			"When" => array(
-				"prefix" => ' on ',
-				"source" => "WFApprovedWhen",
-				"link" => false,
+			"WFApprovedWhen" => array(
+				"formatting" => ' on $value',
+				"title" => "When",
 			)
 		);
 	}
 
-	function getParameterFields() {
+	function parameterFields() {
 		if (ClassInfo::exists('Subsite')) {
 			return new FieldSet(
 				new CheckboxField('AllSubsites', 'All subsites')

@@ -5,7 +5,7 @@
  * @package cmsworkflow
  * @subpackage ThreeStep
  */
-class ThreeStepMyDeletionRequestsSideReport extends SideReport {
+class ThreeStepMyDeletionRequestsSideReport extends SSReport {
 	function title() {
 		return _t('ThreeStepMyDeletionRequestsSideReport.TITLE',"Removal requests I have made");
 	}
@@ -15,7 +15,7 @@ class ThreeStepMyDeletionRequestsSideReport extends SideReport {
 	function sort() {
 		return -100;
 	}
-	function records() {
+	function sourceRecords($params) {
 		// Set stage, otherwise, we won't get any results
 		$currentStage = Versioned::current_stage();
 		Versioned::reading_stage(Versioned::get_live_stage());
@@ -28,10 +28,10 @@ class ThreeStepMyDeletionRequestsSideReport extends SideReport {
 		Versioned::reading_stage($currentStage);
 		return $result;
 	}
-	function fieldsToShow() {
+	function columns() {
 		return array(
 			"Title" => array(
-				"source" => array("NestedTitle", array("2")),
+				"title" => "Title",
 				"link" => true,
 			)
 		);

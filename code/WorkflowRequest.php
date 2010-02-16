@@ -618,8 +618,8 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 			"SiteTree", 
 			$filter, 
 			"{$bt}SiteTree{$bt}.{$bt}LastEdited{$bt} DESC",
-			"LEFT JOIN {$bt}WorkflowRequest{$bt} ON {$bt}WorkflowRequest{$bt}.{$bt}PageID{$bt} = {$bt}SiteTree{$bt}.{$bt}ID}$bt} " .
-			"LEFT JOIN {$bt}WorkflowRequest_Publishers{$bt} ON {$bt}WorkflowRequest{$bt}.[$bt}ID{$bt} = {$bt}WorkflowRequest_Publishers{$bt}.{$bt}WorkflowRequestID{$bt}"
+			"LEFT JOIN {$bt}WorkflowRequest{$bt} ON {$bt}WorkflowRequest{$bt}.{$bt}PageID{$bt} = {$bt}SiteTree{$bt}.{$bt}ID{$bt} " .
+			"LEFT JOIN {$bt}WorkflowRequest_Publishers{$bt} ON {$bt}WorkflowRequest{$bt}.{$bt}ID{$bt} = {$bt}WorkflowRequest_Publishers{$bt}.{$bt}WorkflowRequestID{$bt}"
 		);
 	}
 	
