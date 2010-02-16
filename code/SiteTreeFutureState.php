@@ -11,19 +11,16 @@ class SiteTreeFutureState extends DataObjectDecorator {
 	 */
 	static function set_future_datetime($datetime) {
 		if($datetime) {
-			Versioned::reset();
-			Session::set('currentStage', "Stage");
-			Versioned::reading_stage("Stage");
+			Versioned::set_reading_mode('FutureState.' . $datetime);
 		}
-		
-		self::$future_datetime = $datetime;
 	}
 	
 	/**
 	 * Return the currently viewed future datetime
 	 */
 	static function get_future_datetime() {
-		return self::$future_datetime;
+		$parts = explode('.', Versioned::get_reading_mode());
+		if($parts[0] == 'FutureState') return $parts[1];
 	}
 
 	/**
@@ -32,21 +29,17 @@ class SiteTreeFutureState extends DataObjectDecorator {
 	 * session.
 	 */
 	static function choose_future_datetime() {
-		if(!empty($_GET['stage']) || !empty($_GET['archiveDate'])) {
-			Session::set('futureDate', null);
-
-		} else if(isset($_GET['futureDate'])) {
+		$date = false;
+		
+		if(empty($_GET['stage']) && empty($_GET['archiveDate']) && isset($_GET['futureDate'])) {
 			if($time = strtotime($_GET['futureDate'])) $date = date('Y-m-d H:i:s', $time);
-			else $date = null;
-			
-			Session::set('futureDate', $date);
 		}
 		
-		if(Session::get('futureDate')) {
-			self::set_future_datetime(Session::get('futureDate'));
+		if($date) {
+			Session::set('readingMode', 'FutureState.' . $date);
+			self::set_future_datetime($date);
 			Cookie::set('bypassStaticCache', '1', 0);
 		} else {
-			self::set_future_datetime(null);
 			if(Versioned::current_stage() == 'Live') {
 				Cookie::set('bypassStaticCache', null, 0);
 			}
@@ -69,8 +62,7 @@ class SiteTreeFutureState extends DataObjectDecorator {
 	 * Amend the query to select from a future date if necessary.
 	 */
 	function augmentSQL(SQLQuery &$query) {
-		$currentStage = Versioned::current_stage();
-		if(($datetime = self::$future_datetime) && ($currentStage == 'Stage' || !$currentStage)) {
+		if($datetime = self::get_future_datetime()) {
 			foreach($query->from as $table => $dummy) {
 				if(!isset($baseTable)) {
 					$baseTable = $table;
@@ -175,8 +167,8 @@ class SiteTreeFutureState extends DataObjectDecorator {
 	 * Return a piece of text to keep DataObject cache keys appropriately specific
 	 */
 	function cacheKeyComponent() {
-		if(self::$future_datetime) {
-			return 'future-'.str_replace(array(' ',':','-'),'',self::$future_datetime);
+		if(self::get_future_datetime()) {
+			return 'future-'.str_replace(array(' ',':','-'),'',self::get_future_datetime());
 		}
 	}
 
