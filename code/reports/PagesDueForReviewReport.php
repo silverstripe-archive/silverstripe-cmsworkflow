@@ -103,13 +103,13 @@ class PagesDueForReviewReport extends SSReport {
 		
 		if(empty($params['ReviewDateBefore']) && empty($params['ReviewDateAfter'])) {
 			// If there's no review dates set, default to all pages due for review now
-			$wheres[] = 'NextReviewDate <= \'' . SSDatetime::now()->URLDate() . '\'';
+			$wheres[] = 'NextReviewDate < \'' . SSDatetime::now()->URLDate() . '\' + INTERVAL 1 DAY';
 		} else {
 			// Review date before
 			if(!empty($params['ReviewDateBefore'])) {
 				list($day, $month, $year) = explode('/', $_REQUEST['ReviewDateBefore']);
 				$reviewDate = "$year-$month-$day";
-				$wheres[] = 'NextReviewDate <= \'' . Convert::raw2sql($reviewDate) . '\'';
+				$wheres[] = 'NextReviewDate < \'' . Convert::raw2sql($reviewDate) . '\' + INTERVAL 1 DAY';
 			}
 			
 			// Review date after
