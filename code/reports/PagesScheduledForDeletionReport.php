@@ -16,6 +16,8 @@ class PagesScheduledForDeletionReport extends SSReport {
 		$params->push($startDate = new PopupDateTimeField('StartDate', 'Start date'));
 		$params->push($endDate = new PopupDateTimeField('EndDate', 'End date'));
 		$endDate->defaultToEndOfDay();
+		$startDate->allowOnlyTime(false);
+		$endDate->allowOnlyTime(false);
 		
 		return $params;
 	}
@@ -34,7 +36,11 @@ class PagesScheduledForDeletionReport extends SSReport {
 			'AbsoluteLink' => array(
 				'title' => 'URL',
 				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'
-			)
+			),
+			"BacklinkCount" => array(
+				"title" => "Incoming links",
+				'formatting' => '".($value ? "<a href=\"admin/show/$ID#Root_Expiry\" title=\"View backlinks\">yes, $value</a>" : "no") . "'
+			),
 		);
 		
 		return $fields;
@@ -92,6 +98,7 @@ class PagesScheduledForDeletionReport extends SSReport {
 		// Filter to only those with canEdit permission
 		$filteredRecords = new DataObjectSet();
 		if($records) foreach($records as $record) {
+			$record->BacklinkCount = $record->BackLinkTracking()->Count();
 			if($record->canEdit()) $filteredRecords->push($record);
 		}
 		
