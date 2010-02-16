@@ -60,6 +60,24 @@ Page:
         Sort: 4
     contact:
         Title: Contact Us
+    virtuals:
+        Title: Virtuals
+        Parent: =>Page.about
+
+VirtualPage:
+   vproduct1:
+      CopyContentFrom: =>Page.product1
+      Parent: =>Page.virtuals
+      Sort: 1
+   vproduct2:
+      CopyContentFrom: =>Page.product2
+      Parent: =>Page.virtuals
+      Sort: 2
+   vproduct4:
+      CopyContentFrom: =>Page.product4
+      Parent: =>Page.virtuals
+      Sort: 4
+      
         
 ErrorPage:
     404:

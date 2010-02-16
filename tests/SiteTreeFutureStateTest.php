@@ -133,17 +133,84 @@ class SiteTreeFutureStateTest extends SapphireTest {
 		
 		$this->assertEquals('New About Us', $aboutStage->Title);
 		$this->assertEquals('About Us', $aboutLive->Title);
+	}
+	
+	/**
+	 * Test virtual pages for future state
+	 */
+	function testVirtualPageFutureState() {
+		$virtuals = $this->objFromFixture('Page', 'virtuals');
+
+		$this->assertEquals(array('Product 1', 'Product 2'),
+			$virtuals->Children()->column("Title"));
+
+		// Test embargo - the draft-only VP, Product 4, is *not* auto-published
+		SiteTreeFutureState::set_future_datetime('2020-01-01 10:30:00');
+		$virtuals->flushCache();
+
+		$this->assertEquals(array('Product 1', 'Product 2'),
+			$virtuals->Children()->column("Title"));
+
+		// Test expiry - Product 2 is auto-removed
+		SiteTreeFutureState::set_future_datetime('2020-01-01 11:30:00');
+		$virtuals->flushCache();
+
+		$this->assertEquals(array('Product 1'),
+			$virtuals->Children()->column("Title"));
 		
 	}
+
+	/**
+	 * Test embargo edits for both regular and virtual pages.
+	 */
+	function testEmbargoedEdit() {
+		// Make an edit
+		Versioned::reading_stage('Stage');
+		$product1 = $this->objFromFixture('Page', 'product1');
+		$product1->Title = "New Product 1";
+		$product1->write();
+
+		// Embargo the change
+		$wf = $product1->openOrNewWorkflowRequest('WorkflowPublicationRequest');
+		$wf->EmbargoDate = '2019-01-01 10:00:00';
+		$wf->approve("Approved");
+
+		// Verify that the change isn't currently on the live site (just in case a bug meant that
+		// the change was insta-published
+		Versioned::reading_stage('Live');
+		singleton('Page')->flushCache();
+
+		$p1 = $this->objFromFixture('Page', 'product1');
+		$vp1 = $this->objFromFixture('VirtualPage', 'vproduct1');
+
+		$this->assertEquals('Product 1', $p1->Title);
+		$this->assertEquals('Product 1', $vp1->Title);
+
+		// Verify the the change is reflected in both the source page and its virtual
+		SiteTreeFutureState::set_future_datetime('2019-01-01 10:30:00');
+		singleton('Page')->flushCache();
+		
+		Debug::message("VProduct1: " . $this->idFromFixture('VirtualPage', 'vproduct1'));
+		
+		$p1 = $this->objFromFixture('Page', 'product1');
+		$vp1 = $this->objFromFixture('VirtualPage', 'vproduct1');
+		
+		$this->assertEquals('New Product 1', $p1->Title);
+		$this->assertEquals('New Product 1', $vp1->Title);
+	}	
 	
 	function setUp() {
 		parent::setUp();
 		
 		// Publish all but the embargoed content and switch view to Live
 		$pages = array('home', 'about', 'staff', 'staffduplicate','products', 'product1', 
-			'product2', 'contact');
+			'product2', 'contact', 'virtuals');
 		foreach($pages as $page) $this->objFromFixture('Page', $page)->doPublish();
+
 		$this->objFromFixture('ErrorPage', 404)->doPublish();
+		$this->objFromFixture('VirtualPage', 'vproduct1')->doPublish();
+		$this->objFromFixture('VirtualPage', 'vproduct2')->doPublish();
+
 
 		Versioned::reading_stage('Live');
 	}

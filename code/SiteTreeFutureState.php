@@ -158,6 +158,30 @@ class SiteTreeFutureState extends DataObjectDecorator {
 				
 			// Remove expired pages
 			DB::query("DELETE FROM \"$tempTable\" WHERE \"ExpiryDate\" IS NOT NULL AND \"ExpiryDate\" <= '$SQL_date'");
+
+			// Remove expired subsite pages
+			DB::query("DELETE FROM \"$tempTable\" WHERE \"ExpiryDate\" IS NOT NULL AND \"ExpiryDate\" <= '$SQL_date'");
+
+			// Add/update embargoed Virtual pages - if the VP already exists on the live site
+			if($baseTable == 'SiteTree') {
+				// Remove existing items to prevent duplication
+				DB::query("DELETE FROM \"$tempTable\" WHERE \"ID\" IN (
+					SELECT \"VirtualPage\".\"ID\"
+					FROM \"WorkflowRequest\" 
+					INNER JOIN \"VirtualPage\" ON \"VirtualPage\".\"CopyContentFromID\" = \"WorkflowRequest\".\"PageID\"
+					INNER JOIN \"{$baseTable}_Live\" ON \"VirtualPage\".\"ID\" = \"{$baseTable}_Live\".\"ID\"
+					WHERE \"WorkflowRequest\" .\"Status\" = 'Scheduled' AND \"WorkflowRequest\" .\"EmbargoDate\" <= '$SQL_date')");
+					
+				// Then insert new ones
+				DB::query("INSERT INTO \"$tempTable\"
+					SELECT \"VirtualPage\".\"ID\", \"$baseTable\".\"Version\", \"$baseTable\".\"ExpiryDate\"
+					FROM \"WorkflowRequest\" 
+					INNER JOIN \"VirtualPage\" ON \"VirtualPage\".\"CopyContentFromID\" = \"WorkflowRequest\".\"PageID\"
+					INNER JOIN \"$baseTable\" ON \"$baseTable\".\"ID\" = \"VirtualPage\".\"ID\"
+					INNER JOIN \"{$baseTable}_Live\" ON \"$baseTable\".\"ID\" = \"{$baseTable}_Live\".\"ID\"
+					WHERE \"WorkflowRequest\" .\"Status\" = 'Scheduled' AND \"WorkflowRequest\" .\"EmbargoDate\" <= '$SQL_date'");
+			}
+				
 		}
 		
 		return self::$temp_tables[$tmpID];
