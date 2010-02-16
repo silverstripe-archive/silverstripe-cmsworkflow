@@ -30,7 +30,7 @@ class PagesScheduledForDeletionReport extends SSReport {
 			'Title' => 'Title',
 			'ExpiryDate' => array(
 				'title' => 'Will be deleted at',
-				'casting' => 'SSDatetime->Nice'
+				'casting' => 'SSDatetime->Full'
 			),
 			'ID' => array(
 				'title' => 'Actions',

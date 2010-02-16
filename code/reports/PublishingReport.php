@@ -10,7 +10,7 @@ class PublishingReport extends SSReport {
 			'PageTitle' => 'Page Title',
 			'Published' => array(
 				'title' => 'Published',
-				'casting' => 'SSDatetime->Nice'
+				'casting' => 'SSDatetime->Full'
 			),
 			'PublisherEmail' => 'Publisher',
 			'AbsoluteLink' => array(

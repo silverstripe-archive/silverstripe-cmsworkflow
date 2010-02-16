@@ -168,7 +168,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		$liveVersion = Versioned::get_one_by_stage('SiteTree', 'Live', "SiteTree_Live.ID = {$this->owner->ID}");
 		if ($liveVersion && $liveVersion->ExpiryDate != null && $liveVersion->ExpiryDate != '0000-00-00 00:00:00') {
 			$fields->addFieldsToTab('Root.** Expiry **', array(
-				new LiteralField('ExpiryWarning', "This page is scheduled to expire at ".$liveVersion->ExpiryDate)
+				new LiteralField('ExpiryWarning', "This page is scheduled to expire at ".$liveVersion->dbObject('ExpiryDate')->Full())
 			));
 			if ($this->owner->BackLinkTracking() && $this->owner->BackLinkTracking()->Count() > 0) {
 				$fields->addFieldsToTab('Root.** Expiry **', array(
@@ -234,7 +234,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			"DiffLinkToLastPublished" => '<a href=\"$value\" target=\"_blank\" class=\"externallink\">' . $diffLinkTitle . '</a>'
 		));
 		$closedRequestsTF->setFieldCasting(array(
-			'Created' => 'SSDatetime->Nice'
+			'Created' => 'SSDatetime->Full'
 		));
 		$closedRequestsTF->setCustomSourceItems($closedRequests);
 		$fields->push($closedRequestsTF);
