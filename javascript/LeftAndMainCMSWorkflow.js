@@ -152,9 +152,9 @@ var EmbargoExpiry = {
 				if (data.status == 'success') {
 					$(ids.wholeMessage).style.display = 'block';
 					$(ids.dateTime).innerHTML = eval('data.message.'+what);
-				} else { EmbargoExpiry.error(t); }
+				} else { EmbargoExpiry.errorAlert(data); }
 			},
-			onFailure: function(t) { EmbargoExpiry.error(t); },
+			onFailure: function(t) { EmbargoExpiry.errorAlert(data); },
 			onComplete: function(t) { $(el.id).className = 'action'; }
 		});	
 	},
@@ -177,18 +177,19 @@ var EmbargoExpiry = {
 		new Ajax.Request(url, {
 			method: 'get',
 			onSuccess: function(t) {
-				data = eval('('+t.responseText+')');
 				if (data.status == 'success') {
 					$(ids.wholeMessage).style.display = 'none';
-				} else { EmbargoExpiry.error(t); }
+				} else {
+					EmbargoExpiry.errorAlert(data);
+				}
 			},
-			onFailure: function(t) { EmbargoExpiry.error(t); },
+			onFailure: function(t) { EmbargoExpiry.errorAlert(t); },
 			onComplete: function(t) { $(el.id).className = 'action'; }
 		});
 	},
-	error: function(transport) {
+	errorAlert: function(data) {
 		EmbargoExpiry.fieldCheck();
-		alert('There was an error processing that request.');
+		alert("There was an error processing that request:\n\n"+data.message);
 	},
 	ids: function(forWhat) {
 		switch(forWhat) {

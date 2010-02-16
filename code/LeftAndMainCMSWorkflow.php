@@ -36,36 +36,61 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 						'status' => 'success'
 					);
 				} else {
+					$expiryTimestamp = $embargoTimestamp = null;
 					if (isset($data['EmbargoDate']) && isset($data['EmbargoTime'])) {
-						list($day, $month, $year) = explode('/', $data['EmbargoDate']);
-						$embargoTimestamp = strtotime("$year-$month-$day {$data['EmbargoTime']}");
-						if ($wfRequest->EmbargoField()) {
-							$wfRequest->EmbargoDate = $embargoTimestamp;
-							$wfRequest->write();
+						if (count(explode('/', $data['EmbargoDate'])) >= 3) {
+							list($day, $month, $year) = explode('/', $data['EmbargoDate']);
+							$embargoTimestamp = strtotime("$year-$month-$day {$data['EmbargoTime']}");
 						}
 					}
 					
 					if (isset($data['ExpiryDate']) && isset($data['ExpiryTime'])) {
-						list($day, $month, $year) = explode('/', $data['ExpiryDate']);
-						$expiryTimestamp = strtotime("$year-$month-$day {$data['ExpiryTime']}");
-						if ($wfRequest->ExpiryField()) {
-							$wfRequest->Page()->ExpiryDate = $expiryTimestamp;
-							$wfRequest->Page()->write();
+						if (count(explode('/', $data['ExpiryDate'])) >= 3) {
+							list($day, $month, $year) = explode('/', $data['ExpiryDate']);
+							$expiryTimestamp = strtotime("$year-$month-$day {$data['ExpiryTime']}");
 						}
 					}
 					
-					$expiryTimestamp = $wfRequest->getExpiryDate();
-					$embargoTimestamp = $wfRequest->getEmbargoDate();
-					if (!is_numeric($expiryTimestamp)) $expiryTimestamp = strtotime($expiryTimestamp);
-					if (!is_numeric($embargoTimestamp)) $embargoTimestamp = strtotime($embargoTimestamp);
+					// Validation time
+					$error = false;
+					if (isset($data['EmbargoDate']) && !$embargoTimestamp) {
+						$error = "Embargo date is not valid";
+					} else if (isset($data['ExpiryDate']) && !$expiryTimestamp) {
+						$error = "Expiry date is not valid";
+					} else if ($embargoTimestamp < time()) {
+						$error = "Embargo date must be AFTER the current server time";
+					} else if ($embargoTimestamp && $embargoTimestamp > $expiryTimestamp) {
+						$error = "Embargo date must be AFTER the expiry date";
+					} else {
+						if ($embargoTimestamp && $wfRequest->EmbargoField()) {
+							$wfRequest->EmbargoDate = $embargoTimestamp;
+							$wfRequest->write();
+						}
+						if ($expiryTimestamp && $wfRequest->ExpiryField()) {
+							$wfRequest->Page()->ExpiryDate = $expiryTimestamp;
+							$wfRequest->Page()->write();
+						}
 					
-					$result = array(
-						'status' => 'success',
-						'message' => array(
-							'embargo' => $embargoTimestamp ? date('Y-m-d H:i:s', $embargoTimestamp) : null,
-							'expiry' => $expiryTimestamp ? date('Y-m-d H:i:s', $expiryTimestamp) : null
-						)
-					);
+						$expiryTimestamp = $wfRequest->getExpiryDate();
+						$embargoTimestamp = $wfRequest->getEmbargoDate();
+						if (!is_numeric($expiryTimestamp)) $expiryTimestamp = strtotime($expiryTimestamp);
+						if (!is_numeric($embargoTimestamp)) $embargoTimestamp = strtotime($embargoTimestamp);
+						
+						$result = array(
+							'status' => 'success',
+							'message' => array(
+								'embargo' => $embargoTimestamp ? date('Y-m-d H:i:s', $embargoTimestamp) : null,
+								'expiry' => $expiryTimestamp ? date('Y-m-d H:i:s', $expiryTimestamp) : null
+							)
+						);
+					}
+					
+					if ($error) {
+						$result = array(
+							'status' => 'failed',
+							'message' => $error
+						);
+					}
 				}
 			}
 		} else {
