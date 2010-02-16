@@ -183,11 +183,17 @@ class SiteTreeFutureState_SilverStripeNavigatorItem extends SilverStripeNavigato
 	}
 	
 	function getMessage($page) {
-		if($datetime = SiteTreeFutureState::get_future_datetime()) {
+		if($date = SiteTreeFutureState::get_future_datetime()) {
 			$dateObj = Object::create('Datetime');
-			$dateObj->setValue($datetime);
+			$dateObj->setValue($date);
 			
 			return "<div id=\"SilverStripeNavigatorMessage\" title=\"". _t('ContentControl.NOTEWONTBESHOWN', 'Note: this message will not be shown to your visitors') ."\">". "Viewing site in future at <br>" . $dateObj->Nice() . "</div>";
+		}
+	}
+	
+	function getLink($page) {
+		if($date = SiteTreeFutureState::get_future_datetime()) {
+			return $page->AbsoluteLink() . '?futureDate=' . $date;
 		}
 	}
 	
