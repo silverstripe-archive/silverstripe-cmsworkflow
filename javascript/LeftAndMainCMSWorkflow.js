@@ -282,14 +282,14 @@ Behaviour.register({
 	'#ExpiryDate_Time' : { onchange: EmbargoExpiry.expiryChange }
 });
 
-var autoSave_before_tom_fucked_with_it = autoSave;
+var autoSave_original = autoSave;
 autoSave = function(confirmation, callAfter) {
 	if (EmbargoExpiry.embargoUnsaved || EmbargoExpiry.expiryUnsaved) {
 		if (!confirm('Your embargo/expiry date changes have not been saved. Do you wish to continue?')) {
 			return false;
 		}
 	}
-	return autoSave_before_tom_fucked_with_it(confirmation, callAfter);
+	return autoSave_original(confirmation, callAfter);
 }
 
 function action_publish_right(e) {
