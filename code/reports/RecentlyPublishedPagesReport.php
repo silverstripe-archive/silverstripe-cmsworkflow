@@ -85,8 +85,19 @@ class RecentlyPublishedPagesReport extends SSReport {
 			$q->where[] = "WorkflowRequest.LastEdited >= '".SSDatetime::now()->URLDate()."'";
 		}
 		
+		
 		// Turn a query into records
-		if($sort) $q->orderby = $sort;
+		if($sort) {
+			$parts = explode(' ', $sort);
+			$field = $parts[0];
+			$direction = $parts[1];
+			
+			if($field == 'AbsoluteLink') {
+				$sort = 'URLSegment ' . $direction;
+			}
+		
+			$q->orderby = $sort;
+		}
 		$records = singleton('SiteTree')->buildDataObjectSet($q->execute(), 'DataObjectSet', $q);
 
 		// Apply limit after that filtering.
