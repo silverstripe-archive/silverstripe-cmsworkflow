@@ -79,7 +79,7 @@ class PagesDueForReviewReport extends SSReport {
 		return $fields;
 	}
 		
-	function sourceQuery($params) {
+	function sourceRecords($params, $sort, $limit) {
 		$wheres = array();
 		
 		
@@ -101,8 +101,6 @@ class PagesDueForReviewReport extends SSReport {
 				$wheres[] = 'NextReviewDate >= \'' . Convert::raw2sql($reviewDate) . '\'';
 			}
 		}
-		
-
 		
 		// Show virtual pages?
 		if(empty($params['ShowVirtualPages'])) {
@@ -126,7 +124,19 @@ class PagesDueForReviewReport extends SSReport {
 
 		$query->from[] = 'LEFT JOIN "Member" AS "Owner" ON "SiteTree"."OwnerID" = "Owner"."ID"';
 		
-		return $query;
+		// Turn a query into records
+		if($sort) $query->orderby = $sort;
+		$records = singleton('SiteTree')->buildDataObjectSet($query->execute(), 'DataObjectSet', $query);
+
+		// Filter to only those with canEdit permission
+		$filteredRecords = new DataObjectSet();
+		if($records) foreach($records as $record) {
+			$filteredRecords->push($record);
+		}
+		
+		// Apply limit after that filtering.
+		if($limit) return $filteredRecords->getRange($limit['start'], $limit['limit']);
+		else return $filteredRecords;
 	}
 }
 
