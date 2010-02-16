@@ -103,15 +103,6 @@ class PagesScheduledForPublishingReport extends SSReport {
 		return $fields;
 	}
 	
-	function sortColumns() {
-		//  sort by site and by time and by approver
-		return array(
-			'Subsite.Title',
-			'openWorkflowRequest.EmbargoDate',
-			'openWorkflowRequest.Approver.Title'
-		);
-	}
-	
 	function parameterFields() {
 		$params = new FieldSet();
 		

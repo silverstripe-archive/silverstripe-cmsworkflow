@@ -10,7 +10,7 @@ class ThreeStepWorkflowPublicationRequestsNeedingApprovalReport extends SSReport
 		return _t('ThreeStepWorkflowPublicationRequestsNeedingApprovalReport.TITLE',"Workflow: publication requests I need to approve");
 	}
 	
-	function sourceRecords($params) {
+	function sourceRecords($params, $sort, $limit) {
 		
 		if(!empty($params['Subsites'])) {
 			// 'any' wasn't selected
@@ -32,11 +32,16 @@ class ThreeStepWorkflowPublicationRequestsNeedingApprovalReport extends SSReport
 			foreach ($res as $result) {
 				if ($wf = $result->openWorkflowRequest()) {
 					if (!$result->canApprove()) continue;
+					if(ClassInfo::exists('Subsite')) $result->SubsiteTitle = $result->Subsite()->Title;
+					$result->AuthorTitle = $wf->Author()->Title;
+					$result->RequestedAt = $wf->Created;
 					$result->HasEmbargoOrExpiry = $wf->getEmbargoDate() || $wf->ExpiryDate() ? 'yes' : 'no';
 					$doSet->push($result);
 				}
 			}
 		}
+		
+		if ($sort) $doSet->sort($sort);
 		
 		// Manually manage the subsite filtering
 		if(ClassInfo::exists('Subsite')) Subsite::$force_subsite = null;
@@ -47,8 +52,11 @@ class ThreeStepWorkflowPublicationRequestsNeedingApprovalReport extends SSReport
 	function columns() {
 		$fields = array(
 			'Title' => 'Title',
-			'openWorkflowRequest.Author.Title' => 'Requested by',
-			'openWorkflowRequest.Created' => 'Requested at',
+			'AuthorTitle' => 'Requested by',
+			'RequestedAt' => array(
+				'title' => 'Requested at',
+				'casting' => 'SSDatetime->Full'
+			),
 			'HasEmbargoOrExpiry' => 'Embargo or expiry dates set',
 			'ID' => array(
 				'title' => 'Actions',
@@ -61,10 +69,18 @@ class ThreeStepWorkflowPublicationRequestsNeedingApprovalReport extends SSReport
 		);
 		
 		if(class_exists('Subsite')) {
-			$fields['Subsite.Title'] = 'Subsite';
+			$fields['SubsiteTitle'] = 'Subsite';
 		}
 		
 		return $fields;
+	}
+	
+	function sortColumns() {
+		return array(
+			'SubsiteTitle',
+			'AuthorTitle',
+			'RequestedAt'
+		);
 	}
 	
 	function parameterFields() {
