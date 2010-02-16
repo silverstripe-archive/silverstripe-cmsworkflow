@@ -60,7 +60,7 @@ class UnapprovedPublications3StepReport extends SS_Report {
 			'WFAuthorTitle' => 'Requested by',
 			'RequestedAt' => array(
 				'title' => 'Requested',
-				'casting' => 'SSDatetime->Full'
+				'casting' => 'SS_Datetime->Full'
 			),
 			'HasEmbargo' => 'Embargo',
 			'AbsoluteLink' => array(
@@ -85,7 +85,7 @@ class UnapprovedPublications3StepReport extends SS_Report {
 			),
 			'RequestedAt' => array(
 				'formatting' => ' on $value',
-				'casting' => 'SSDatetime->Full'
+				'casting' => 'SS_Datetime->Full'
 			),
 		);
 	}

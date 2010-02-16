@@ -43,7 +43,7 @@ class PagesScheduledForPublishingReport extends SS_Report {
 		} else if (!$startDate && $endDate) {
 			$wheres[] = "EmbargoDate <= '".Convert::raw2sql($endDate)."'";
 		} else {
-			$wheres[] = "EmbargoDate >= '".SSDatetime::now()->URLDate()."'";
+			$wheres[] = "EmbargoDate >= '".SS_Datetime::now()->URLDate()."'";
 		}
 		
 		$wheres[] = "WorkflowRequest.Status = 'Scheduled'";
@@ -98,7 +98,7 @@ class PagesScheduledForPublishingReport extends SS_Report {
 			),
 			'EmbargoDate' => array(
 				'title' => 'Will be published at',
-				'casting' => 'SSDatetime->Full'
+				'casting' => 'SS_Datetime->Full'
 			),
 			'ApproverName' => 'Approved by',
 			'AbsoluteLink' => array(

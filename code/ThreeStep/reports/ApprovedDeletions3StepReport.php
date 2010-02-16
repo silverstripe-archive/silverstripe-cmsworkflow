@@ -57,14 +57,14 @@ class ApprovedDeletions3StepReport extends SS_Report {
 			),
 			"WFApprovedWhen" => array(
 				"title" => "Approved",
-				'casting' => 'SSDatetime->Full'
+				'casting' => 'SS_Datetime->Full'
 			),
 			"WFAuthorTitle" => array(
 				"title" => "Author",
 			),
 			"WFRequestedWhen" => array(
 				"title" => "Requested",
-				'casting' => 'SSDatetime->Full'
+				'casting' => 'SS_Datetime->Full'
 			),
 			'AbsoluteLink' => array(
 				'title' => 'URL',
@@ -93,7 +93,7 @@ class ApprovedDeletions3StepReport extends SS_Report {
 			"WFApprovedWhen" => array(
 				"title" => "When",
 				"formatting" => ' on $value',
-				'casting' => 'SSDatetime->Full'
+				'casting' => 'SS_Datetime->Full'
 			),
 		);
 	}

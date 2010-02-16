@@ -42,7 +42,7 @@ class ThreeStepMyPublicationRequestsSideReport extends SS_Report {
 			),
 			"WFRequestedWhen" => array(
 				"formatting" => 'Requested on $value',
-				'casting' => 'SSDatetime->Full'
+				'casting' => 'SS_Datetime->Full'
 			),
 		);
 	}

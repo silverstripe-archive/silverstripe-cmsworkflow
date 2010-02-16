@@ -63,7 +63,7 @@ class UnapprovedDeletions3StepReport extends SS_Report {
 			),
 			"WFRequestedWhen" => array(
 				"title" => "Requested",
-				'casting' => 'SSDatetime->Full',
+				'casting' => 'SS_Datetime->Full',
 			),
 			'AbsoluteLink' => array(
 				'title' => 'URL',
@@ -90,7 +90,7 @@ class UnapprovedDeletions3StepReport extends SS_Report {
 			),
 			"WFRequestedWhen" => array(
 				"formatting" => ' on $value',
-				'casting' => 'SSDatetime->Full'
+				'casting' => 'SS_Datetime->Full'
 			),
 		);
 	}

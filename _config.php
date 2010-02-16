@@ -36,7 +36,6 @@ if(class_exists('Subsite')) {
 	SS_Report::register('ReportAdmin', 'SubsiteReportWrapper("ApprovedDeletions3StepReport")',20);
 	SS_Report::register('ReportAdmin', 'SubsiteReportWrapper("PagesScheduledForPublishingReport")',20);
 	SS_Report::register('ReportAdmin', 'SubsiteReportWrapper("PagesScheduledForDeletionReport")',20);
-	SS_Report::register('ReportAdmin', 'SubsiteReportWrapper("PagesDueForReviewReport")',20);
 	SS_Report::register('ReportAdmin', 'SubsiteReportWrapper("RecentlyPublishedPagesReport")',20);
 	
 	
@@ -47,7 +46,6 @@ if(class_exists('Subsite')) {
 	SS_Report::register('ReportAdmin', 'ApprovedDeletions3StepReport',20);
 	SS_Report::register('ReportAdmin', 'PagesScheduledForPublishingReport',20);
 	SS_Report::register('ReportAdmin', 'PagesScheduledForDeletionReport',20);
-	SS_Report::register('ReportAdmin', 'PagesDueForReviewReport',20);
 	SS_Report::register('ReportAdmin', 'RecentlyPublishedPagesReport',20);
 }
 

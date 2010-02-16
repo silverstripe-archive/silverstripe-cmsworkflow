@@ -72,7 +72,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 				if (count(explode('/', $date)) != 3) return false;
 				list($day, $month, $year) = explode('/', $date);
 				$timestamp = strtotime("$year-$month-$day $time");
-				if ($timestamp && $timestamp > SSDatetime::now()->getValue()) {
+				if ($timestamp && $timestamp > SS_Datetime::now()->getValue()) {
 					$wf->EmbargoDate = $timestamp;
 					$wf->write();
 					return true;
@@ -169,7 +169,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		if ($liveVersion && $liveVersion->ExpiryDate != null && $liveVersion->ExpiryDate != '0000-00-00 00:00:00') {
 			$tzConverter = new TZDateTimeField('ExpiryDate', 'Expiry Date', $liveVersion->ExpiryDate, SiteConfig::current_site_config()->Timezone);
 			$fields->addFieldsToTab('Root.Expiry', array(
-				new LiteralField('ExpiryWarning', "<p>This page is scheduled to expire at ".$tzConverter->SSDatetime()->Full().', '.$tzConverter->DefaultTimezoneName().' time. <a href="' . $this->ViewExpiredLink() . '" target="_blank">View site on date</a></p>')
+				new LiteralField('ExpiryWarning', "<p>This page is scheduled to expire at ".$tzConverter->SS_Datetime()->Full().', '.$tzConverter->DefaultTimezoneName().' time. <a href="' . $this->ViewExpiredLink() . '" target="_blank">View site on date</a></p>')
 			));
 			if ($this->owner->BackLinkTracking() && $this->owner->BackLinkTracking()->Count() > 0) {
 				$fields->addFieldsToTab('Root.Expiry', array(
@@ -250,7 +250,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			"DiffLinkToLastPublished" => '<a href=\"$value\" target=\"_blank\" class=\"externallink\">' . $diffLinkTitle . '</a>'
 		));
 		$closedRequestsTF->setFieldCasting(array(
-			'Created' => 'SSDatetime->Full'
+			'Created' => 'SS_Datetime->Full'
 		));
 		$closedRequestsTF->setCustomSourceItems($closedRequests);
 		$fields->push($closedRequestsTF);

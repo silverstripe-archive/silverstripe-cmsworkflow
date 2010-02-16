@@ -19,7 +19,7 @@ class RecentlyPublishedPagesReport extends SS_Report {
 			),
 			'Published' => array(
 				'title' => 'Published',
-				'casting' => 'SSDatetime->Full'
+				'casting' => 'SS_Datetime->Full'
 			),
 			'PublisherTitle' => 'Publisher',
 			'AbsoluteLink' => array(
@@ -83,7 +83,7 @@ class RecentlyPublishedPagesReport extends SS_Report {
 		} else if (!$startDate && $endDate) {
 			$q->where[] = "WorkflowRequest.LastEdited <= '".Convert::raw2sql($endDate)."'";
 		} else {
-			$q->where[] = "WorkflowRequest.LastEdited >= '".SSDatetime::now()->URLDate()."'";
+			$q->where[] = "WorkflowRequest.LastEdited >= '".SS_Datetime::now()->URLDate()."'";
 		}
 		
 		

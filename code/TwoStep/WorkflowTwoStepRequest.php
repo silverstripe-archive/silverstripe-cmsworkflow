@@ -68,10 +68,8 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 				$this->owner->sendNotificationEmail(
 					Member::currentUser(), // sender
 					$publisher, // recipient
-					_t("{$this->owner->class}.EMAIL_SUBJECT_APPROVED"),
-					_t("{$this->owner->class}.EMAIL_PARA_APPROVED"),
 					$comment,
-					'WorkflowGenericEmail'
+					'approved'
 				);
 			}
 		}
@@ -79,10 +77,8 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		$this->owner->sendNotificationEmail(
 			Member::currentUser(), // sender
 			$author, // recipient
-			_t("{$this->owner->class}.EMAIL_SUBJECT_APPROVED"),
-			_t("{$this->owner->class}.EMAIL_PARA_APPROVED"),
 			$comment,
-			'WorkflowGenericEmail'
+			'approved'
 		);
 	}
 	
@@ -99,10 +95,8 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 			$this->owner->sendNotificationEmail(
 				Member::currentUser(), // sender
 				$recipient, // recipient
-				_t("{$this->owner->class}.EMAIL_SUBJECT_COMMENT"),
-				_t("{$this->owner->class}.EMAIL_PARA_COMMENT"),
 				$comment,
-				'WorkflowGenericEmail'
+				'comment'
 			);
 		}
 	}
@@ -119,10 +113,8 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 			$this->owner->sendNotificationEmail(
 				$author, // sender
 				$publisher, // recipient
-				_t("{$this->owner->class}.EMAIL_SUBJECT_AWAITINGAPPROVAL"),
-				_t("{$this->owner->class}.EMAIL_PARA_AWAITINGAPPROVAL"),
 				$comment,
-				'WorkflowGenericEmail'
+				'awaiting approval'
 			);
 		}
 	}

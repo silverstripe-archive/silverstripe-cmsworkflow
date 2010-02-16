@@ -32,7 +32,7 @@ class PagesScheduledForDeletionReport extends SS_Report {
 			),
 			'ExpiryDate' => array(
 				'title' => 'Will be deleted at',
-				'casting' => 'SSDatetime->Full'
+				'casting' => 'SS_Datetime->Full'
 			),
 			'ApproverName' => 'Approved by',
 			'AbsoluteLink' => array(
@@ -82,7 +82,7 @@ class PagesScheduledForDeletionReport extends SS_Report {
 		} else if(!$startDate && $endDate) {
 			$wheres[] = "ExpiryDate <= '".Convert::raw2sql($endDate)."'";
 		} else {
-			$wheres[] = "ExpiryDate >= '".SSDatetime::now()->URLDate()."'";
+			$wheres[] = "ExpiryDate >= '".SS_Datetime::now()->URLDate()."'";
 		}
 		
 		$stage = Versioned::current_stage();

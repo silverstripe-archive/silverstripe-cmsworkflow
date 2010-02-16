@@ -13,6 +13,7 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 	
 	protected $requiredExtensions = array(
 		'SiteTree' => array('SiteTreeCMSTwoStepWorkflow'),
+		'SiteConfig' => array('SiteConfigTwoStepWorkflow'),
 		'WorkflowRequest' => array('WorkflowTwoStepRequest'),
 	);
 
