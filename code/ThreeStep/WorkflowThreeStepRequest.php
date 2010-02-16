@@ -198,18 +198,8 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 		$classes[] = $class;
 		$classesSQL = implode("','", $classes);
 		
-		// build filter
-		
-		// check for admin permission
-		if (Permission::checkMember($approver, 'ADMIN') || Permission::checkMember($approver, 'IS_WORKFLOW_ADMIN')) {
-			// Admins can approve/publish anything
-			$filter = "{$bt}WorkflowRequest{$bt}.{$bt}ClassName{$bt} IN ('$classesSQL')";
-		} else {
-			$filter = "{$bt}WorkflowRequest_Approvers{$bt}.{$bt}MemberID{$bt} = {$approver->ID} 
-				AND {$bt}WorkflowRequest{$bt}.{$bt}ClassName{$bt} IN ('$classesSQL')
-			";
-		}
-		
+		$filter = "{$bt}WorkflowRequest{$bt}.{$bt}ClassName{$bt} IN ('$classesSQL')";
+
 		if($status) {
 			$filter .= "AND {$bt}WorkflowRequest{$bt}.{$bt}Status{$bt} IN (" . $statusStr . ")";
 		} 
@@ -236,6 +226,14 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 		$return->merge($onDraft);
 		$return->merge($onLive);
 		$return->removeDuplicates();
+		
+		$canApprove = SiteTree::batch_permission_check($return->column('ID'), $approver->ID, 'CanApproveType', 'SiteTree_ApproverGroups', 'canApprove');		
+		foreach($return as $page) {
+			if (!isset($canApprove[$page->ID]) || !$canApprove[$page->ID]) {
+				$return->remove($page);
+			}
+		}
+		
 		return $return;
 	}
 	
@@ -270,17 +268,15 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 			"LEFT JOIN {$bt}WorkflowRequest{$bt} ON {$bt}WorkflowRequest{$bt}.{$bt}PageID{$bt} = {$bt}SiteTree_Live{$bt}.{$bt}ID{$bt} "
 		);
 
-		$objects = new DataObjectSet();
 		$return = new DataObjectSet();
-		$objects->merge($onDraft);
-		$objects->merge($onLive);
-		$objects->removeDuplicates();
+		$return->merge($onDraft);
+		$return->merge($onLive);
+		$return->removeDuplicates();
 		
-		if ($objects) {
-			foreach($objects as $do) {
-				if ($do->canPublish($publisher)) {
-					$return->push($do);
-				}
+		$canPublish = SiteTree::batch_permission_check($return->column('ID'), $publisher->ID, 'CanPublishType', 'SiteTree_PublisherGroups', 'canPublish');		
+		foreach($return as $page) {
+			if (!isset($canPublish[$page->ID]) || !$canPublish[$page->ID]) {
+				$return->remove($page);
 			}
 		}
 		

@@ -111,6 +111,8 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 		$unpublishedRecord->write();
 		$unpublishedRecord->PublisherGroups()->add($custompublishersgroup);
 		
+		$custompublisher->logIn();
+		
 		$publishedRecord = new Page();
 		$publishedRecord->CanEditType = 'LoggedInUsers';
 		$publishedRecord->write();

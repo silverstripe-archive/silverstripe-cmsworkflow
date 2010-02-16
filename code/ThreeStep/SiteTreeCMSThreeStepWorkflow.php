@@ -173,37 +173,26 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 	 * @return boolean True if the current user can approve requests for this page.
 	 */
 	public function canApprove($member = null) {
-		if(!$member && $member !== FALSE) $member = Member::currentUser();
-
-		// check for admin permission
-		if(Permission::checkMember($member, 'ADMIN')) return true;
+		if(!$member) $member = Member::currentUser();
+		$memberID = $member->ID;
 		
-		// check for workflow admin permission
-		if(Permission::checkMember($member, 'IS_WORKFLOW_ADMIN')) return true;
-		
-		// check for missing cmsmain permission
-		if(!Permission::checkMember($member, 'CMS_ACCESS_CMSMain')) return false;
-
-		if ($this->canPublish($member)) return true;
-		
-		// check for empty spec
-		if(!$this->owner->CanApproveType || $this->owner->CanApproveType == 'Anyone') return true;
-
-		// check against parent page/site config
-		if($this->owner->CanApproveType == 'Inherit') {
-			if ($this->owner->Parent()->exists()) {
-				// if (!$this->owner->Parent()->getExtensionInstance('SiteTreeCMSThreeStepWorkflow')->canApprove($member)) return false;
-				if (!$this->owner->Parent()->canApprove($member)) return false;
-			} else { return $this->owner->SiteConfig->canApprove($member); }
+		if(isset(SiteTree::$cache_permissions['CanApproveType'][$this->owner->ID])) {
+			return SiteTree::$cache_permissions['CanApproveType'][$this->owner->ID];
 		}
 		
-		// check for any logged-in users
-		if($this->owner->CanApproveType == 'LoggedInUsers' && !Permission::checkMember($member, 'CMS_ACCESS_CMSMain')) return false;
+		// DANGER, WILL ROBINSON!
+		// we currently have not implemented extensions here. if you do
+		// be aware that the WorkflowRequest::get_by_* functions use
+		// batch_permission_check directly so you will need to ammend
+		// them appropriately
 
-		// check for specific groups
-		if($this->owner->CanApproveType == 'OnlyTheseUsers' && (!$member || !$member->inGroups($this->owner->ApproverGroups()))) return false;
-
-		return true;
+		// check for (workflow)admin permission
+		if(Permission::checkMember($member, array('ADMIN', 'IS_WORKFLOW_ADMIN'))) return true;
+		
+		if ($this->canPublish($member)) return true;
+		
+		$results = SiteTree::batch_permission_check(array($this->owner->ID), $memberID, 'CanApproveType', 'SiteTree_ApproverGroups', 'canApprove');
+		return isset($results[$this->owner->ID]) ? $results[$this->owner->ID] : false;
 	}
 	
 	/**
@@ -243,34 +232,24 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 	 * @return boolean True if the current user can publish this page.
 	 */
 	public function canPublish($member = null) {
-		if(!$member && $member !== FALSE) $member = Member::currentUser();
-
-		// check for admin permission
-		if(Permission::checkMember($member, 'ADMIN')) return true;
+		if(!$member) $member = Member::currentUser();
+		$memberID = $member->ID;
 		
-		// check for workflow admin permission
-		if(Permission::checkMember($member, 'IS_WORKFLOW_ADMIN')) return true;
-		
-		// check for missing cmsmain permission
-		if(!Permission::checkMember($member, 'CMS_ACCESS_CMSMain')) return false;
-
-		// check for empty spec
-		if(!$this->owner->CanPublishType || $this->owner->CanPublishType == 'Anyone') return true;
-
-		// check against parent page/site config
-		if($this->owner->CanPublishType == 'Inherit') {
-			if ($this->owner->Parent()->exists()) {
-				if (!$this->owner->Parent()->canPublish($member)) return false;
-			} else { return $this->owner->SiteConfig->canPublish($member); }
+		if(isset(SiteTree::$cache_permissions['CanPublishType'][$this->owner->ID])) {
+			return SiteTree::$cache_permissions['CanPublishType'][$this->owner->ID];
 		}
 		
-		// check for any logged-in users
-		if($this->owner->CanPublishType == 'LoggedInUsers' && !Permission::checkMember($member, 'CMS_ACCESS_CMSMain')) return false;
+		// DANGER, WILL ROBINSON!
+		// we currently have not implemented extensions here. if you do
+		// be aware that the WorkflowRequest::get_by_* functions use
+		// batch_permission_check directly so you will need to ammend
+		// them appropriately
 
-		// check for specific groups
-		if($this->owner->CanPublishType == 'OnlyTheseUsers' && (!$member || !$member->inGroups($this->owner->PublisherGroups()))) return false;
-
-		return true;
+		// check for (workflow)admin permission
+		if(Permission::checkMember($member, array('ADMIN', 'IS_WORKFLOW_ADMIN'))) return true;
+		
+		$results = SiteTree::batch_permission_check(array($this->owner->ID), $memberID, 'CanPublishType', 'SiteTree_PublisherGroups', 'canPublish');
+		return isset($results[$this->owner->ID]) ? $results[$this->owner->ID] : false;
 	}
 	
 	/**

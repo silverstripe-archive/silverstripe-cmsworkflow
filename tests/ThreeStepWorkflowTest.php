@@ -76,6 +76,30 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		);
 	}
 	
+	function testManipulatingGroupsDuringAWorkflow() {
+		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
+	
+		$custompublisher = $this->objFromFixture('Member', 'custompublisher');
+		$customauthor = $this->objFromFixture('Member', 'customauthor');
+		$customauthorgroup = $this->objFromFixture('Group', 'customauthorsgroup');
+	
+		// awaiting approval 
+		$customauthor->logIn();
+		$request = $page->openOrNewWorkflowRequest('WorkflowPublicationRequest');
+
+		// Asset publisher can approve but author cannot
+		$this->assertFalse($page->canApprove($customauthor));
+		$this->assertTrue($page->canApprove($custompublisher));
+		
+		// Add the author group, assert they can now approve
+		$page->CanApproveType = 'OnlyTheseUsers';
+		$page->write();
+		$page->ApproverGroups()->add($customauthorgroup);
+		$this->assertTrue($page->canApprove($customauthor));
+		
+		$custompublisher->logIn();
+	}
+	
 	function testEmbargoExpiry() {
 		// Get fixtures
 		$page = $this->objFromFixture('SiteTree', 'embargoexpirypage');

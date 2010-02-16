@@ -154,8 +154,47 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		return $actions;
 	}
 	
+	/**
+	 * Get all publication requests assigned to a specific publisher
+	 * 
+	 * @param string $class WorkflowRequest subclass
+	 * @param Member $publisher
+	 * @param array $status One or more stati from the $Status property
+	 * @return DataObjectSet
+	 */
 	public static function get_by_publisher($class, $publisher, $status = null) {
-		return WorkflowRequest::get_by_publisher($class, $publisher, $status);
+		// To ensure 2.3 and 2.4 compatibility
+		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
+
+		if($status) $statusStr = "'".implode("','", $status)."'";
+
+		$classes = (array)ClassInfo::subclassesFor($class);
+		$classes[] = $class;
+		$classesSQL = implode("','", $classes);
+		
+		// build filter
+		$filter = "{$bt}WorkflowRequest{$bt}.{$bt}ClassName{$bt} IN ('$classesSQL')
+		";
+		if($status) {
+			$filter .= "AND {$bt}WorkflowRequest{$bt}.{$bt}Status{$bt} IN (" . $statusStr . ")";
+		} 
+		
+		$return = DataObject::get(
+			"SiteTree", 
+			$filter, 
+			"{$bt}SiteTree{$bt}.{$bt}LastEdited{$bt} DESC",
+			"LEFT JOIN {$bt}WorkflowRequest{$bt} ON {$bt}WorkflowRequest{$bt}.{$bt}PageID{$bt} = {$bt}SiteTree{$bt}.{$bt}ID{$bt} " .
+			"LEFT JOIN {$bt}WorkflowRequest_Publishers{$bt} ON {$bt}WorkflowRequest{$bt}.{$bt}ID{$bt} = {$bt}WorkflowRequest_Publishers{$bt}.{$bt}WorkflowRequestID{$bt}"
+		);
+		
+		$canPublish = SiteTree::batch_permission_check($return->column('ID'), $publisher->ID, 'CanPublishType', 'SiteTree_PublisherGroups', 'canPublish');		
+		foreach($return as $page) {
+			if (!isset($canPublish[$page->ID]) || !$canPublish[$page->ID]) {
+				$return->remove($page);
+			}
+		}
+		
+		return $return;
 	}
 	
 	public static function get_by_author($class, $author, $status = null) {

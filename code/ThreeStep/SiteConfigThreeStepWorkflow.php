@@ -123,6 +123,7 @@ class SiteConfigThreeStepWorkflow extends DataObjectDecorator {
 	 */
 	public function canPublish($member = null) {
 		if(!$member && $member !== FALSE) $member = Member::currentUser();
+		if (is_numeric($member)) $member = DataObject::get_by_id('Member', $member);
 
 		// check for admin permission
 		if(Permission::checkMember($member, 'ADMIN')) return true;
@@ -153,6 +154,7 @@ class SiteConfigThreeStepWorkflow extends DataObjectDecorator {
 	 */
 	public function canApprove($member = null) {
 		if(!$member && $member !== FALSE) $member = Member::currentUser();
+		if (is_numeric($member)) $member = DataObject::get_by_id('Member', $member);
 
 		// check for admin permission
 		if(Permission::checkMember($member, 'ADMIN')) return true;

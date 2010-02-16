@@ -89,31 +89,25 @@ class SiteTreeCMSTwoStepWorkflow extends SiteTreeCMSWFDecorator {
 	 * @return boolean True if the current user can publish this page.
 	 */
 	public function canPublish($member = null) {
-		if(!$member && $member !== FALSE) $member = Member::currentUser();
+		if(!$member) $member = Member::currentUser();
+		if (is_numeric($member)) $memberID = $member;
+		else $memberID = $member->ID;
 
-		// check for admin permission
-		if(Permission::checkMember($member, 'ADMIN')) return true;
-		
-		// check for missing cmsmain permission
-		if(!Permission::checkMember($member, 'CMS_ACCESS_CMSMain')) return false;
-
-		// check for empty spec
-		if(!$this->owner->CanPublishType || $this->owner->CanPublishType == 'Anyone') return true;
-
-		// check against parent page (default to FALSE if there is no parent page)
-		if($this->owner->CanPublishType == 'Inherit') {
-			if ($this->owner->Parent()->exists()) {
-				if (!$this->owner->Parent()->canPublish($member)) return false;
-			} else { return false; }
+		if(isset(SiteTree::$cache_permissions['CanPublishType'][$this->owner->ID])) {
+			return SiteTree::$cache_permissions['CanPublishType'][$this->owner->ID];
 		}
 		
-		// check for any logged-in users
-		if($this->owner->CanPublishType == 'LoggedInUsers' && !Permission::checkMember($member, 'CMS_ACCESS_CMSMain')) return false;
+		// DANGER, WILL ROBINSON!
+		// we currently have not implemented extensions here. if you do
+		// be aware that the WorkflowRequest::get_by_* functions use
+		// batch_permission_check directly so you will need to ammend
+		// them appropriately
 
-		// check for specific groups
-		if($this->owner->CanPublishType == 'OnlyTheseUsers' && (!$member || !$member->inGroups($this->owner->PublisherGroups()))) return false;
-
-		return true;
+		// check for (workflow)admin permission
+		if(Permission::checkMember($member, array('ADMIN', 'IS_WORKFLOW_ADMIN'))) return true;
+		
+		$results = SiteTree::batch_permission_check(array($this->owner->ID), $memberID, 'CanPublishType', 'SiteTree_PublisherGroups', 'canPublish');
+		return isset($results[$this->owner->ID]) ? $results[$this->owner->ID] : false;
 	}
 	
 	/**

@@ -94,6 +94,30 @@ class WorkflowRequestTest extends FunctionalTest {
 		$this->session()->inst_set('loggedInAs',null);
 	}
 
+	function testManipulatingGroupsDuringAWorkflow() {
+		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
+	
+		$custompublisher = $this->objFromFixture('Member', 'custompublisher');
+		$customauthor = $this->objFromFixture('Member', 'customauthor');
+		$customauthorgroup = $this->objFromFixture('Group', 'customauthorsgroup');
+	
+		// awaiting approval 
+		$customauthor->logIn();
+		$request = $page->openOrNewWorkflowRequest('WorkflowPublicationRequest');
+	
+		// Asset publisher can publish but author cannot
+		$this->assertFalse($page->canPublish($customauthor));
+		$this->assertTrue($page->canPublish($custompublisher));
+		
+		// Add the author group, assert they can now publish
+		$page->CanPublishType = 'OnlyTheseUsers';
+		$page->write();
+		$page->PublisherGroups()->add($customauthorgroup);
+		$this->assertTrue($page->canPublish($customauthor));
+		
+		$custompublisher->logIn();
+	}
+	
 	function testEmbargoExpiry() {
 		// Get fixtures
 		$page = $this->objFromFixture('SiteTree', 'embargoexpirypage');
@@ -236,11 +260,12 @@ class WorkflowRequestTest extends FunctionalTest {
 	 * Confirm that an array of comments is created on a workflow
 	 */
 	function testCommentThread() {
-		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
-		$page->doPublish();
-	
 		$custompublisher = $this->objFromFixture('Member', 'custompublisher');
 		$customauthor = $this->objFromFixture('Member', 'customauthor');
+		
+		$custompublisher->logIn();
+		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
+		$page->doPublish();
 		
 		$customauthor->logIn();
 		$wf = $page->openOrNewWorkflowRequest('WorkflowPublicationRequest');
