@@ -5,7 +5,7 @@
  * @package cmsworkflow
  * @subpackage ThreeStep
  */
-class ThreeStepMyDeletionRequestsSideReport extends SSReport {
+class ThreeStepMyDeletionRequestsSideReport extends SS_Report {
 	function title() {
 		return _t('ThreeStepMyDeletionRequestsSideReport.TITLE',"My deletion requests");
 	}

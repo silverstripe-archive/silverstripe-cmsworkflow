@@ -5,7 +5,7 @@
  * @package cmsworkflow
  * @subpackage ThreeStep
  */
-class UnapprovedPublications3StepReport extends SSReport {
+class UnapprovedPublications3StepReport extends SS_Report {
 	function title() {
 		return _t('UnapprovedPublications3StepReport.TITLE',"Publication requests I need to approve");
 	}

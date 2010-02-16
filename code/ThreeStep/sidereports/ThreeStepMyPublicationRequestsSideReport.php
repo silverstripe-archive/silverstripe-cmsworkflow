@@ -5,7 +5,7 @@
  * @package cmsworkflow
  * @subpackage ThreeStep
  */
-class ThreeStepMyPublicationRequestsSideReport extends SSReport {
+class ThreeStepMyPublicationRequestsSideReport extends SS_Report {
 	function title() {
 		return _t('ThreeStepMyPublicationRequestsSideReport.TITLE',"My publication requests");
 	}

@@ -1,6 +1,6 @@
 <?php
 
-class RecentlyPublishedPagesReport extends SSReport {
+class RecentlyPublishedPagesReport extends SS_Reportt {
 	function title() {
 		return _t('RecentlyPublishedPagesReport.TITLE', 'Recently published pages');
 	}

@@ -5,7 +5,7 @@
  * @package cmsworkflow
  * @subpackage reports
  */
-class PagesScheduledForDeletionReport extends SSReport {
+class PagesScheduledForDeletionReport extends SS_Report {
 	function title() {
 		return _t('PagesScheduledForDeletionReport.TITLE',"Published pages with Expiry on");
 	}
