@@ -27,6 +27,7 @@ class ApprovedDeletions3StepReport extends SSReport {
 				$result->WFApproverID = $wf->ApproverID;
 				$result->WFPublisherID = $wf->PublisherID;
 				if (isset($_REQUEST['OnlyMine']) && $result->WFApproverID != Member::currentUserID()) continue;
+				$result->BacklinkCount = $result->BackLinkTracking()->Count();
 				$doSet->push($result);
 			}
 		}
@@ -56,7 +57,11 @@ class ApprovedDeletions3StepReport extends SSReport {
 			'AbsoluteLink' => array(
 				'title' => 'URL',
 				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'
-			)
+			),
+			"BacklinkCount" => array(
+				"title" => "Incoming links",
+				'formatting' => '".($value ? "<a href=\"admin/show/$ID#Root_Expiry\" title=\"View backlinks\">yes, $value</a>" : "none") . "'
+			),
 		);
 	}
 

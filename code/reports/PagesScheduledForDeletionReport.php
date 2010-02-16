@@ -39,7 +39,7 @@ class PagesScheduledForDeletionReport extends SSReport {
 			),
 			"BacklinkCount" => array(
 				"title" => "Incoming links",
-				'formatting' => '".($value ? "<a href=\"admin/show/$ID#Root_Expiry\" title=\"View backlinks\">yes, $value</a>" : "no") . "'
+				'formatting' => '".($value ? "<a href=\"admin/show/$ID#Root_Expiry\" title=\"View backlinks\">yes, $value</a>" : "none") . "'
 			),
 		);
 		
