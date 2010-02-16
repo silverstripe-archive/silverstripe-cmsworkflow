@@ -62,8 +62,7 @@ class PagesDueForReviewReport extends SSReport {
 			$params->push(new DropdownField("OwnerID", 'Page owner', $map));
 		}
 		
-		$params->push(new LiteralField('ReviewDateNotes', '<p>If no review date range is selected, pages currently due for review will be shown.'));
-		$params->push(new CalendarDateField('ReviewDateAfter', 'Review date after or on (DD/MM/YYY)'));
+		$params->push(new CalendarDateField('ReviewDateAfter', 'Review date after or on (DD/MM/YYYY)'));
 		$params->push(new CalendarDateField('ReviewDateBefore', 'Review date before or on (DD/MM/YYYY)'));
 
 		$params->push(new CheckboxField('ShowVirtualPages', 'Show Virtual Pages'));
