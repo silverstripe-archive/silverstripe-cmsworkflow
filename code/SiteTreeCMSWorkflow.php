@@ -69,9 +69,10 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	function setEmbargo($date, $time) {
 		if ($wf = $this->openWorkflowRequest()) {
 			if ($wf->EmbargoField()) {
+				if (count(explode('/', $date)) != 3) return false;
 				list($day, $month, $year) = explode('/', $date);
 				$timestamp = strtotime("$year-$month-$day $time");
-				if ($timestamp) {
+				if ($timestamp && $timestamp > time()) {
 					$wf->EmbargoDate = $timestamp;
 					$wf->write();
 					return true;
@@ -91,9 +92,11 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	function setExpiry($date, $time) {
 		if ($wf = $this->openWorkflowRequest()) {
 			if ($wf->ExpiryField()) {
+				if (count(explode('/', $date)) != 3) return false;
 				list($day, $month, $year) = explode('/', $date);
 				$timestamp = strtotime("$year-$month-$day $time");
 				if ($timestamp) {
+					if ($wf->EmbargoDate && $timestamp > $wf->EmbargoDate) return false;
 					$this->owner->ExpiryDate = $timestamp;
 					$this->owner->write();
 					return true;
