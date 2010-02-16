@@ -42,9 +42,9 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 		$this->owner->Status = 'Approved';
 		$this->owner->write();
 
+		$this->owner->addNewChange($comment, 'Approved', $member);
 		$this->owner->setSchedule();
 
-		$this->owner->addNewChange($comment, $this->owner->Status, $member);
 		if($notify) $this->notifyApproved($comment);
 		
 		// The request is now approved, but we haven't published it yet
@@ -59,7 +59,11 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 			return false;
 		}
 		
-		if ($notify) $this->notifyPublished($comment);
+		if ($notify) {
+			// Notify?
+		}
+
+		$this->owner->addNewChange($comment, 'Published', $member);
 		
 		return $this->owner->publish($comment, $member, $notify);
 	}
@@ -72,8 +76,12 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 	
 	function notifyApproved($comment) {
 		$author = $this->owner->Author();
+		$subject = sprintf(
+			_t("{$this->owner->class}.EMAIL_SUBJECT_APPROVED"),
+			$this->owner->Page()->Title
+		);
 		
-		if (WorkflowRequest::should_send_alert($this->owner->class, 'approve', 'publisher')) {
+		if (WorkflowRequest::should_send_alert(__CLASS__, 'approve', 'publisher')) {
 			$publishers = $this->owner->Page()->PublisherMembers();
 			foreach($publishers as $publisher){
 				// Notify publishers other than the one who is logged in 
@@ -81,47 +89,23 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 					$this->owner->sendNotificationEmail(
 						Member::currentUser(), // sender
 						$publisher, // recipient
+						_t("{$this->owner->class}.EMAIL_SUBJECT_APPROVED_FOR_PUBLISHING"),
+						_t("{$this->owner->class}.EMAIL_PARA_APPROVED_FOR_PUBLISHING"),
 						$comment,
-						_t('WorkflowRequest.APPROVED_CHANGES', 'approved changes')
+						'WorkflowGenericEmail'
 					);
 				}
 			}
 		}
 		
-		if (WorkflowRequest::should_send_alert($this->owner->class, 'approve', 'author')) {
+		if (WorkflowRequest::should_send_alert(__CLASS__, 'approve', 'author')) {
 			$this->owner->sendNotificationEmail(
 				Member::currentUser(), // sender
 				$author, // recipient
+				_t("{$this->owner->class}.EMAIL_SUBJECT_APPROVED_FOR_PUBLISHING"),
+				_t("{$this->owner->class}.EMAIL_PARA_APPROVED_FOR_PUBLISHING"),
 				$comment,
-				_t('WorkflowRequest.APPROVED_CHANGES', 'approved changes')
-			);
-		}
-	}
-	
-	function notifyPublished($comment) {
-		$author = $this->owner->Author();
-
-		if (WorkflowRequest::should_send_alert($this->owner->class, 'publish', 'publisher')) {
-			$publishers = $this->owner->Page()->PublisherMembers();
-			foreach($publishers as $publisher){
-				// Notify publishers other than the one who is logged in 
-				if(Member::currentUserID() != $publisher->ID) {
-					$this->owner->sendNotificationEmail(
-						Member::currentUser(), // sender
-						$publisher, // recipient
-						$comment,
-						_t('WorkflowRequest.PUBLISHED_CHANGES', 'published changes')
-					);
-				}
-			}
-		}
-		
-		if (WorkflowRequest::should_send_alert($this->owner->class, 'publish', 'author')) {
-			$this->owner->sendNotificationEmail(
-				Member::currentUser(), // sender
-				$author, // recipient
-				$comment,
-				_t('WorkflowRequest.PUBLISHED_CHANGES', 'published changes')
+				'WorkflowGenericEmail'
 			);
 		}
 	}
@@ -129,11 +113,11 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 	function notifyComment($comment) {
 		// Comment recipients cover everyone except the person making the comment
 		$commentRecipients = array();
-		if (WorkflowRequest::should_send_alert($this->owner->class, 'comment', 'author')) {
+		if (WorkflowRequest::should_send_alert(__CLASS__, 'comment', 'author')) {
 			if(Member::currentUserID() != $this->owner->Author()->ID) $commentRecipients[] = $this->owner->Author();
 		}
 		
-		if (WorkflowRequest::should_send_alert($this->owner->class, 'comment', 'publisher')) {
+		if (WorkflowRequest::should_send_alert(__CLASS__, 'comment', 'publisher')) {
 			$receivers = $this->owner->Page()->ApproverMembers();
 			foreach($receivers as $receiver) $commentRecipients[] = $receiver;
 		}
@@ -143,8 +127,10 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 			$this->owner->sendNotificationEmail(
 				Member::currentUser(), // sender
 				$recipient, // recipient
+				_t("{$this->owner->owner->class}.EMAIL_SUBJECT_COMMENT"),
+				_t("{$this->class}.EMAIL_PARA_COMMENT"),
 				$comment,
-				_t('WorkflowRequest.ADDED_COMMENT', 'added a comment')
+				'WorkflowGenericEmail'
 			);
 		}
 	}
@@ -157,15 +143,15 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 		$publishers = $this->owner->Page()->ApproverMembers();
 		$author = $this->owner->Author();
 
-		if (WorkflowRequest::should_send_alert($this->owner->class, 'request', 'publisher')) {
+		if (WorkflowRequest::should_send_alert(__CLASS__, 'request', 'publisher')) {
 			foreach($publishers as $publisher){
 				$this->owner->sendNotificationEmail(
 					$author, // sender
 					$publisher, // recipient
+					_t("{$this->class}.EMAIL_SUBJECT_AWAITINGAPPROVAL"),
+					_t("{$this->class}.EMAIL_PARA_AWAITINGAPPROVAL"),
 					$comment,
-					$this->owner->class == 'WorkflowDeletionRequest' ? 
-						_t('WorkflowRequest.REQUESTED_DELETION', 'requested deletion') :
-						_t('WorkflowRequest.REQUESTED_PUBLICATION', 'requested publication')
+					'WorkflowGenericEmail'
 				);
 			}
 		}
@@ -185,12 +171,10 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 			if (get_class($this->owner) != 'WorkflowDeletionRequest') $actions['cms_requestedit'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_REQUESTEDIT", "Request edit");
 		} elseif($this->owner->Status == 'Scheduled' && $this->owner->Page()->canApprove()) {
 			$actions['cms_requestedit'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_REQUESTEDIT", "Request edit");
-		} elseif($this->owner->Status == 'Scheduled' && $this->owner->Page()->canApprove()) {
-			$actions['cms_requestedit'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_REQUESTEDIT", "Request edit");
 		} elseif($this->owner->Status == 'AwaitingApproval' && $this->owner->Page()->canApprove()) {
 			$actions['cms_approve'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_APPROVE", "Approve");
 			if (get_class($this->owner) != 'WorkflowDeletionRequest') $actions['cms_requestedit'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_REQUESTEDIT", "Request edit");
-			if (WorkflowRequest::$allow_deny) $actions['cms_deny'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_DENY","Deny and revert");
+			if (WorkflowRequest::$allow_deny) $actions['cms_deny'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_DENY","Deny");
 		} else if($this->owner->Status == 'AwaitingEdit' && $this->owner->Page()->canEdit()) {
 			// @todo this couples this class to its subclasses. :-(
 			$requestAction = (get_class($this) == 'WorkflowDeletionRequest') ? 'cms_requestdeletefromlive' : 'cms_requestpublication';
@@ -198,17 +182,15 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 		}
 		
 		$actions['cms_comment'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_COMMENT", "Comment");
-
 		if ($this->owner->Page()->canEdit()) {
-			$actions['cms_cancel'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_CANCEL","Cancel workflow");
+			$actions['cms_cancel'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_CANCEL","Cancel");
 		}
-
 		return $actions;
 	}
 	
 	public static function get_by_approver($class, $approver, $status = null) {
 		// To ensure 2.3 and 2.4 compatibility
-		$bt = defined('DB::USE_ANSI_SQL') ? "\"" : "`";
+		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
 
 		if($status) $statusStr = "'".implode("','", $status)."'";
 
@@ -259,7 +241,7 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 	
 	public static function get_by_publisher($class, $publisher, $status = null) {
 		// To ensure 2.3 and 2.4 compatibility
-		$bt = defined('DB::USE_ANSI_SQL') ? "\"" : "`";
+		$bt = defined('Database::USE_ANSI_SQL') ? "\"" : "`";
 
 		if($status) $statusStr = "'".implode("','", $status)."'";
 
@@ -312,52 +294,5 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 	
 	public static function get($class, $status = null) {
 		return WorkflowRequest::get($class, $status);
-	}
-	
-	public static function apply_alerts() {
-		WorkflowRequest::$alerts = array(
-			'WorkflowPublicationRequest' => array(
-				'request' => array(
-					'publisher' => true
-				),
-				'approve' => array(
-					'author' => true,
-					'publisher' => true
-				),
-				'publish' => array(
-					'author' => true,
-					'publisher' => true
-				),
-				'deny' => array(
-					'author' => true
-				),
-				'cancel' => array(
-					'author' => true
-				),
-				'comment' => array(
-					'author' => true,
-					'publisher' => true
-				)
-			),
-			'WorkflowDeletionRequest' => array(
-				'request' => array(
-					'publisher' => true
-				),
-				'publish' => array(
-					'author' => true,
-					'publisher' => true
-				),
-				'deny' => array(
-					'author' => true
-				),
-				'cancel' => array(
-					'author' => true
-				),
-				'comment' => array(
-					'author' => true,
-					'publisher' => true
-				)
-			)
-		);
 	}
 }

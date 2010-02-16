@@ -29,16 +29,6 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 			}
 		}
 
-				$this->owner->ApproverID = $member->ID;
-				$this->owner->Status = 'Completed';
-				$this->owner->write();
-				
-				$this->owner->addNewChange($comment, $this->owner->Status, $member);
-				if($notify) $this->notifyApproved($comment);
-				return _t('WorkflowDeletionRequest.SETEXPIRY','Set Expiry date. Emailed %s');
-			}
-		}
-
 		$this->owner->PublisherID = $member->ID;
 		$this->owner->Status = 'Approved';
 		$this->owner->write();
@@ -71,50 +61,48 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 			$this->owner->Page()->Title
 		);
 		
-		if (WorkflowRequest::should_send_alert($this->owner->class, 'publish', 'publisher')) {
-			$publishers = $this->owner->Page()->PublisherMembers();
-			foreach($publishers as $publisher){
-				// Notify publishers other than the one who is logged in 
-				if(Member::currentUserID() != $publisher->ID) {
-					$this->owner->sendNotificationEmail(
-						Member::currentUser(), // sender
-						$publisher, // recipient
-						$comment,
-						_t('WorkflowRequest.APPROVED_CHANGES', 'approved changes')
-					);
-				}
+		$publishers = $this->owner->Page()->PublisherMembers();
+		foreach($publishers as $publisher){
+			// Notify publishers other than the one who is logged in 
+			if(Member::currentUserID() != $publisher->ID) {
+				$this->owner->sendNotificationEmail(
+					Member::currentUser(), // sender
+					$publisher, // recipient
+					_t("{$this->owner->class}.EMAIL_SUBJECT_APPROVED"),
+					_t("{$this->owner->class}.EMAIL_PARA_APPROVED"),
+					$comment,
+					'WorkflowGenericEmail'
+				);
 			}
 		}
 
-		if (WorkflowRequest::should_send_alert($this->owner->class, 'publish', 'author')) {
-			$this->owner->sendNotificationEmail(
-				Member::currentUser(), // sender
-				$author, // recipient
-				$comment,
-				_t('WorkflowRequest.APPROVED_CHANGES', 'approved changes')
-			);
-		}
+		$this->owner->sendNotificationEmail(
+			Member::currentUser(), // sender
+			$author, // recipient
+			_t("{$this->owner->class}.EMAIL_SUBJECT_APPROVED"),
+			_t("{$this->owner->class}.EMAIL_PARA_APPROVED"),
+			$comment,
+			'WorkflowGenericEmail'
+		);
 	}
 	
 	function notifyComment($comment) {
 		// Comment recipients cover everyone except the person making the comment
 		$commentRecipients = array();
-		if (WorkflowRequest::should_send_alert($this->owner->class, 'comment', 'author')) {
-			if(Member::currentUserID() != $this->owner->Author()->ID) $commentRecipients[] = $this->owner->Author();
-		}
-		if (WorkflowRequest::should_send_alert($this->owner->class, 'comment', 'publisher')) {
-			$publishers = $this->owner->Page()->PublisherMembers();
-			foreach($publishers as $publisher){
-				if(Member::currentUserID() != $publisher->ID) $commentRecipients[] = $publisher;
-			}
+		if(Member::currentUserID() != $this->owner->Author()->ID) $commentRecipients[] = $this->owner->Author();
+		$publishers = $this->owner->Page()->PublisherMembers();
+		foreach($publishers as $publisher){
+			if(Member::currentUserID() != $publisher->ID) $commentRecipients[] = $publisher;
 		}
 
 		foreach($commentRecipients as $recipient) {
 			$this->owner->sendNotificationEmail(
 				Member::currentUser(), // sender
 				$recipient, // recipient
+				_t("{$this->owner->class}.EMAIL_SUBJECT_COMMENT"),
+				_t("{$this->owner->class}.EMAIL_PARA_COMMENT"),
 				$comment,
-				_t('WorkflowRequest.ADDED_COMMENT', 'added a comment')
+				'WorkflowGenericEmail'
 			);
 		}
 	}
@@ -127,17 +115,15 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		$publishers = $this->owner->Page()->PublisherMembers();
 		$author = $this->owner->Author();
 		
-		if (WorkflowRequest::should_send_alert($this->owner->class, 'request', 'publisher')) {
-			foreach($publishers as $publisher){
-				$this->owner->sendNotificationEmail(
-					$author, // sender
-					$publisher, // recipient
-					$comment,
-					$this->owner->class == 'WorkflowDeletionRequest' ? 
-						_t('WorkflowRequest.REQUESTED_DELETION', 'requested deletion') :
-						_t('WorkflowRequest.REQUESTED_PUBLICATION', 'requested publication')
-				);
-			}
+		foreach($publishers as $publisher){
+			$this->owner->sendNotificationEmail(
+				$author, // sender
+				$publisher, // recipient
+				_t("{$this->owner->class}.EMAIL_SUBJECT_AWAITINGAPPROVAL"),
+				_t("{$this->owner->class}.EMAIL_PARA_AWAITINGAPPROVAL"),
+				$comment,
+				'WorkflowGenericEmail'
+			);
 		}
 	}
 	
@@ -151,9 +137,9 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		$actions = array();
 		
 		if($this->owner->Status == 'AwaitingApproval' && $this->owner->Page()->canPublish()) {
-			$actions['cms_approve'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_PUBLISH", "Publish");
+			$actions['cms_approve'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_APPROVE", "Approve");
 			if (get_class($this->owner) != 'WorkflowDeletionRequest') $actions['cms_requestedit'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_REQUESTEDIT", "Request edit");
-			if (WorkflowRequest::$allow_deny) $actions['cms_deny'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_DENY","Deny and revert");
+			if (WorkflowRequest::$allow_deny) $actions['cms_deny'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_DENY","Deny");
 		} else if($this->owner->Status == 'AwaitingEdit' && $this->owner->Page()->canEdit()) {
 			// @todo this couples this class to its subclasses. :-(
 			$requestAction = (get_class($this->owner) == 'WorkflowDeletionRequest') ? 'cms_requestdeletefromlive' : 'cms_requestpublication';
@@ -161,10 +147,10 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		}
 		
 		if ($this->owner->Page()->canEdit()) {
-			$actions['cms_cancel'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_CANCEL","Cancel workflow");
+			$actions['cms_cancel'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_CANCEL","Cancel");
 		}
 		$actions['cms_comment'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_COMMENT", "Comment");
-
+		
 		return $actions;
 	}
 	
@@ -178,52 +164,5 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 	
 	public static function get($class, $status = null) {
 		return WorkflowRequest::get($class, $status);
-	}
-	
-	public static function apply_alerts() {
-		WorkflowRequest::$alerts = array(
-			'WorkflowPublicationRequest' => array(
-				'request' => array(
-					'publisher' => true
-				),
-				'publish' => array(
-					'author' => true,
-					'publisher' => true
-				),
-				'deny' => array(
-					'author' => true
-				),
-				'cancel' => array(
-					'author' => true
-				),
-				'comment' => array(
-					'author' => true,
-					'publisher' => true
-				)
-			),
-			'WorkflowDeletionRequest' => array(
-				'request' => array(
-					'publisher' => true
-				),
-				'publish' => array(
-					'author' => true,
-					'publisher' => true
-				),
-				'deny' => array(
-					'author' => true
-				),
-				'cancel' => array(
-					'author' => true
-				),
-				'comment' => array(
-					'author' => true,
-					'publisher' => true
-				)
-			)
-		);
-	}
-	
-	function IsTwoStep() {
-		return true;
 	}
 }
