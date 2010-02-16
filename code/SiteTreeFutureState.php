@@ -58,6 +58,11 @@ class SiteTreeFutureState extends DataObjectDecorator {
 	 */
 	function modelascontrollerInit() {
 		self::choose_future_datetime();
+		
+		if(Controller::curr() instanceof ModelAsController && self::$future_datetime && !Permission::check('CMS_ACCESS_CMSMain')) {
+			$message = _t("ContentController.FUTURE_SITE_ACCESS_RESTRICTION", 'You must log in with your CMS password in order to view the future state of the site.  <a href="%s">Click here to go back to the published site.</a>');
+			Security::permissionFailure(Controller::curr(), sprintf($message, "?stage=Live"));
+		}
 	}
 	
 	/**
