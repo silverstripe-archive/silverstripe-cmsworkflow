@@ -25,6 +25,7 @@ Director::addRules(200, array(
 	'admin/cms/changes.rss' => array('Controller' => 'CMSChangeTracker', 'Data' => 'all'),
 ));
 
+unset(CMSBatchActionHandler::$batch_actions['publish']);
 
 
 ?>
