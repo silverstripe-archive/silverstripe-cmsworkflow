@@ -172,11 +172,15 @@ class SiteTreeFutureState_SilverStripeNavigatorItem extends SilverStripeNavigato
 		Requirements::javascript('cmsworkflow/javascript/futurestate.js');
 		
 		$datetimeField = new PopupDateTimeField('FutureStateDate', 'Date');
-		$current = (bool) SiteTreeFutureState::get_future_datetime();
+		$datetime = SiteTreeFutureState::get_future_datetime();
+		if($datetime) {
+			$datetimeField->setValue($datetime);
+		}
+		
 		$data = new ArrayData(array(
 			'Page' => $page,
 			'DateTimeField' => $datetimeField,
-			'Current' => $current
+			'Current' => (bool)$datetime,
 		));
 		
 		return $data->renderWith(array('FutureStateNavigatorItem'));
