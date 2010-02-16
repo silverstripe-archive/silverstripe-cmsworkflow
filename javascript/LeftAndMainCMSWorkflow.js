@@ -62,14 +62,10 @@ CMSWorkflow = {
 			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoExpiryTZConverter_TZ'] = true;
 			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoExpiryTZConverter_From_Date'] = true;
 			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoExpiryTZConverter_From_Time'] = true;
-			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[Date]'] = true;
-			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[Time]'] = true;
-			$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Date]'] = true;
-			$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Time]'] = true;
 			$('Form_EditForm').changeDetection_fieldsToIgnore['DeletionScheduling'] = true;
 			$('Form_EditForm').changeDetection_fieldsToIgnore['WorkflowComment'] = true;
 			
-			if ($('Form_EditForm').isChanged()) {
+			if ($('Form_EditForm').()) {
 				if(!confirm('You have unsaved changes. You will lose them if you click OK.')) return false;
 			}
 			
@@ -127,6 +123,7 @@ function action_cms_requestdeletefromlive_right(e) {
 }
 
 var EmbargoExpiry = {
+	originalValues: null,
 	save: function(what, el) {
 		EmbargoExpiry.fieldCheck();
 		
@@ -135,8 +132,12 @@ var EmbargoExpiry = {
 
 		if (what == 'embargo') {
 			url += '&EmbargoDate='+escape($(ids.dateField).value)+'&EmbargoTime='+escape($(ids.timeField).value);
+			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[Date]'] = true;
+			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[Time]'] = true;
 		} else if (what == 'expiry') {
 			url += '&ExpiryDate='+escape($(ids.dateField).value)+'&ExpiryTime='+escape($(ids.timeField).value);
+			$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Date]'] = true;
+			$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Time]'] = true;
 		}
 
 		if ($(ids.dateField).value == '' || $(ids.timeField).value == '') {
@@ -169,8 +170,12 @@ var EmbargoExpiry = {
 		
 		if (what == 'embargo') {
 			url += '&ResetEmbargo';
+			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[Date]'] = true;
+			$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[Time]'] = true;
 		} else if (what == 'expiry') {
 			url += '&ResetExpiry';
+			$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Date]'] = true;
+			$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Time]'] = true;
 		}
 		
 		$(el.id).className = 'action loading';
@@ -213,6 +218,16 @@ var EmbargoExpiry = {
 				};
 		}
 	},
+	embargoChange: function() {
+		$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[Date]'] = false;
+		$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[Time]'] = false;
+		EmbargoExpiry.fieldCheck();
+	},
+	expiryChange: function() {
+		$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Date]'] = false;
+		$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Time]'] = false;
+		EmbargoExpiry.fieldCheck();
+	},
 	eButton: function(id) {
 		Element.removeClassName(id, 'disabled');
 		$(id).disabled = false;
@@ -222,6 +237,11 @@ var EmbargoExpiry = {
 		$(id).disabled = true;
 	},
 	fieldCheck: function() {
+
+		if (EmbargoExpiry.originalValues === null) {
+			EmbargoExpiry.originalValues = true;
+		}
+		
 		ids = EmbargoExpiry.ids('embargo');
 		// Only call this logic if the date field & save button exist, otherwise it's unnecessary
 		if($(ids.dateField) && $(ids.saveButton)) {
@@ -249,14 +269,14 @@ var EmbargoExpiry = {
 };
 
 Behaviour.register({
-	'#EmbargoDate_Date' : { 
-		onchange: EmbargoExpiry.fieldCheck,
-		initialize: EmbargoExpiry.fieldCheck 
+	'#EmbargoDate_Time' : {
+		initialize: EmbargoExpiry.fieldCheck,
+		onchange: EmbargoExpiry.embargoChange
 	},
-	'#EmbargoDate_Time' : { onchange: EmbargoExpiry.fieldCheck },
-	'#ExpiryDate_Date' : { onchange: EmbargoExpiry.fieldCheck },
-	'#ExpiryDate_Time' : { onchange: EmbargoExpiry.fieldCheck }
-})
+	'#EmbargoDate_Date' : { onchange: EmbargoExpiry.embargoChange },
+	'#ExpiryDate_Date' : { onchange: EmbargoExpiry.expiryChange },
+	'#ExpiryDate_Time' : { onchange: EmbargoExpiry.expiryChange }
+});
 
 
 function action_publish_right(e) {
