@@ -5,7 +5,7 @@
  * @package cmsworkflow
  * @subpackage ThreeStep
  */
-class ApprovedDeletions3StepReport extends SS_Reportt {
+class ApprovedDeletions3StepReport extends SS_Report {
 	function title() {
 		return _t('ApprovedDeletions3StepReport.TITLE',"Approved deletions I need to publish");
 	}

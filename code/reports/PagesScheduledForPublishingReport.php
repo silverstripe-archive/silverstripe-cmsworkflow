@@ -5,7 +5,7 @@
  * @package cmsworkflow
  * @subpackage reports
  */
-class PagesScheduledForPublishingReport extends SS_Reportt {
+class PagesScheduledForPublishingReport extends SS_Report {
 	function title() {
 		return _t('PagesScheduledForPublishingReport.TITLE',"Approved pages with Embargo on");
 	}

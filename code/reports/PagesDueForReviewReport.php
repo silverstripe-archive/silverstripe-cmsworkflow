@@ -6,7 +6,7 @@
  * @package cmsworkflow
  * @subpackage reports
  */
-class PagesDueForReviewReport extends SS_Reportt {
+class PagesDueForReviewReport extends SS_Report {
 	function title() {
 		return 'Pages due for review';
 	}

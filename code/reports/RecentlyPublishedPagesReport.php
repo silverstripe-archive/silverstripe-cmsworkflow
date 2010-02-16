@@ -6,7 +6,7 @@
  * @package cmsworkflow
  * @subpackage reports
  */
-class RecentlyPublishedPagesReport extends SS_Reportt {
+class RecentlyPublishedPagesReport extends SS_Report {
 	function title() {
 		return _t('RecentlyPublishedPagesReport.TITLE', 'Recently published pages');
 	}
