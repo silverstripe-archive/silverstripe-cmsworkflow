@@ -130,6 +130,9 @@ class PagesDueForReviewReport extends SSReport {
 			$field = $parts[0];
 			$direction = $parts[1];
 			
+			if($field == 'AbsoluteLink')
+				$sort = 'URLSegment ' . $direction;
+			
 			if($field != "LastEditedByName") {
 				$query->orderby = $sort;
 			}
