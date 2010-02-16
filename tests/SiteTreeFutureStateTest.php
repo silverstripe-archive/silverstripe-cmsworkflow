@@ -10,15 +10,15 @@ class SiteTreeFutureStateTest extends SapphireTest {
 		// The top-level items have no embargo/expiry, and so should be unaffected by the embargoes
 		// of their children
 		
-		$items1 = DataObject::get("SiteTree", "ParentID = 0")->column("Title");
+		$items1 = DataObject::get("SiteTree", "ParentID = 0 AND ShowInMenus = 1")->column("Title");
 		SiteTreeFutureState::set_future_datetime('2020-01-01 10:00:00');
-		$items2 = DataObject::get("SiteTree", "ParentID = 0")->column("Title");
+		$items2 = DataObject::get("SiteTree", "ParentID = 0 AND ShowInMenus = 1")->column("Title");
 		SiteTreeFutureState::set_future_datetime('2020-01-01 10:59:00');
-		$items3 = DataObject::get("SiteTree", "ParentID = 0")->column("Title");
+		$items3 = DataObject::get("SiteTree", "ParentID = 0 AND ShowInMenus = 1")->column("Title");
 		SiteTreeFutureState::set_future_datetime('2020-01-01 11:01:00');
-		$items4 = DataObject::get("SiteTree", "ParentID = 0")->column("Title");
+		$items4 = DataObject::get("SiteTree", "ParentID = 0 AND ShowInMenus = 1")->column("Title");
 		SiteTreeFutureState::set_future_datetime('2020-01-03 11:01:00');
-		$items5 = DataObject::get("SiteTree", "ParentID = 0")->column("Title");
+		$items5 = DataObject::get("SiteTree", "ParentID = 0 AND ShowInMenus = 1")->column("Title");
 		
 		$this->assertEquals(array('Home', 'About Us', 'Products', 'Contact Us'), $items1);
 		$this->assertEquals(array('Home', 'About Us', 'Products', 'Contact Us'), $items2);
@@ -64,6 +64,19 @@ class SiteTreeFutureStateTest extends SapphireTest {
 			$products->Children()->column("Title"));
 	}
 	
+	/**
+	 * Test that the 404 page can be found, which also tests that subclass fields work on future
+	 * state view.
+	 */
+	function test404PageOnFutureState() {
+		SiteTreeFutureState::set_future_datetime('2020-01-01 09:59:00');
+		
+		$errorPage = DataObject::get_one("ErrorPage", "\"ErrorCode\" = '404'");
+
+		$this->assertType('ErrorPage', $errorPage);
+		$this->assertEquals("Page not Found", $errorPage->Title);
+	}
+	
 	function setUp() {
 		parent::setUp();
 		
@@ -71,6 +84,7 @@ class SiteTreeFutureStateTest extends SapphireTest {
 		$pages = array('home', 'about', 'staff', 'staffduplicate','products', 'product1', 
 			'product2', 'contact');
 		foreach($pages as $page) $this->objFromFixture('Page', $page)->doPublish();
+		$this->objFromFixture('ErrorPage', 404)->doPublish();
 
 		Versioned::reading_stage('Live');
 	}

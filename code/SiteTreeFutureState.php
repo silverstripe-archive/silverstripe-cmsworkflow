@@ -71,6 +71,7 @@ class SiteTreeFutureState extends DataObjectDecorator {
 				}
 				$query->renameTable($table, $table . '_versions');
 				$query->replaceText("\"$table\".\"ID\"", "\"$table\".\"RecordID\"");
+				$query->replaceText("\"{$table}_versions\".\"ID\"", "\"{$table}_versions\".\"RecordID\"");
 				
 				if($table == $baseTable) {
 					// Add all <basetable>_versions columns
