@@ -39,7 +39,7 @@ class UnapprovedDeletions3StepReport extends SSReport {
 				'formatting' => '<a href=\"admin/show/$ID\" title=\"Edit page\">$value</a>'
 			),
 			"WFAuthorTitle" => array(
-				"title" => "Author",
+				"title" => "Requested by",
 			),
 			"WFRequestedWhen" => array(
 				"title" => "Requested",

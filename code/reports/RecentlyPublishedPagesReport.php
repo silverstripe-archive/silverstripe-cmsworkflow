@@ -13,14 +13,14 @@ class RecentlyPublishedPagesReport extends SSReport {
 	
 	function columns() {
 		$fields = array(
-			'PageTitle' => 'Page Title',
+			'PageTitle' => 'Page name',
 			'Published' => array(
 				'title' => 'Published',
 				'casting' => 'SSDatetime->Full'
 			),
 			'PublisherTitle' => 'Publisher',
 			'AbsoluteLink' => array(
-				'title' => 'Links',
+				'title' => 'URL',
 				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'
 			),
 			'ExpiryDate' => array(
