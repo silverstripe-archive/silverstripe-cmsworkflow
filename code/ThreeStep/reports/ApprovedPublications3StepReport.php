@@ -32,6 +32,17 @@ class ApprovedPublications3StepReport extends SSReport {
 			}
 		}
 		
+		if($sort) {
+			$parts = explode(' ', $sort);
+			$field = $parts[0];
+			$direction = $parts[1];
+			
+			if($field == 'AbsoluteLink') $sort = 'URLSegment ' . $direction;
+			if($field == 'Subsite.Title') $sort = 'SubsiteID ' . $direction;
+			
+			$doSet->sort($sort);
+		}
+		
 		return $doSet;
 	}
 	function columns() {
