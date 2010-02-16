@@ -68,7 +68,9 @@ class PagesDueForReviewReport extends SSReport {
 				'title' => 'Review Date',
 				'casting' => 'Date->Full'
 			),
-			'OwnerName' => 'Owner',
+			'OwnerNames' => array(
+				'title' => 'Owner'
+			),
 			'LastEditedByName' => 'Last edited by',
 			'AbsoluteLink' => array(
 				'title' => 'URL',
@@ -121,7 +123,7 @@ class PagesDueForReviewReport extends SSReport {
 		
 		$query = singleton("SiteTree")->extendedSQL(join(' AND ', $wheres));
 		
-		$query->select[] = Member::get_title_sql('Owner').' AS OwnerName';
+		$query->select[] = Member::get_title_sql('Owner').' AS OwnerNames';
 		$query->from[] = 'LEFT JOIN "Member" AS "Owner" ON "SiteTree"."OwnerID" = "Owner"."ID"';
 		
 		// Turn a query into records
@@ -140,7 +142,9 @@ class PagesDueForReviewReport extends SSReport {
 				$query->orderby = $sort;
 			}
 		}
+
 		$records = singleton('SiteTree')->buildDataObjectSet($query->execute(), 'DataObjectSet', $query);
+		// var_dump($records);
 		foreach($records as $record) {
 			$record->LastEditedByName = $record->LastEditedBy()->Title;
 		}
