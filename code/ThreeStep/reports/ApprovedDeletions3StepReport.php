@@ -20,8 +20,8 @@ class ApprovedDeletions3StepReport extends SSReport {
 			if ($wf = $result->openWorkflowRequest()) {
 				if (!$result->canDeleteFromLive()) continue;
 				$result->WFAuthorID = $wf->AuthorID;
-				$result->WFApproverEmail = $wf->Approver()->Email;
-				$result->WFRequesterEmail = $wf->Author()->Email;
+				$result->WFApproverTitle = $wf->Approver()->Title;
+				$result->WFAuthorTitle = $wf->Author()->Title;
 				$result->WFApprovedWhen = $wf->ApprovalDate();
 				$result->WFRequestedWhen = $wf->Created;
 				$result->WFApproverID = $wf->ApproverID;
@@ -39,14 +39,14 @@ class ApprovedDeletions3StepReport extends SSReport {
 				"title" => "Title",
 				'formatting' => '<a href=\"admin/show/$ID\" title=\"Edit page\">$value</a>'
 			),
-			"WFApproverEmail" => array(
+			"WFApproverTitle" => array(
 				"title" => "Approver",
 			),
 			"WFApprovedWhen" => array(
 				"title" => "Approved",
 				'casting' => 'SSDatetime->Full'
 			),
-			"WFRequesterEmail" => array(
+			"WFAuthorTitle" => array(
 				"title" => "Author",
 			),
 			"WFRequestedWhen" => array(

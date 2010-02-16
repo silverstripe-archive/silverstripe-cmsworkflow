@@ -23,8 +23,8 @@ class UnapprovedPublications3StepReport extends SSReport {
 				if ($wf = $result->openWorkflowRequest()) {
 					if (!$result->canApprove()) continue;
 					if(ClassInfo::exists('Subsite')) $result->SubsiteTitle = $result->Subsite()->Title;
-					$result->AuthorTitle = $wf->Author()->Title;
 					$result->RequestedAt = $wf->Created;
+					$result->WFAuthorTitle = $wf->Author()->Title;
 					$result->HasEmbargoOrExpiry = $wf->getEmbargoDate() || $wf->ExpiryDate() ? 'yes' : 'no';
 					$doSet->push($result);
 				}
@@ -42,7 +42,7 @@ class UnapprovedPublications3StepReport extends SSReport {
 				'title' => 'Title',
 				'formatting' => '<a href=\"admin/show/$ID\" title=\"Edit page\">$value</a>'
 			),
-			'AuthorTitle' => 'Requested by',
+			'WFAuthorTitle' => 'Requested by',
 			'RequestedAt' => array(
 				'title' => 'Requested',
 				'casting' => 'SSDatetime->Full'

@@ -20,8 +20,8 @@ class UnapprovedDeletions3StepReport extends SSReport {
 			foreach ($res as $result) {
 				if ($wf = $result->openWorkflowRequest()) {
 					if (!$result->canApprove()) continue;
+					$result->WFAuthorTitle = $wf->Author()->Title;
 					$result->WFAuthorID = $wf->AuthorID;
-					$result->WFRequesterEmail = $wf->Author()->Email;
 					$result->WFRequestedWhen = $wf->Created;
 					$result->WFApproverID = $wf->ApproverID;
 					$result->WFPublisherID = $wf->PublisherID;
@@ -38,7 +38,7 @@ class UnapprovedDeletions3StepReport extends SSReport {
 				"title" => "Title",
 				'formatting' => '<a href=\"admin/show/$ID\" title=\"Edit page\">$value</a>'
 			),
-			"WFRequesterEmail" => array(
+			"WFAuthorTitle" => array(
 				"title" => "Author",
 			),
 			"WFRequestedWhen" => array(

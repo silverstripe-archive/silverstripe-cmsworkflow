@@ -83,7 +83,8 @@ class PagesScheduledForDeletionReport extends SSReport {
 
 		
 		$query->from[] = "LEFT JOIN Member AS Approver ON WorkflowRequest.ApproverID = Approver.ID";
-		$query->select[] = 'CONCAT(Approver.FirstName, \' \', Approver.Surname) AS ApproverName';
+		$query->select[] = Member::get_title_sql('Approver').' AS ApproverName';
+			
 		
 		// Turn a query into records
 		if($sort) $query->orderby = $sort;

@@ -122,7 +122,7 @@ class PagesDueForReviewReport extends SSReport {
 		}
 		
 		$query = singleton("SiteTree")->extendedSQL(join(' AND ', $wheres));
-		$query->select[] = 'CONCAT_WS(\', \', "Owner"."Surname", "Owner"."FirstName") AS OwnerName';
+		$query->select[] = Member::get_title_sql('Owner').' AS OwnerName';
 		
 		$query->from[] = 'LEFT JOIN "Member" AS "Owner" ON "SiteTree"."OwnerID" = "Owner"."ID"';
 		

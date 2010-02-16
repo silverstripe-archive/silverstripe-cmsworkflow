@@ -55,7 +55,7 @@ class PagesScheduledForPublishingReport extends SSReport {
 		$query->select[] = "WorkflowRequest.EmbargoDate AS EmbargoDate";
 		
 		$query->from[] = "LEFT JOIN Member AS Approver ON WorkflowRequest.ApproverID = Approver.ID";
-		$query->select[] = 'CONCAT(Approver.FirstName, \' \', Approver.Surname) AS ApproverName';
+		$query->select[] = Member::get_title_sql('Approver').' AS ApproverName';
 
 		
 		// Turn a query into records
