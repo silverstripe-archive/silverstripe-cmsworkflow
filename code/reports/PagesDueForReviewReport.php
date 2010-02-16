@@ -145,15 +145,17 @@ class PagesDueForReviewReport extends SSReport {
 
 		$records = singleton('SiteTree')->buildDataObjectSet($query->execute(), 'DataObjectSet', $query);
 		// var_dump($records);
-		foreach($records as $record) {
-			$record->LastEditedByName = $record->LastEditedBy()->Title;
+		if($records) {
+			foreach($records as $record) {
+				$record->LastEditedByName = $record->LastEditedBy()->Title;
+			}
+		
+			if($sort && $field != "LastEditedByName") $records->sort($sort);
+		
+			// Apply limit after that filtering.
+			if($limit) return $records->getRange($limit['start'], $limit['limit']);
+			else return $records;
 		}
-		
-		if($sort && $field != "LastEditedByName") $records->sort($sort);
-		
-		// Apply limit after that filtering.
-		if($limit && $records) return $records->getRange($limit['start'], $limit['limit']);
-		else return $records;
 	}
 }
 
