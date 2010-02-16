@@ -10,6 +10,8 @@ class ApprovedPublications3StepReport extends SSReport {
 		return _t('ApprovedPublications3StepReport.TITLE',"Approved pages I need to publish");
 	}
 	function sourceRecords($params, $sort, $limit) {
+		increase_time_limit_to(120);
+
 		$res = WorkflowThreeStepRequest::get_by_publisher(
 			'WorkflowPublicationRequest',
 			Member::currentUser(),
