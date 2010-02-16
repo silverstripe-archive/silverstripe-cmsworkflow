@@ -288,7 +288,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	}
 	
 	function ApprovalDate() {
-		$change = DataObject::get_one('WorkflowRequestChange', "WorkflowRequestID = $this->ID AND Status = 'AwaitingApproval'", "ID DESC");
+		$change = DataObject::get_one('WorkflowRequestChange', "WorkflowRequestID = $this->ID AND Status = 'Approved'", "ID DESC");
 		return $change ? $change->Created : null;
 	}
 	
