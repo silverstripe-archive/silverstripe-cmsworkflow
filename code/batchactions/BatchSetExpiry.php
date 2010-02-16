@@ -9,14 +9,18 @@ class BatchSetExpiry extends CMSBatchAction {
 	}
 
 	function run(DataObjectSet $pages) {
+		$tzConverter = new TZDateTimeField('TZConvert', $_REQUEST['ExpiryDate_Batch'], SiteConfig::current_site_config()->Timezone);
+		$tzConverter->setValue($_REQUEST['ExpiryDate_Batch']);
+		$date = date('d/m/Y', strtotime($tzConverter->Value()));
+		$time = date('h:i a', strtotime($tzConverter->Value()));
 		return $this->batchaction($pages, 'setExpiry',
 			_t('BatchSetExpiry.ACTIONED_PAGES', 'Set expiry date on %d pages, %d failures'),
-		array($_REQUEST['ExpiryDate_Batch']['Date'], $_REQUEST['ExpiryDate_Batch']['Time']));
+		array($date, $time));
 	}
 	
 	function getParameterFields() {
 		return new Fieldset(
-			new PopupDateTimeField('ExpiryDate_Batch')
+			new TZDateTimeField('ExpiryDate_Batch')
 		);
 	}
 
