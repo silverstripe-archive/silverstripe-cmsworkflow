@@ -246,7 +246,6 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 		if($status) $statusStr = "'".implode("','", $status)."'";
 
 		$classes = (array)ClassInfo::subclassesFor($class);
-		$classes[] = $class;
 		$classesSQL = implode("','", $classes);
 		
 		// build filter
