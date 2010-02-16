@@ -80,7 +80,7 @@ CMSWorkflow = {
 			return false;
 		}
 	},
-
+	
 	showHideExpiry: {
 		onclick: function() {
 			if ($('deleteImmediate').checked) {

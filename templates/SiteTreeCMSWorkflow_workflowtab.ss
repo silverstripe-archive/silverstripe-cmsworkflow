@@ -38,7 +38,38 @@ div#futurePublishing div.popupdatetime ul {
 </style>
 
 <div id="embargoExpiry">
-	
+
+
+<% if ClassName == WorkflowDeletionRequest %>
+<% if Page.canApprove %>
+
+
+<table>
+	<tr>
+		<td><input id="deleteImmediate" <% if ExpiryDate %><% else %>checked="true"<% end_if %> type="radio" name="DeletionScheduling" value="immediate" /></td>
+		<td>Action this request when the publish button is pushed</td>
+	</tr>
+	<tr>
+		<td><input id="deleteLater" <% if ExpiryDate %>checked="true"<% end_if %> type="radio" name="DeletionScheduling" value="scheduled"/></td>
+		<td>Schedule this page to expire at a later date</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td><div id="expiryField" style="display:<% if ExpiryDate %>block<% else %>none<% end_if %>">$ExpiryField</div></td>
+	</tr>
+</table>
+
+<% if ExpiryField %>
+	<p id="embargoExpiry-expiryStatus" style="display:<% if ExpiryDate %>block<% else %>none<% end_if %>">
+		This page is currently scheduled to be unpublished at <span id="expiryDate">$ExpiryDate</span>.
+	</p>
+<% end_if %>
+
+<% end_if %>
+<% end_if %>
+
+<% if ClassName == WorkflowPublicationRequest %>
+
 <% if ExpiryField || EmbargoField %>
 	<% if Status = AwaitingApproval %>
 <h2>Embargo Expiry</h2>
