@@ -110,7 +110,7 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 	}
 	
 	public function ViewExpiredLink() {
-		return $this->Page->ViewExpiredLink();
+		return $this->Page()->ViewExpiredLink();
 	}
 	
 	public function publish($comment, $member, $notify) {
