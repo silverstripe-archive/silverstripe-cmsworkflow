@@ -65,7 +65,7 @@ CMSWorkflow = {
 			$('Form_EditForm').changeDetection_fieldsToIgnore['DeletionScheduling'] = true;
 			$('Form_EditForm').changeDetection_fieldsToIgnore['WorkflowComment'] = true;
 			
-			if ($('Form_EditForm').()) {
+			if ($('Form_EditForm').isChanged()) {
 				if(!confirm('You have unsaved changes. You will lose them if you click OK.')) return false;
 			}
 			
