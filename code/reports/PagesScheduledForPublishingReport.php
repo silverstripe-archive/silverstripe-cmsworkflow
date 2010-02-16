@@ -105,7 +105,7 @@ class PagesScheduledForPublishingReport extends SSReport {
 			'ApproverName' => 'Approved by',
 			'AbsoluteLink' => array(
 				'title' => 'URL',
-				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a> <a href=\"$value?futureDate=$EmbargoDate\">(live on embargo date)</a>'
+				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a> <a href=\"$value?futureDate=$EmbargoDate\">(view on embargo date)</a>'
 			)
 		);
 		
