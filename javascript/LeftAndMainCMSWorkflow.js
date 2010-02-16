@@ -65,6 +65,12 @@ CMSWorkflow = {
 			$('Form_EditForm').changeDetection_fieldsToIgnore['DeletionScheduling'] = true;
 			$('Form_EditForm').changeDetection_fieldsToIgnore['WorkflowComment'] = true;
 			
+			if (EmbargoExpiry.embargoUnsaved || EmbargoExpiry.expiryUnsaved) {
+				if (!confirm('Your embargo/expiry date changes have not been saved. Do you wish to continue?')) {
+					return false;
+				}
+			}
+			
 			if ($('Form_EditForm').isChanged()) {
 				if(!confirm('You have unsaved changes. You will lose them if you click OK.')) return false;
 			}
@@ -298,6 +304,7 @@ CMSForm.prototype.save = function(ifChanged, callAfter, action, publish) {
 		if (!confirm('Your embargo/expiry date changes have not been saved. Do you wish to continue?')) {
 			_AJAX_LOADING = false;
 			if($('Form_EditForm_action_save') && $('Form_EditForm_action_save').stopLoading) $('Form_EditForm_action_save').stopLoading();
+			if($('Form_EditForm_action_publish') && $('Form_EditForm_action_publish').stopLoading) $('Form_EditForm_action_publish').stopLoading();
 			return false;
 		}
 	}
