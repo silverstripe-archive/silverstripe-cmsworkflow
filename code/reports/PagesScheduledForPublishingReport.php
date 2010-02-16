@@ -75,7 +75,7 @@ class PagesScheduledForPublishingReport extends SSReport {
 	function columns() {
 		$fields = array(
 			"Title" => array(
-				"title" => "Title",
+				"title" => "Page name",
 				'formatting' => '<a href=\"admin/show/$ID\" title=\"Edit page\">$value</a>'
 			),
 			'EmbargoDate' => array(

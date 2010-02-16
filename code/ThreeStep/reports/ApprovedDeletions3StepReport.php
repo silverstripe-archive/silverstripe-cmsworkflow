@@ -71,7 +71,7 @@ class ApprovedDeletions3StepReport extends SSReport {
 	function sideReportColumns() {
 		return array(
 			"Title" => array(
-				"title" => "Title",
+				"title" => "Page name",
 				"link" => true,
 			),
 			"WFAuthorTitle" => array(
