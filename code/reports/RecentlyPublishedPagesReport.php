@@ -84,10 +84,10 @@ class RecentlyPublishedPagesReport extends SSReport {
 		
 		// Turn a query into records
 		if($sort) $q->orderby = $sort;
-		$records = singleton('SiteTree')->buildDataObjectSet($query->execute(), 'DataObjectSet', $q);
+		$records = singleton('SiteTree')->buildDataObjectSet($q->execute(), 'DataObjectSet', $q);
 
 		// Apply limit after that filtering.
-		if($limit) return $records->getRange($limit['start'], $limit['limit']);
+		if($limit && $records) return $records->getRange($limit['start'], $limit['limit']);
 		else return $records;
 	}
 	
