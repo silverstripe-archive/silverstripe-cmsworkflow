@@ -31,42 +31,42 @@ unset(CMSBatchActionHandler::$batch_actions['publish']);
 
 // Register main reports
 if(class_exists('Subsite')) {
-	SSReport::register('ReportAdmin', 'SubsiteReportWrapper("UnapprovedPublications3StepReport")',20);
-	SSReport::register('ReportAdmin', 'SubsiteReportWrapper("ApprovedPublications3StepReport")',20);
-	SSReport::register('ReportAdmin', 'SubsiteReportWrapper("UnapprovedDeletions3StepReport")',20);
-	SSReport::register('ReportAdmin', 'SubsiteReportWrapper("ApprovedDeletions3StepReport")',20);
-	SSReport::register('ReportAdmin', 'SubsiteReportWrapper("PagesScheduledForPublishingReport")',20);
-	SSReport::register('ReportAdmin', 'SubsiteReportWrapper("PagesScheduledForDeletionReport")',20);
-	SSReport::register('ReportAdmin', 'SubsiteReportWrapper("PagesDueForReviewReport")',20);
-	SSReport::register('ReportAdmin', 'SubsiteReportWrapper("RecentlyPublishedPagesReport")',20);
+	SS_Report::register('ReportAdmin', 'SubsiteReportWrapper("UnapprovedPublications3StepReport")',20);
+	SS_Report::register('ReportAdmin', 'SubsiteReportWrapper("ApprovedPublications3StepReport")',20);
+	SS_Report::register('ReportAdmin', 'SubsiteReportWrapper("UnapprovedDeletions3StepReport")',20);
+	SS_Report::register('ReportAdmin', 'SubsiteReportWrapper("ApprovedDeletions3StepReport")',20);
+	SS_Report::register('ReportAdmin', 'SubsiteReportWrapper("PagesScheduledForPublishingReport")',20);
+	SS_Report::register('ReportAdmin', 'SubsiteReportWrapper("PagesScheduledForDeletionReport")',20);
+	SS_Report::register('ReportAdmin', 'SubsiteReportWrapper("PagesDueForReviewReport")',20);
+	SS_Report::register('ReportAdmin', 'SubsiteReportWrapper("RecentlyPublishedPagesReport")',20);
 	
 	
 } else {
-	SSReport::register('ReportAdmin', 'UnapprovedPublications3StepReport',20);
-	SSReport::register('ReportAdmin', 'ApprovedPublications3StepReport',20);
-	SSReport::register('ReportAdmin', 'UnapprovedDeletions3StepReport',20);
-	SSReport::register('ReportAdmin', 'ApprovedDeletions3StepReport',20);
-	SSReport::register('ReportAdmin', 'PagesScheduledForPublishingReport',20);
-	SSReport::register('ReportAdmin', 'PagesScheduledForDeletionReport',20);
-	SSReport::register('ReportAdmin', 'PagesDueForReviewReport',20);
-	SSReport::register('ReportAdmin', 'RecentlyPublishedPagesReport',20);
+	SS_Report::register('ReportAdmin', 'UnapprovedPublications3StepReport',20);
+	SS_Report::register('ReportAdmin', 'ApprovedPublications3StepReport',20);
+	SS_Report::register('ReportAdmin', 'UnapprovedDeletions3StepReport',20);
+	SS_Report::register('ReportAdmin', 'ApprovedDeletions3StepReport',20);
+	SS_Report::register('ReportAdmin', 'PagesScheduledForPublishingReport',20);
+	SS_Report::register('ReportAdmin', 'PagesScheduledForDeletionReport',20);
+	SS_Report::register('ReportAdmin', 'PagesDueForReviewReport',20);
+	SS_Report::register('ReportAdmin', 'RecentlyPublishedPagesReport',20);
 }
 
 
 // Register site reports
 
 // 2 Step
-SSReport::register('SideReport', 'MyTwoStepDeletionRequestsSideReport', 20);
-SSReport::register('SideReport', 'MyTwoStepPublicationRequestsSideReport', 20);
-SSReport::register('SideReport', 'MyTwoStepWorkflowRequestsSideReport', 20);
+SS_Report::register('SideReport', 'MyTwoStepDeletionRequestsSideReport', 20);
+SS_Report::register('SideReport', 'MyTwoStepPublicationRequestsSideReport', 20);
+SS_Report::register('SideReport', 'MyTwoStepWorkflowRequestsSideReport', 20);
 
 // 3 Step
-SSReport::register('SideReport', 'SideReportWrapper("ThreeStepMyPublicationRequestsSideReport")', 20);
-SSReport::register('SideReport', 'SideReportWrapper("ThreeStepMyDeletionRequestsSideReport")', 20);
-SSReport::register('SideReport', 'SideReportWrapper("UnapprovedPublications3StepReport")', 20);
-SSReport::register('SideReport', 'SideReportWrapper("ApprovedPublications3StepReport")', 20);
-SSReport::register('SideReport', 'SideReportWrapper("UnapprovedDeletions3StepReport")', 20);
-SSReport::register('SideReport', 'SideReportWrapper("ApprovedDeletions3StepReport")', 20);
+SS_Report::register('SideReport', 'SideReportWrapper("ThreeStepMyPublicationRequestsSideReport")', 20);
+SS_Report::register('SideReport', 'SideReportWrapper("ThreeStepMyDeletionRequestsSideReport")', 20);
+SS_Report::register('SideReport', 'SideReportWrapper("UnapprovedPublications3StepReport")', 20);
+SS_Report::register('SideReport', 'SideReportWrapper("ApprovedPublications3StepReport")', 20);
+SS_Report::register('SideReport', 'SideReportWrapper("UnapprovedDeletions3StepReport")', 20);
+SS_Report::register('SideReport', 'SideReportWrapper("ApprovedDeletions3StepReport")', 20);
 
 
 ?>
