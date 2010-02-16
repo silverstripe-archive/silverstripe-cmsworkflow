@@ -84,12 +84,14 @@
 				<% if EmbargoField %>
 					<p id="embargoExpiry-embargoStatus" style="display:<% if EmbargoDate %>block<% else %>none<% end_if %>">
 						This page is currently scheduled to be published at <span id="embargoDate">$EmbargoField.SSDatetime.Full</span>, $ExpiryField.DefaultTimezoneName time.
+						<% if Status = Scheduled %><a href="$ViewEmbargoedLink" target="_blank">View on date</a><% end_if %>
 					</p>
 				<% end_if %>
 				
 				<% if ExpiryField %>
 					<p id="embargoExpiry-expiryStatus" style="display:<% if ExpiryDate %>block<% else %>none<% end_if %>">
 						This page is currently scheduled to be unpublished at <span id="expiryDate">$ExpiryField.SSDatetime.Full</span>, $ExpiryField.DefaultTimezoneName time.
+						<% if Status = Scheduled %><a href="$ViewExpiredLink" target="_blank">View site on date</a><% end_if %>
 					</p>
 				<% end_if %>
 

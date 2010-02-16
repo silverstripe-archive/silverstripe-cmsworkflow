@@ -6,6 +6,13 @@
 		}
 	);
 	
+	$('#FutureStateDatePopup a.close').livequery('click',
+		function() {
+			$('#FutureStateDatePopup').hide();
+			return false;
+		}
+	);
+	
 	$('#FutureStateGoLink').livequery('click',
 		function() {
 			var date = $('#FutureStateDate_Date').val();

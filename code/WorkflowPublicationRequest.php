@@ -105,6 +105,19 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 		}
 	}
 	
+	public function ViewEmbargoedLink() {
+		return $this->Page()->Link() . '?futureDate=' . $this->dbObject('EmbargoDate')->URLDatetime();
+	}
+	
+	public function ViewExpiredLink() {
+		if(class_exists('Subsite') && $this->Page()->SubsiteID) {
+			$link = 'http://' . $this->owner->Subsite()->domain();
+		} else {
+			$link = Director::absoluteBaseURL();
+		}
+		return $link . '?futureDate=' . $this->Page()->dbObject('ExpiryDate')->URLDatetime();
+	}
+	
 	public function publish($comment, $member, $notify) {
 		if(!$member) $member = Member::currentUser();
 		
