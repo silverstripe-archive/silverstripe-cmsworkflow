@@ -79,15 +79,10 @@ class PagesDueForReviewReport extends SSReport {
 			),
 			'Owner.Title' => 'Owner',
 			'LastEditedBy.Title' => 'Last edited by',
-			'OwnerID' => 'Owner ID',
 			'AbsoluteLink' => array(
 				'title' => 'URL',
-				'formatting' => '$value <a href=\"$value?stage=Live\">(live)</a> <a href=\"$value?stage=Stage\">(draft)</a>',
-			),
-			'ID' => array(
-				'Edit',
-				'formatting' => '<a href=\"admin/show/$value\">Edit page</a>',
-			),
+				'formatting' => '<a href=\"admin/show/$ID\" title=\"Edit page\">$value</a> " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>',
+			)
 		);
 		
 		if(class_exists('Subsite')) {
@@ -151,6 +146,7 @@ class PagesDueForReviewReport extends SSReport {
 		}
 		
 		$query = singleton("SiteTree")->extendedSQL(join(' AND ', $wheres));
+		$query->select[] = '(SELECT "URLSegment" FROM "SiteTree_Live" WHERE "SiteTree_Live"."ID" = "SiteTree"."ID") AS LiveURLSegment';
 		
 		// Now that we've generated the query, put all our subsite stuff back to
 		// normal.
