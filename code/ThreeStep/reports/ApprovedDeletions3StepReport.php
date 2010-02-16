@@ -49,7 +49,7 @@ class ApprovedDeletions3StepReport extends SSReport {
 	function columns() {
 		return array(
 			"Title" => array(
-				"title" => "Title",
+				"title" => "Page name",
 				'formatting' => '<a href=\"admin/show/$ID\" title=\"Edit page\">$value</a>'
 			),
 			"WFApproverTitle" => array(
