@@ -130,8 +130,11 @@ class PagesDueForReviewReport extends SSReport {
 			$field = $parts[0];
 			$direction = $parts[1];
 			
-			if($field == 'AbsoluteLink')
+			if($field == 'AbsoluteLink') {
 				$sort = 'URLSegment ' . $direction;
+			} elseif($field == 'Subsite.Title') {
+				$query->from[] = 'LEFT JOIN "Subsite" ON "Subsite"."ID" = "SiteTree"."SubsiteID"';
+			}
 			
 			if($field != "LastEditedByName") {
 				$query->orderby = $sort;
