@@ -18,15 +18,7 @@ class PagesDueForReviewReport extends SSReport {
 		if(class_exists('Subsite') && $subsites = DataObject::get('Subsite')) {
 			// javascript for subsite specific owner dropdown
 			Requirements::javascript('cmsworkflow/javascript/PagesDueForReviewReport.js');
-			
-			// Add subsite dropdown
-			$options = $subsites->toDropdownMap('ID', 'Title', 'Any');
-			$params->push(new DropdownField(
-				"SubsiteIDWithOwner", 
-				"Subsite",
-				$options
-			));
-			
+
 			// Remember current subsite
 			$existingSubsite = Subsite::currentSubsiteID();
 			
@@ -85,10 +77,6 @@ class PagesDueForReviewReport extends SSReport {
 			)
 		);
 		
-		if(class_exists('Subsite')) {
-			$fields['Subsite.Title'] = 'Subsite';
-		}
-		
 		return $fields;
 	}
 		
@@ -124,18 +112,7 @@ class PagesDueForReviewReport extends SSReport {
 		
 		// We use different dropdown depending on the subsite
 		$ownerIdParam = 'OwnerID';
-		
-		// If subsites is enabled, we need to either disable the filter, or
-		// change subsite to the subsite selected in the dropdown.
-		if(class_exists('Subsite')) {
-			$existingSubsite = 	Subsite::currentSubsiteID();
-			if(!empty($params['SubsiteIDWithOwner'])) {
-				Subsite::changeSubsite($params['SubsiteIDWithOwner']);
-				$ownerIdParam .= $params['SubsiteIDWithOwner'];
-			} else {
-				Subsite::$disable_subsite_filter = true;
-			}
-		}
+
 		
 		// Owner dropdown
 		if(!empty($params[$ownerIdParam])) {
@@ -147,13 +124,6 @@ class PagesDueForReviewReport extends SSReport {
 		
 		$query = singleton("SiteTree")->extendedSQL(join(' AND ', $wheres));
 		$query->select[] = '(SELECT "URLSegment" FROM "SiteTree_Live" WHERE "SiteTree_Live"."ID" = "SiteTree"."ID") AS LiveURLSegment';
-		
-		// Now that we've generated the query, put all our subsite stuff back to
-		// normal.
-		if (class_exists('Subsite')) {
-			Subsite::$disable_subsite_filter = false;
-			Subsite::changeSubsite($existingSubsite);
-		}
 		
 		return $query;
 	}

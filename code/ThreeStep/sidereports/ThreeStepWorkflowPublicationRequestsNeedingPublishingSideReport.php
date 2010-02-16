@@ -5,19 +5,14 @@
  * @package cmsworkflow
  * @subpackage ThreeStep
  */
-class ThreeStepWorkflowPublicationRequestsNeedingPublishingSideReport extends SSReport {
+class ApprovedPublications3StepReport extends SSReport {
 	function title() {
-		return _t('ThreeStepWorkflowPublicationRequestsNeedingPublishingSideReport.TITLE',"Publication requests I need to publish");
+		return _t('ApprovedPublications3StepReport.TITLE',"Approved pages I need to publish");
 	}
 	function group() {
 		return "Workflow reports";
 	}
 	function sourceRecords($params) {
-		if (ClassInfo::exists('Subsite') && isset($params['AllSubsites'])) {
-			$oldSSFilterState = Subsite::$disable_subsite_filter;
-			Subsite::$disable_subsite_filter = true;
-		}
-		
 		$res = WorkflowThreeStepRequest::get_by_publisher(
 			'WorkflowPublicationRequest',
 			Member::currentUser(),
@@ -35,10 +30,6 @@ class ThreeStepWorkflowPublicationRequestsNeedingPublishingSideReport extends SS
 				if (isset($_REQUEST['OnlyMine']) && $result->WFApproverID != Member::currentUserID()) continue;
 				$doSet->push($result);
 			}
-		}
-		
-		if (ClassInfo::exists('Subsite') && isset($params['AllSubsites'])) {
-			Subsite::$disable_subsite_filter = $oldSSFilterState;
 		}
 		
 		return $doSet;
@@ -67,13 +58,10 @@ class ThreeStepWorkflowPublicationRequestsNeedingPublishingSideReport extends SS
 		);
 	}
 	
-	function getParameterFields() {
+	function parameterFields() {
 		$fieldset = new FieldSet(
 			new CheckboxField('OnlyMine', 'Only requests I approved')
 		);
-		if (ClassInfo::exists('Subsite')) {
-			$fieldset->push(new CheckboxField('AllSubsites', 'All subsites'));
-		}
 		return $fieldset;
 	}
 

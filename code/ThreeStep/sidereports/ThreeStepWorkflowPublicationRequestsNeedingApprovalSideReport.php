@@ -16,11 +16,6 @@ class ThreeStepWorkflowPublicationRequestsNeedingApprovalSideReport extends SSRe
 		return 100;
 	}
 	function sourceRecords($params) {
-		if (ClassInfo::exists('Subsite') && isset($params['AllSubsites'])) {
-			$oldSSFilterState = Subsite::$disable_subsite_filter;
-			Subsite::$disable_subsite_filter = true;
-		}
-		
 		$res = WorkflowThreeStepRequest::get_by_approver(
 			'WorkflowPublicationRequest',
 			Member::currentUser(),
@@ -41,10 +36,6 @@ class ThreeStepWorkflowPublicationRequestsNeedingApprovalSideReport extends SSRe
 			}
 		}
 		
-		if (ClassInfo::exists('Subsite') && isset($params['AllSubsites'])) {
-			Subsite::$disable_subsite_filter = $oldSSFilterState;
-		}
-		
 		return $doSet;
 	}
 	function columns() {
@@ -62,13 +53,6 @@ class ThreeStepWorkflowPublicationRequestsNeedingApprovalSideReport extends SSRe
 				"formatting" => ' on $value',
 			)
 		);
-	}
-	function parameterFields() {
-		if (ClassInfo::exists('Subsite')) {
-			return new FieldSet(
-				new CheckboxField('AllSubsites', 'All subsites')
-			);
-		}
 	}
 	function canView() {
 		return Object::has_extension('SiteTree', 'SiteTreeCMSThreeStepWorkflow');

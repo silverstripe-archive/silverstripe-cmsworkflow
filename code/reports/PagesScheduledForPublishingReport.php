@@ -7,23 +7,11 @@
  */
 class PagesScheduledForPublishingReport extends SSReport {
 	function title() {
-		return _t('PagesScheduledForPublishingReport.TITLE',"Pages scheduled for publishing");
+		return _t('PagesScheduledForPublishingReport.TITLE',"Approved pages with Embargo on");
 	}
 		
 	function sourceQuery($params) {
-		// Manually manage the subsite filtering
-		if(ClassInfo::exists('Subsite')) Subsite::$disable_subsite_filter = true;
-		
 		$wheres = array();
-		
-		if(!empty($params['Subsites'])) {
-			// 'any' wasn't selected
-			$subsiteIds = array();
-			foreach(explode(',', $params['Subsites']) as $subsite) {
-				if(is_numeric($subsite)) $subsiteIds[] = $subsite;
-			}
-			$wheres[] = 'SubsiteID IN(' . implode(',' , $subsiteIds) . ')';
-		}
 		
 		$startDate = !empty($params['StartDate']) ? $params['StartDate'] : null;
 		$endDate = !empty($params['EndDate']) ? $params['EndDate'] : null;
@@ -67,14 +55,6 @@ class PagesScheduledForPublishingReport extends SSReport {
 		$query->from[] = "LEFT JOIN Member AS Approver ON WorkflowRequest.ApproverID = Approver.ID";
 		$query->select[] = 'CONCAT(Approver.FirstName, \' \', Approver.Surname) AS ApproverName';
 
-		// Manually manage the subsite filtering
-		if(ClassInfo::exists('Subsite')) {
-			$query->from[] = "LEFT JOIN Subsite ON SiteTree.SubsiteID = Subsite.ID";
-			// $query->select[] = "CASE WHEN Subsite.Title IS NOT '0' THEN Subsite.Title ELSE 'Main site' END AS SubsiteTitle";
-			$query->select[] = "Subsite.Title AS SubsiteTitle";
-			Subsite::$disable_subsite_filter = false;
-		}
-		
 		return $query;
 	}
 
@@ -92,20 +72,11 @@ class PagesScheduledForPublishingReport extends SSReport {
 			)
 		);
 		
-		if(class_exists('Subsite')) {
-			$fields['SubsiteTitle'] = 'Subsite';
-		}
-		
 		return $fields;
 	}
 	
 	function parameterFields() {
 		$params = new FieldSet();
-		
-		if (class_exists('Subsite') && $subsites = Subsite::accessible_sites('CMS_ACCESS_CMSMain')) {
-			$options = $subsites->toDropdownMap('ID', 'Title');
-			$params->push(new TreeMultiselectField('Subsites', 'Sites', $options));
-		}
 		
 		$params->push(new PopupDateTimeField('StartDate', 'Start date'));
 		$params->push(new PopupDateTimeField('EndDate', 'End date'));

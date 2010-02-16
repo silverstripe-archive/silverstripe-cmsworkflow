@@ -5,9 +5,9 @@
  * @package cmsworkflow
  * @subpackage ThreeStep
  */
-class ThreeStepWorkflowRemovalRequestsNeedingPublishingSideReport extends SSReport {
+class ApprovedDeletions3StepReport extends SSReport {
 	function title() {
-		return _t('ThreeStepWorkflowRemovalRequestsNeedingPublishingSideReport.TITLE',"Removal requests I need to publish");
+		return _t('ApprovedDeletions3StepReport.TITLE',"Approved deletions I need to publish");
 	}
 	function group() {
 		return "Workflow reports";
@@ -16,11 +16,6 @@ class ThreeStepWorkflowRemovalRequestsNeedingPublishingSideReport extends SSRepo
 		return 400;
 	}
 	function sourceRecords($params) {
-		if (ClassInfo::exists('Subsite') && isset($params['AllSubsites'])) {
-			$oldSSFilterState = Subsite::$disable_subsite_filter;
-			Subsite::$disable_subsite_filter = true;
-		}
-		
 		$res = WorkflowThreeStepRequest::get_by_publisher(
 			'WorkflowDeletionRequest',
 			Member::currentUser(),
@@ -38,10 +33,6 @@ class ThreeStepWorkflowRemovalRequestsNeedingPublishingSideReport extends SSRepo
 				if (isset($_REQUEST['OnlyMine']) && $result->WFApproverID != Member::currentUserID()) continue;
 				$doSet->push($result);
 			}
-		}
-		
-		if (ClassInfo::exists('Subsite') && isset($params['AllSubsites'])) {
-			Subsite::$disable_subsite_filter = $oldSSFilterState;
 		}
 		
 		return $doSet;
@@ -62,14 +53,6 @@ class ThreeStepWorkflowRemovalRequestsNeedingPublishingSideReport extends SSRepo
 				"title" => "When",
 			)
 		);
-	}
-
-	function parameterFields() {
-		if (ClassInfo::exists('Subsite')) {
-			return new FieldSet(
-				new CheckboxField('AllSubsites', 'All subsites')
-			);
-		}
 	}
 
 	function canView() {

@@ -5,21 +5,12 @@
  * @package cmsworkflow
  * @subpackage ThreeStep
  */
-class ThreeStepWorkflowPublicationRequestsNeedingApprovalReport extends SSReport {
+class UnapprovedPublications3StepReport extends SSReport {
 	function title() {
-		return _t('ThreeStepWorkflowPublicationRequestsNeedingApprovalReport.TITLE',"Workflow: publication requests I need to approve");
+		return _t('UnapprovedPublications3StepReport.TITLE',"Publication requests I need to approve");
 	}
 	
 	function sourceRecords($params, $sort, $limit) {
-		if(!empty($params['Subsites'])) {
-			// 'any' wasn't selected
-			$subsiteIds = array();
-			foreach(explode(',', $params['Subsites']) as $subsite) {
-				if(is_numeric(trim($subsite))) $subsiteIds[] = trim($subsite);
-			}
-			Subsite::$force_subsite = join(',', $subsiteIds);
-		}
-		
 		$res = WorkflowThreeStepRequest::get_by_approver(
 			'WorkflowPublicationRequest',
 			Member::currentUser(),
@@ -41,10 +32,7 @@ class ThreeStepWorkflowPublicationRequestsNeedingApprovalReport extends SSReport
 		}
 		
 		if ($sort) $doSet->sort($sort);
-		
-		// Manually manage the subsite filtering
-		if(ClassInfo::exists('Subsite')) Subsite::$force_subsite = null;
-		
+
 		return $doSet;
 	}
 	
@@ -63,10 +51,6 @@ class ThreeStepWorkflowPublicationRequestsNeedingApprovalReport extends SSReport
 			)
 		);
 		
-		if(class_exists('Subsite')) {
-			$fields['SubsiteTitle'] = 'Subsite';
-		}
-		
 		return $fields;
 	}
 	
@@ -78,16 +62,6 @@ class ThreeStepWorkflowPublicationRequestsNeedingApprovalReport extends SSReport
 		);
 	}
 	
-	function parameterFields() {
-		$params = new FieldSet();
-		
-		if (class_exists('Subsite') && $subsites = Subsite::accessible_sites('CMS_ACCESS_CMSMain')) {
-			$options = $subsites->toDropdownMap('ID', 'Title');
-			$params->push(new TreeMultiselectField('Subsites', 'Sites', $options));
-		}
-		
-		return $params;
-	}
 	function canView() {
 		return Object::has_extension('SiteTree', 'SiteTreeCMSThreeStepWorkflow');
 	}

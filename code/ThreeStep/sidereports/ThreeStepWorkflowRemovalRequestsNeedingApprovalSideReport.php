@@ -5,9 +5,9 @@
  * @package cmsworkflow
  * @subpackage ThreeStep
  */
-class ThreeStepWorkflowRemovalRequestsNeedingApprovalSideReport extends SSReport {
+class UnapprovedDeletions3StepReport extends SSReport {
 	function title() {
-		return _t('ThreeStepWorkflowRemovalRequestsNeedingApprovalSideReport.TITLE',"Removal requests I need to approve");
+		return _t('UnapprovedDeletions3StepReport.TITLE',"Deletion requests I need to approve");
 	}
 	function group() {
 		return "Workflow reports";
@@ -16,11 +16,6 @@ class ThreeStepWorkflowRemovalRequestsNeedingApprovalSideReport extends SSReport
 		return 200;
 	}
 	function sourceRecords($params) {
-		if (ClassInfo::exists('Subsite') && isset($params['AllSubsites'])) {
-			$oldSSFilterState = Subsite::$disable_subsite_filter;
-			Subsite::$disable_subsite_filter = true;
-		}
-		
 		$res = WorkflowThreeStepRequest::get_by_approver(
 			'WorkflowRemovalRequest',
 			Member::currentUser(),
@@ -41,10 +36,6 @@ class ThreeStepWorkflowRemovalRequestsNeedingApprovalSideReport extends SSReport
 			}
 		}
 		
-		if (ClassInfo::exists('Subsite') && isset($params['AllSubsites'])) {
-			Subsite::$disable_subsite_filter = $oldSSFilterState;
-		}
-		
 		return $doSet;
 	}
 	function columns() {
@@ -63,13 +54,6 @@ class ThreeStepWorkflowRemovalRequestsNeedingApprovalSideReport extends SSReport
 				"link" => false,
 			)
 		);
-	}
-	function parameterFields() {
-		if (ClassInfo::exists('Subsite')) {
-			return new FieldSet(
-				new CheckboxField('AllSubsites', 'All subsites')
-			);
-		}
 	}
 	function canView() {
 		return Object::has_extension('SiteTree', 'SiteTreeCMSThreeStepWorkflow');

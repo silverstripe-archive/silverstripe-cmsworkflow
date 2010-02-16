@@ -2,32 +2,48 @@
 
 global $lang;
 
-$lang['en_US']['BatchApprovePages']['APPROVED_PAGES'] = 'Approved %d pages';
+$lang['en_US']['BatchApprovePages']['APPROVED_PAGES'] = 'Approved %d pages, %d failures';
 $lang['en_US']['BatchApprovePages']['APPROVE_PAGES'] = 'Approve';
 $lang['en_US']['BatchApprovePages']['APPROVING_PAGES'] = 'Approving pages';
-$lang['en_US']['BatchPublishPages']['PUBLISHED_PAGES'] = 'Published %d pages';
+$lang['en_US']['BatchPublishPages']['DELETE_FAILURE'] = 'Failed to delete %d pages from the published site.';
+$lang['en_US']['BatchPublishPages']['DELETE_FAILURE_ONE'] = 'Failed to delete %d page from the published site.';
+$lang['en_US']['BatchPublishPages']['DELETE_SUCCESS'] = 'Deleted %d pages from the published site.';
+$lang['en_US']['BatchPublishPages']['DELETE_SUCCESS_ONE'] = 'Deleted %d page from the published site.';
+$lang['en_US']['BatchPublishPages']['FORCE_PUBLISH'] = 'Force publish';
 $lang['en_US']['BatchPublishPages']['PUBLISHING_PAGES'] = 'Publishing pages';
+$lang['en_US']['BatchPublishPages']['PUBLISH_FAILURE'] = 'Failed to publish %d pages.';
+$lang['en_US']['BatchPublishPages']['PUBLISH_FAILURE_ONE'] = 'Failed to publish %d page.';
 $lang['en_US']['BatchPublishPages']['PUBLISH_PAGES'] = 'Publish';
-$lang['en_US']['BatchResetEmbargo']['ACTIONED_PAGES'] = 'Reset embargo date on %d pages';
+$lang['en_US']['BatchPublishPages']['PUBLISH_SUCCESS'] = 'Published %d pages.';
+$lang['en_US']['BatchPublishPages']['PUBLISH_SUCCESS_ONE'] = 'Published %d page.';
+$lang['en_US']['BatchResetEmbargo']['ACTIONED_PAGES'] = 'Reset embargo date on %d pages, %d failures';
 $lang['en_US']['BatchResetEmbargo']['ACTION_TITLE'] = 'Reset embargo date';
 $lang['en_US']['BatchResetEmbargo']['DOING_TEXT'] = 'Resetting embargo date';
-$lang['en_US']['BatchResetExpiry']['ACTIONED_PAGES'] = 'Reset expiry date on %d pages';
+$lang['en_US']['BatchResetExpiry']['ACTIONED_PAGES'] = 'Reset expiry date on %d pages, %d failures';
 $lang['en_US']['BatchResetExpiry']['ACTION_TITLE'] = 'Reset expiry date';
 $lang['en_US']['BatchResetExpiry']['DOING_TEXT'] = 'Resetting expiry date';
-$lang['en_US']['BatchSetEmbargo']['ACTIONED_PAGES'] = 'Set embargo date on %d pages';
+$lang['en_US']['BatchSetEmbargo']['ACTIONED_PAGES'] = 'Set embargo date on %d pages, %d failures';
 $lang['en_US']['BatchSetEmbargo']['ACTION_TITLE'] = 'Set embargo date';
 $lang['en_US']['BatchSetEmbargo']['DOING_TEXT'] = 'Setting embargo date';
-$lang['en_US']['BatchSetExpiry']['ACTIONED_PAGES'] = 'Set expiry date on %d pages';
+$lang['en_US']['BatchSetExpiry']['ACTIONED_PAGES'] = 'Set expiry date on %d pages, %d failures';
+$lang['en_US']['BatchSetExpiry']['ACTION_TITLE'] = 'Set expiry date';
+$lang['en_US']['BatchSetExpiry']['DOING_TEXT'] = 'Setting expiry date';
+$lang['en_US']['CMSWorkflowThreeStepFilters_PagesAwaitingApproval']['TITLE'] = 'Pages awaiting approval';
+$lang['en_US']['CMSWorkflowThreeStepFilters_PagesAwaitingPublishing']['TITLE'] = 'Pages awaiting publishing';
 $lang['en_US']['LeftAndMain']['CHANGEDURL'] = '  Changed URL to \'%s\'';
 $lang['en_US']['LeftAndMain']['SAVEDUP'] = 'Saved';
 $lang['en_US']['LeftAndMain']['STATUSTO'] = '  Status changed to \'%s\'';
-$lang['en_US']['MyWorkflowRequestsSideReport']['TITLE'] = 'Workflow: pages scheduled for publishing (all subsites)';
-$lang['en_US']['PagesDueForReviewSideReport']['TITLE'] = 'Pages due for review';
+$lang['en_US']['MyTwoStepDeletionRequestsSideReport']['TITLE'] = 'Workflow: Awaiting deletion';
+$lang['en_US']['MyTwoStepPublicationRequestsSideReport']['TITLE'] = 'Workflow: Awaiting publication';
+$lang['en_US']['MyTwoStepWorkflowRequestsSideReport']['TITLE'] = 'Workflow: My requests pending review';
 $lang['en_US']['SiteTree']['EDITANYONE'] = 'Anyone who can log-in to the CMS';
 $lang['en_US']['SiteTree']['EDITINHERIT'] = 'Inherit from parent page';
 $lang['en_US']['SiteTree']['EDITONLYTHESE'] = 'Only these people (choose from list)';
+$lang['en_US']['SiteTreeCMSWorkflow']['APPROVEDANDPUBLISHMESSAGE'] = 'Approved request and published changes to live version. Emailed %s.';
 $lang['en_US']['SiteTreeCMSWorkflow']['APPROVEHEADER'] = 'Who can approve requests inside the CMS?';
 $lang['en_US']['SiteTreeCMSWorkflow']['APPROVEMESSAGE'] = 'Approved request. Emailed %s.';
+$lang['en_US']['SiteTreeCMSWorkflow']['AUTO_APPROVED'] = '(automatically approved)';
+$lang['en_US']['SiteTreeCMSWorkflow']['AUTO_DENIED'] = '(automatically denied)';
 $lang['en_US']['SiteTreeCMSWorkflow']['AUTO_DENIED_DELETED'] = '(automatically denied when the page was deleted)';
 $lang['en_US']['SiteTreeCMSWorkflow']['AUTO_DENIED_PUBLISHED'] = '(automatically denied when the page was published)';
 $lang['en_US']['SiteTreeCMSWorkflow']['BUTTONREQUESTPUBLICATION'] = 'Request Publication';
@@ -51,8 +67,6 @@ $lang['en_US']['SiteTreeCMSWorkflow']['PAGEOWNER'] = 'Page owner (will be respon
 $lang['en_US']['SiteTreeCMSWorkflow']['PUBLISHAPPROVEDHEADER'] = 'Who can publish approved requests inside the CMS?';
 $lang['en_US']['SiteTreeCMSWorkflow']['PUBLISHHEADER'] = 'Who can publish this inside the CMS?';
 $lang['en_US']['SiteTreeCMSWorkflow']['PUBLISHMESSAGE'] = 'Published changes to live version. Emailed %s.';
-$lang['en_US']['SiteTreeCMSWorkflow']['REQUEST_DELETEFROMLIVE_SUCCESS_MESSAGE'] = 'Emailed %s requesting deletion';
-$lang['en_US']['SiteTreeCMSWorkflow']['REQUEST_PUBLICATION_SUCCESS_MESSAGE'] = 'Emailed %s requesting publication';
 $lang['en_US']['SiteTreeCMSWorkflow']['REVIEWFREQUENCY'] = 'Review frequency (the review date will be set to this far in the future whenever the page is published.)';
 $lang['en_US']['SiteTreeCMSWorkflow']['REVIEWHEADER'] = 'Content review';
 $lang['en_US']['SiteTreeCMSWorkflow']['STATUS_APPROVED'] = 'Approved';
@@ -71,6 +85,12 @@ $lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOW_ACTION_COMMENT'] = 'Comment';
 $lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOW_ACTION_DENY'] = 'Deny';
 $lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOW_ACTION_FAILED'] = 'There was an error when processing your workflow request.';
 $lang['en_US']['SiteTreeCMSWorkflow']['WORKFLOW_ACTION_RESUBMIT'] = 'Re-submit';
+$lang['en_US']['ThreeStepMyDeletionRequestsSideReport']['TITLE'] = 'Workflow: my deletion requests';
+$lang['en_US']['ThreeStepMyPublicationRequestsSideReport']['TITLE'] = 'Workflow: my publication requests';
+$lang['en_US']['ThreeStepWorkflowPublicationRequestsNeedingApprovalSideReport']['TITLE'] = 'Workflow: publication requests I need to approve';
+$lang['en_US']['ThreeStepWorkflowPublicationRequestsNeedingPublishingSideReport']['TITLE'] = 'Workflow: publication requests I need to publish';
+$lang['en_US']['ThreeStepWorkflowRemovalRequestsNeedingApprovalSideReport']['TITLE'] = 'Workflow: removal requests I need to approve';
+$lang['en_US']['ThreeStepWorkflowRemovalRequestsNeedingPublishingSideReport']['TITLE'] = 'Workflow: removal requests I need to publish';
 $lang['en_US']['WorkflowDeletionRequest']['EMAIL_PARA_APPROVED'] = array(
 	'%s has approved your request to delete the "%s" page and deleted it from the published site.',
 	50,
@@ -121,6 +141,7 @@ $lang['en_US']['WorkflowDeletionRequest']['EMAIL_SUBJECT_DENIED'] = array(
 	50,
 	'Email subject with page title'
 );
+$lang['en_US']['WorkflowDeletionRequest']['SETEXPIRY'] = 'Set Expiry date. Emailed %s';
 $lang['en_US']['WorkflowPublicationRequest']['EMAIL_PARA_APPROVED'] = array(
 	'%s has approved and published your changes to the "%s" page.',
 	50,
@@ -197,5 +218,16 @@ $lang['en_US']['WorkflowRequestChange']['SINGULARNAME'] = array(
 	50,
 	'Singular name of the object, used in dropdowns and to generally identify a single object in the interface'
 );
+$lang['en_US']['WorkflowSystemMember']['PLURALNAME'] = array(
+	'Workflow System Members',
+	50,
+	'Pural name of the object, used in dropdowns and to generally identify a collection of this object in the interface'
+);
+$lang['en_US']['WorkflowSystemMember']['SINGULARNAME'] = array(
+	'Workflow System Member',
+	50,
+	'Singular name of the object, used in dropdowns and to generally identify a single object in the interface'
+);
+$lang['en_US']['WorkflowThreeStepRequest']['PUBLISHMESSAGE'] = 'Published changes to live version. Emailed %s.';
 
 ?>

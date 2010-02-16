@@ -29,29 +29,40 @@ unset(CMSBatchActionHandler::$batch_actions['publish']);
 
 
 // Register main reports
-SSReport::register('ReportAdmin', 'PagesDueForReviewReport');
-SSReport::register('ReportAdmin', 'PagesScheduledForDeletionReport');
-SSReport::register('ReportAdmin', 'PagesScheduledForPublishingReport');
+if(class_exists('Subsite')) {
+	SSReport::register('ReportAdmin', 'SubsiteReportWrapper("UnapprovedPublications3StepReport")',20);
+	SSReport::register('ReportAdmin', 'SubsiteReportWrapper("ApprovedPublications3StepReport")',20);
+	SSReport::register('ReportAdmin', 'SubsiteReportWrapper("UnapprovedDeletions3StepReport")',20);
+	SSReport::register('ReportAdmin', 'SubsiteReportWrapper("ApprovedDeletions3StepReport")',20);
+	SSReport::register('ReportAdmin', 'SubsiteReportWrapper("PagesScheduledForPublishingReport")',20);
+	SSReport::register('ReportAdmin', 'SubsiteReportWrapper("PagesScheduledForDeletionReport")',20);
+	SSReport::register('ReportAdmin', 'SubsiteReportWrapper("PagesDueForReviewReport")',20);
+	
+	
+} else {
+	SSReport::register('ReportAdmin', 'UnapprovedPublications3StepReport',20);
+	SSReport::register('ReportAdmin', 'ApprovedPublications3StepReport',20);
+	SSReport::register('ReportAdmin', 'UnapprovedDeletions3StepReport',20);
+	SSReport::register('ReportAdmin', 'ApprovedDeletions3StepReport',20);
+	SSReport::register('ReportAdmin', 'PagesScheduledForPublishingReport',20);
+	SSReport::register('ReportAdmin', 'PagesScheduledForDeletionReport',20);
+	SSReport::register('ReportAdmin', 'PagesDueForReviewReport',20);
+}
 
-SSReport::register('ReportAdmin', 'ThreeStepMyDeletionRequestsSideReport');
-SSReport::register('ReportAdmin', 'ThreeStepMyPublicationRequestsSideReport');
-SSReport::register('ReportAdmin', 'ThreeStepWorkflowPublicationRequestsNeedingApprovalSideReport');
-SSReport::register('ReportAdmin', 'ThreeStepWorkflowPublicationRequestsNeedingPublishingSideReport');
-SSReport::register('ReportAdmin', 'ThreeStepWorkflowRemovalRequestsNeedingApprovalSideReport');
-SSReport::register('ReportAdmin', 'ThreeStepWorkflowRemovalRequestsNeedingPublishingSideReport');
-SSReport::register('ReportAdmin', 'MyTwoStepDeletionRequestsSideReport');
-SSReport::register('ReportAdmin', 'MyTwoStepPublicationRequestsSideReport');
-SSReport::register('ReportAdmin', 'MyTwoStepWorkflowRequestsSideReport');
 
 // Register site reports
-SSReport::register('SideReport', 'ThreeStepMyDeletionRequestsSideReport');
-SSReport::register('SideReport', 'ThreeStepMyPublicationRequestsSideReport');
-SSReport::register('SideReport', 'ThreeStepWorkflowPublicationRequestsNeedingApprovalSideReport');
-SSReport::register('SideReport', 'ThreeStepWorkflowPublicationRequestsNeedingPublishingSideReport');
-SSReport::register('SideReport', 'ThreeStepWorkflowRemovalRequestsNeedingApprovalSideReport');
-SSReport::register('SideReport', 'ThreeStepWorkflowRemovalRequestsNeedingPublishingSideReport');
-SSReport::register('SideReport', 'MyTwoStepDeletionRequestsSideReport');
-SSReport::register('SideReport', 'MyTwoStepPublicationRequestsSideReport');
-SSReport::register('SideReport', 'MyTwoStepWorkflowRequestsSideReport');
+
+// 2 Step
+SSReport::register('SideReport', 'MyTwoStepDeletionRequestsSideReport', 20);
+SSReport::register('SideReport', 'MyTwoStepPublicationRequestsSideReport', 20);
+SSReport::register('SideReport', 'MyTwoStepWorkflowRequestsSideReport', 20);
+
+// 3 Step
+SSReport::register('SideReport', 'ThreeStepMyPublicationRequestsSideReport', 20);
+SSReport::register('SideReport', 'UnapprovedPublications3StepReport', 20);
+SSReport::register('SideReport', 'ApprovedPublications3StepReport', 20);
+SSReport::register('SideReport', 'UnapprovedDeletions3StepReport', 20);
+SSReport::register('SideReport', 'ApprovedDeletions3StepReport', 20);
+
 
 ?>
