@@ -69,6 +69,9 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 					
 					$embargoField->saveInto($wfRequest);
 					$expiryField->saveInto($wfRequest->Page());
+					
+					$embargoTimestamp = strtotime($embargoField->dataValue());
+					$expiryTimestamp = strtotime($expiryField->dataValue());
 		
 					// Validation time
 					$error = false;
