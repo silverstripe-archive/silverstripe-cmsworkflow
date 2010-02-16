@@ -49,7 +49,7 @@ class UnapprovedPublications3StepReport extends SSReport {
 			),
 			'HasEmbargoOrExpiry' => 'Scheduled',
 			'AbsoluteLink' => array(
-				'title' => 'Links',
+				'title' => 'URL',
 				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'
 			)
 		);
