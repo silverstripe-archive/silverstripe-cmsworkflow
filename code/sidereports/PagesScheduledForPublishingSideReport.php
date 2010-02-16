@@ -15,8 +15,8 @@ class PagesScheduledForPublishingSideReport extends SideReport {
 	function sort() {
 		return 900;
 	}
-	function records() {
 
+	function records() {
 		if (ClassInfo::exists('Subsite') && isset($this->params['AllSubsites'])) {
 			$oldSSFilterState = Subsite::$disable_subsite_filter;
 			Subsite::$disable_subsite_filter = true;
@@ -63,11 +63,9 @@ class PagesScheduledForPublishingSideReport extends SideReport {
 		);
 	}
 	function getParameterFields() {
-		$fieldset = new FieldSet(
+		return new FieldSet(
 			new DateField('StartDate', 'Start date (YYYY-MM-DD HH:mm:ss)'),
 			new DateField('EndDate', 'End date (YYYY-MM-DD HH:mm:ss)')
 		);
-		if (ClassInfo::exists('Subsite')) $fieldset->push(new CheckboxField('AllSubsites', 'All subsites'));
-		return $fieldset;
 	}
 }
