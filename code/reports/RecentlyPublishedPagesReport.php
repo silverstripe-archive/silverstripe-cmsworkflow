@@ -120,6 +120,8 @@ class RecentlyPublishedPagesReport extends SSReport {
 		$params->push($startDate = new PopupDateTimeField('StartDate', 'Start date'));
 		$params->push($endDate = new PopupDateTimeField('EndDate', 'End date'));
 		$endDate->defaultToEndOfDay();
+		$startDate->allowOnlyTime(false);
+		$endDate->allowOnlyTime(false);
 		
 		return $params;
 	}
