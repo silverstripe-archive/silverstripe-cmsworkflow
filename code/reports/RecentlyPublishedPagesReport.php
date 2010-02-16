@@ -13,7 +13,10 @@ class RecentlyPublishedPagesReport extends SSReport {
 	
 	function columns() {
 		$fields = array(
-			'PageTitle' => 'Page name',
+			"PageTitle" => array(
+				"title" => "Title",
+				'formatting' => '<a href=\"admin/show/$ID\" title=\"Edit page\">$value</a>'
+			),
 			'Published' => array(
 				'title' => 'Published',
 				'casting' => 'SSDatetime->Full'
