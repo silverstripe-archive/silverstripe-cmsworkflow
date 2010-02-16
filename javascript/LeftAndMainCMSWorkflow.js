@@ -176,7 +176,7 @@ var EmbargoExpiry = {
 		});	
 	},
 	reset: function(what, el) {
-		elIds = EmbargoExpiry.ids(what);
+		var elIds = EmbargoExpiry.ids(what);
 		var url = 'admin/cms_setembargoexpiry?wfRequest='+$('WorkflowRequest_ID').value;
 		
 		$(elIds.dateField).value = '';
