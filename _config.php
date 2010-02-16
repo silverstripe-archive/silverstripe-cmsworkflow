@@ -59,6 +59,7 @@ SSReport::register('SideReport', 'MyTwoStepWorkflowRequestsSideReport', 20);
 
 // 3 Step
 SSReport::register('SideReport', 'ThreeStepMyPublicationRequestsSideReport', 20);
+SSReport::register('SideReport', 'ThreeStepMyDeletionRequestsSideReport', 20);
 SSReport::register('SideReport', 'UnapprovedPublications3StepReport', 20);
 SSReport::register('SideReport', 'ApprovedPublications3StepReport', 20);
 SSReport::register('SideReport', 'UnapprovedDeletions3StepReport', 20);

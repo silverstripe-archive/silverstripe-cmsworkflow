@@ -7,7 +7,7 @@
  */
 class ThreeStepMyPublicationRequestsSideReport extends SSReport {
 	function title() {
-		return _t('ThreeStepMyPublicationRequestsSideReport.TITLE',"Publication requests I have made");
+		return _t('ThreeStepMyPublicationRequestsSideReport.TITLE',"My publication requests");
 	}
 	function group() {
 		return "Workflow reports";

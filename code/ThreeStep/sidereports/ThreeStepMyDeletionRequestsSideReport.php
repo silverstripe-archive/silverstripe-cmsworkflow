@@ -7,7 +7,7 @@
  */
 class ThreeStepMyDeletionRequestsSideReport extends SSReport {
 	function title() {
-		return _t('ThreeStepMyDeletionRequestsSideReport.TITLE',"Removal requests I have made");
+		return _t('ThreeStepMyDeletionRequestsSideReport.TITLE',"My deletion requests");
 	}
 	function group() {
 		return "Workflow reports";
