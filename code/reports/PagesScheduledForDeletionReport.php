@@ -107,6 +107,10 @@ class PagesScheduledForDeletionReport extends SSReport {
 			if($field == 'Subsite.Title') {
 				$query->from[] = 'LEFT JOIN "Subsite" ON "Subsite"."ID" = "SiteTree"."SubsiteID"';
 			}
+			
+			if($field == 'BacklinkCount') {
+				$query->select[] = '(SELECT COUNT(*) FROM "SiteTree_LinkTracking" WHERE "SiteTree_LinkTracking"."ChildID" = "SiteTree"."ID") AS BacklinkCount';
+			}
 		}
 		
 		// Turn a query into records
