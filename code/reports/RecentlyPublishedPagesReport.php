@@ -31,7 +31,7 @@ class RecentlyPublishedPagesReport extends SSReport {
 		return $fields;
 	}
 	
-	function sourceQuery($params) {
+	function sourceRecords($params, $sort, $limit) {
 		$q = singleton('SiteTree')->extendedSQL();
 		$q->select[] = 'SiteTree.Title AS PageTitle';
 	
@@ -82,7 +82,13 @@ class RecentlyPublishedPagesReport extends SSReport {
 			$q->where[] = "WorkflowRequest.LastEdited >= '".SSDatetime::now()->URLDate()."'";
 		}
 		
-		return $q;
+		// Turn a query into records
+		if($sort) $q->orderby = $sort;
+		$records = singleton('SiteTree')->buildDataObjectSet($query->execute(), 'DataObjectSet', $q);
+
+		// Apply limit after that filtering.
+		if($limit) return $records->getRange($limit['start'], $limit['limit']);
+		else return $records;
 	}
 	
 	function parameterFields() {

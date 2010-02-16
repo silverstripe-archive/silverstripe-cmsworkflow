@@ -128,15 +128,9 @@ class PagesDueForReviewReport extends SSReport {
 		if($sort) $query->orderby = $sort;
 		$records = singleton('SiteTree')->buildDataObjectSet($query->execute(), 'DataObjectSet', $query);
 
-		// Filter to only those with canEdit permission
-		$filteredRecords = new DataObjectSet();
-		if($records) foreach($records as $record) {
-			$filteredRecords->push($record);
-		}
-		
 		// Apply limit after that filtering.
-		if($limit) return $filteredRecords->getRange($limit['start'], $limit['limit']);
-		else return $filteredRecords;
+		if($limit) return $records->getRange($limit['start'], $limit['limit']);
+		else return $records;
 	}
 }
 
