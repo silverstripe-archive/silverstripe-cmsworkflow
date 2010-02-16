@@ -36,7 +36,7 @@ class SiteTreeFutureState extends DataObjectDecorator {
 			Session::set('futureDate', null);
 
 		} else if(isset($_GET['futureDate'])) {
-			if($time = strtotime($_GET['futureDate'])) $date = date('Y-m-d h:i:s', $time);
+			if($time = strtotime($_GET['futureDate'])) $date = date('Y-m-d H:i:s', $time);
 			else $date = null;
 			
 			Session::set('futureDate', $date);
