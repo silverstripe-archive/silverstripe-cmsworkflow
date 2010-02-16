@@ -36,7 +36,7 @@ class UnapprovedDeletions3StepReport extends SSReport {
 		return array(
 			"Title" => array(
 				"title" => "Title",
-				"link" => true,
+				'formatting' => '<a href=\"admin/show/$ID\" title=\"Edit page\">$value</a>'
 			),
 			"WFRequesterEmail" => array(
 				"title" => "Author",
@@ -50,7 +50,7 @@ class UnapprovedDeletions3StepReport extends SSReport {
 			),
 			'AbsoluteLink' => array(
 				'title' => 'URL',
-				'formatting' => '<a href=\"admin/show/$ID\" title=\"Edit page\">$value</a> " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>',
+				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'
 			)
 		);
 	}

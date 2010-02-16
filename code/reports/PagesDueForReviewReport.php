@@ -60,7 +60,10 @@ class PagesDueForReviewReport extends SSReport {
 	
 	function columns() {
 		$fields = array(
-			'Title' => 'Page Title',
+			'Title' => array(
+				'title' => 'Title',
+				'formatting' => '<a href=\"admin/show/$ID\" title=\"Edit page\">$value</a>'
+			),
 			'NextReviewDate' => array(
 				'title' => 'Review Date',
 				'casting' => 'Date->Full'
@@ -69,7 +72,7 @@ class PagesDueForReviewReport extends SSReport {
 			'LastEditedBy.Title' => 'Last edited by',
 			'AbsoluteLink' => array(
 				'title' => 'URL',
-				'formatting' => '<a href=\"admin/show/$ID\" title=\"Edit page\">$value</a> " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>',
+				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'
 			)
 		);
 		
@@ -120,7 +123,6 @@ class PagesDueForReviewReport extends SSReport {
 		
 		$query = singleton("SiteTree")->extendedSQL(join(' AND ', $wheres));
 		$query->select[] = 'CONCAT_WS(\', \', "Owner"."Surname", "Owner"."FirstName") AS OwnerName';
-		$query->select[] = '(SELECT "URLSegment" FROM "SiteTree_Live" WHERE "SiteTree_Live"."ID" = "SiteTree"."ID") AS LiveURLSegment';
 		
 		$query->from[] = 'LEFT JOIN "Member" AS "Owner" ON "SiteTree"."OwnerID" = "Owner"."ID"';
 		

@@ -21,7 +21,10 @@ class PagesScheduledForDeletionReport extends SSReport {
 	
 	function columns() {
 		$fields = array(
-			'Title' => 'Title',
+			"Title" => array(
+				"title" => "Title",
+				'formatting' => '<a href=\"admin/show/$ID\" title=\"Edit page\">$value</a>'
+			),
 			'ExpiryDate' => array(
 				'title' => 'Will be deleted at',
 				'casting' => 'SSDatetime->Full'
@@ -29,7 +32,7 @@ class PagesScheduledForDeletionReport extends SSReport {
 			'ApproverName' => 'Approved by',
 			'AbsoluteLink' => array(
 				'title' => 'Links',
-				'formatting' => '<a href=\"admin/show/$ID\" title=\"Edit page\">$value</a> " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'
+				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'
 			)
 		);
 		

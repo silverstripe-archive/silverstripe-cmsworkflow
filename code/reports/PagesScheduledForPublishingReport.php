@@ -75,7 +75,10 @@ class PagesScheduledForPublishingReport extends SSReport {
 
 	function columns() {
 		$fields = array(
-			'Title' => 'Title',
+			"Title" => array(
+				"title" => "Title",
+				'formatting' => '<a href=\"admin/show/$ID\" title=\"Edit page\">$value</a>'
+			),
 			'EmbargoDate' => array(
 				'title' => 'Will be published at',
 				'casting' => 'SSDatetime->Full'
@@ -83,7 +86,7 @@ class PagesScheduledForPublishingReport extends SSReport {
 			'ApproverName' => 'Approved by',
 			'AbsoluteLink' => array(
 				'title' => 'Links',
-				'formatting' => '<a href=\"admin/show/$ID\" title=\"Edit page\">$value</a> " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'
+				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'
 			)
 		);
 		

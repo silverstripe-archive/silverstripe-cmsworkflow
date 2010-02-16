@@ -38,7 +38,10 @@ class UnapprovedPublications3StepReport extends SSReport {
 	
 	function columns() {
 		$fields = array(
-			'Title' => 'Title',
+			'Title' => array(
+				'title' => 'Title',
+				'formatting' => '<a href=\"admin/show/$ID\" title=\"Edit page\">$value</a>'
+			),
 			'AuthorTitle' => 'Requested by',
 			'RequestedAt' => array(
 				'title' => 'Requested at',
@@ -47,7 +50,7 @@ class UnapprovedPublications3StepReport extends SSReport {
 			'HasEmbargoOrExpiry' => 'Embargo or expiry dates set',
 			'AbsoluteLink' => array(
 				'title' => 'Links',
-				'formatting' => '<a href=\"admin/show/$ID\" title=\"Edit page\">$value</a> " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'
+				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'
 			)
 		);
 		
