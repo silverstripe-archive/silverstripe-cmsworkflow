@@ -17,7 +17,7 @@ class UnapprovedDeletions3StepReport extends SSReport {
 	}
 	function sourceRecords($params) {
 		$res = WorkflowThreeStepRequest::get_by_approver(
-			'WorkflowRemovalRequest',
+			'WorkflowDeletionRequest',
 			Member::currentUser(),
 			array('AwaitingApproval')
 		);
@@ -25,7 +25,7 @@ class UnapprovedDeletions3StepReport extends SSReport {
 		if ($res) {
 			foreach ($res as $result) {
 				if ($wf = $result->openWorkflowRequest()) {
-					if (!$result->canPublish()) continue;
+					if (!$result->canApprove()) continue;
 					$result->WFRequestedWhen = $wf->Created;
 					$result->WFAuthorID = $wf->AuthorID;
 					$result->WFAuthorEmail = $wf->Author()->Email;

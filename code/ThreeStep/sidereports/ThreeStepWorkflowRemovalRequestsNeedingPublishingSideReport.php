@@ -24,7 +24,7 @@ class ApprovedDeletions3StepReport extends SSReport {
 		$doSet = new DataObjectSet();
 		foreach ($res as $result) {
 			if ($wf = $result->openWorkflowRequest()) {
-				if (!$result->canApprove()) continue;
+				if (!$result->canDeleteFromLive()) continue;
 				$result->WFAuthorID = $wf->AuthorID;
 				$result->WFApproverEmail = $wf->Approver()->Email;
 				$result->WFApprovedWhen = $wf->ApprovalDate();
