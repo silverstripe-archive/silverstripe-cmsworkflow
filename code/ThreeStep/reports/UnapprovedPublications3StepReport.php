@@ -60,7 +60,7 @@ class UnapprovedPublications3StepReport extends SSReport {
 			'HasEmbargo' => 'Embargo',
 			'AbsoluteLink' => array(
 				'title' => 'URL',
-				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'
+				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a target=\"_blank\" href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a target=\"_blank\" href=\"$value?stage=Stage\">(draft)</a>'
 			)
 		);
 		
