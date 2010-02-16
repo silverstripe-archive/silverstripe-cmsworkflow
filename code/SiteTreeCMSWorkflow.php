@@ -195,7 +195,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	
 	function BacklinkTable() {
 	 	$backLinksTable = new TableListField(
-			'BackLinkTracking',
+			'BackLinkTrackingWorkflow',
 			'SiteTree',
 			array(
 				'Title' => 'Title',
