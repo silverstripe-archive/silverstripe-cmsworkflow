@@ -58,6 +58,10 @@ Page:
         Title: Product 4
         Parent: =>Page.products
         Sort: 4
+    product5:
+        Title: Product 5
+        Parent: =>Page.products
+        Sort: 5
     contact:
         Title: Contact Us
     virtuals:
@@ -77,6 +81,10 @@ VirtualPage:
       CopyContentFrom: =>Page.product4
       Parent: =>Page.virtuals
       Sort: 4
+   vproduct5:
+      CopyContentFrom: =>Page.product5
+      Parent: =>Page.virtuals
+      Sort: 5
       
         
 ErrorPage:
