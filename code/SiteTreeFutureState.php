@@ -160,5 +160,33 @@ class SiteTreeFutureState extends DataObjectDecorator {
 		
 		return self::$temp_tables[$baseTable];
 	}
+}
 
+class SiteTreeFutureState_SilverStripeNavigatorItem extends SilverStripeNavigatorItem {
+	static $priority = 50;
+	
+	function getHTML($page) {
+		Requirements::css('cmsworkflow/css/FutureStateNavigatorItem.css');
+		Requirements::javascript('jsparty/jquery/jquery.js');
+		Requirements::javascript('jsparty/jquery/plugins/livequery/jquery.livequery.js');
+		Requirements::javascript('cmsworkflow/javascript/futurestate.js');
+		
+		$datetimeField = new PopupDateTimeField('FutureStateDate', 'Date');
+		$current = (bool) SiteTreeFutureState::get_future_datetime();
+		$data = new ArrayData(array(
+			'Page' => $page,
+			'DateTimeField' => $datetimeField,
+			'Current' => $current
+		));
+		
+		return $data->renderWith(array('FutureStateNavigatorItem'));
+	}
+	
+	function getMessage($page) {
+		if($datetime = SiteTreeFutureState::get_future_datetime()) {
+		
+			return "<div id=\"SilverStripeNavigatorMessage\" title=\"". _t('ContentControl.NOTEWONTBESHOWN', 'Note: this message will not be shown to your visitors') ."\">". "Viewing site in future at <br>" . $datetime . "</div>";
+		}
+	}
+	
 }
