@@ -123,6 +123,8 @@ class RecentlyPublishedPagesReport extends SSReport {
 		$endDate->defaultToEndOfDay();
 		$startDate->allowOnlyTime(false);
 		$endDate->allowOnlyTime(false);
+		$endDate->mustBeAfter($startDate->Name());
+		$startDate->mustBeBefore($endDate->Name());
 		
 		return $params;
 	}
