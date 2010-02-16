@@ -25,7 +25,7 @@ class UnapprovedPublications3StepReport extends SSReport {
 					if(ClassInfo::exists('Subsite')) $result->SubsiteTitle = $result->Subsite()->Title;
 					$result->RequestedAt = $wf->Created;
 					$result->WFAuthorTitle = $wf->Author()->Title;
-					$result->HasEmbargoOrExpiry = $wf->getEmbargoDate() || $wf->ExpiryDate() ? 'yes' : 'no';
+					$result->HasEmbargoOrExpiry = $wf->getEmbargoDate() || $wf->ExpiryDate() ? date('j M Y g:ia', strtotime($wf->ExpiryDate())) : 'no';
 					$doSet->push($result);
 				}
 			}
@@ -57,7 +57,7 @@ class UnapprovedPublications3StepReport extends SSReport {
 				'title' => 'Requested',
 				'casting' => 'SSDatetime->Full'
 			),
-			'HasEmbargoOrExpiry' => 'Scheduled',
+			'HasEmbargoOrExpiry' => 'Embargo',
 			'AbsoluteLink' => array(
 				'title' => 'URL',
 				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'

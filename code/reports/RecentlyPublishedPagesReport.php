@@ -28,7 +28,8 @@ class RecentlyPublishedPagesReport extends SSReport {
 			),
 			'ExpiryDate' => array(
 				'title' => 'Expiry on?',
-				'formatting' => '" . ($value && $value != "0000-00-00 00:00:00" ? "yes" : "no") . "'
+				'formatting' => '" . ($value && $value != "0000-00-00 00:00:00" ? date("j M Y g:ia", strtotime($value)) : "no") . "',
+				'csvFormatting' => '" . ($value && $value != "0000-00-00 00:00:00" ? date("j M Y g:ia", strtotime($value)) : "no") . "'
 			)
 		);
 		return $fields;

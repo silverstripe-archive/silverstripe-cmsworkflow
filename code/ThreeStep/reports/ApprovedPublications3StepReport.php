@@ -26,7 +26,7 @@ class ApprovedPublications3StepReport extends SSReport {
 				$result->WFRequestedWhen = $wf->Created;
 				$result->WFApproverID = $wf->ApproverID;
 				$result->WFPublisherID = $wf->PublisherID;
-				$result->HasEmbargoOrExpiry = $wf->getEmbargoDate() || $wf->ExpiryDate() ? 'yes' : 'no';
+				$result->HasEmbargoOrExpiry = $wf->getEmbargoDate() || $wf->ExpiryDate() ? date('j M Y g:ia', strtotime($wf->ExpiryDate())) : 'no';
 				if (isset($_REQUEST['OnlyMine']) && $result->WFApproverID != Member::currentUserID()) continue;
 				$doSet->push($result);
 			}
@@ -66,7 +66,7 @@ class ApprovedPublications3StepReport extends SSReport {
 				"title" => "Requested",
 				'casting' => 'SSDatetime->Full'
 			),
-			'HasEmbargoOrExpiry' => 'Scheduled',
+			'HasEmbargoOrExpiry' => 'Embargo',
 			'AbsoluteLink' => array(
 				'title' => 'URL',
 				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a href=\"$value?stage=Stage\">(draft)</a>'
