@@ -10,13 +10,11 @@ SiteTreeCMSWorkflow::register_request('WorkflowPublicationRequest');
 SiteTreeCMSWorkflow::register_request('WorkflowDeletionRequest');
 
 // Defaults to a "two step" workflow.
-WorkflowTwoStepRequest::apply_alerts();
 Object::add_extension('WorkflowRequest', 'WorkflowTwoStepRequest');
 Object::add_extension('SiteTree', 'SiteTreeCMSTwoStepWorkflow');
 Object::add_extension('SiteConfig', 'SiteConfigTwoStepWorkflow');
 
 // To enable ThreeStep, remove the two Object:: lines above, and uncomment these.
-// WorkflowThreeStepRequest::apply_alerts();
 // Object::add_extension('WorkflowRequest', 'WorkflowThreeStepRequest');
 // Object::add_extension('SiteTree', 'SiteTreeCMSThreeStepWorkflow');
 // Object::add_extension('SiteConfig', 'SiteConfigThreeStepWorkflow');
