@@ -72,12 +72,13 @@ class PagesScheduledForPublishingReport extends SSReport {
 			}
 		}
 		
-
+		if($sort) $query->orderby = $sort;
+		
 		// Turn a query into records
 		$records = singleton('SiteTree')->buildDataObjectSet($query->execute(), 'DataObjectSet', $query);
 		
 					
-		if($sort) $query->orderby = $sort;
+
 		
 
 		// Filter to only those with canEdit permission
