@@ -22,27 +22,23 @@ class PagesDueForReviewReport extends SSReport {
 			// Remember current subsite
 			$existingSubsite = Subsite::currentSubsiteID();
 			
-			// Create subsite specific owner dropdowns
-			foreach($options as $option => $dummy) {
-				if($option == 0) {
-					Subsite::$disable_subsite_filter = true;
-				} else {
-					Subsite::changeSubsite($option);
-				}
-				
+			$map = array();
+
+			// Create a map of all potential owners from all applicable sites
+			$sites = Subsite::accessible_sites('CMS_ACCESS_CMSMain');
+			foreach($sites as $site) {
+				Subsite::changeSubsite($site);
+
 				$cmsUsers = Permission::get_members_by_permission(array("CMS_ACCESS_CMSMain", "ADMIN"));
-				$map = $cmsUsers->map('ID', 'Title', '(no owner)');
-				unset($map['']);
-				$map = array('' => 'Any', '-1' => '(no owner)') + $map;
-				
-				$dropdown = new DropdownField("OwnerID" . $option, 'Page owner', $map);
-				$dropdown->addExtraClass('subsiteSpecificOwnerID');
-				$params->push($dropdown);
-				
-				if($option == 0) {
-					Subsite::$disable_subsite_filter = false;
+				// Key-preserving merge
+				foreach($cmsUsers->toDropdownMap('ID', 'Title') as $k => $v) {
+					$map[$k] = $v;
 				}
 			}
+			
+			$map = $map + array('' => 'Any', '-1' => '(no owner)');
+				
+			$params->push(new DropdownField("OwnerID", 'Page owner', $map));
 			
 			// Restore current subsite
 			Subsite::changeSubsite($existingSubsite);
