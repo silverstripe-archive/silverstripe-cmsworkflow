@@ -4,7 +4,7 @@
  * 
  * @package cmsworkflow
  */
-class MyTwoStepWorkflowRequests extends SSReport {
+class MyTwoStepWorkflowRequests extends SS_Report {
 	function title() {
 		return _t('MyTwoStepWorkflowRequests.TITLE',"Workflow: My requests pending review");
 	}
