@@ -109,18 +109,18 @@
 
 				<% if CanChangeEmbargoExpiry %>
 					<% if EmbargoField %>
-						<div class="embargofield">
+						<p>
 							$EmbargoField
 							<input type="button" id="saveEmbargoButton" class="action" onclick="EmbargoExpiry.save('embargo', this);" value="Set embargo date">
 							<input type="button" id="resetEmbargoButton" class="action" onclick="EmbargoExpiry.reset('embargo', this);" value="Reset">
-						</div>
+						</p>
 					<% end_if %>
 					<% if ExpiryField %>
-						<div class="expiryfield">
+						<p>
 							$ExpiryField
 							<input type="button" id="saveExpiryButton" class="action" onclick="EmbargoExpiry.save('expiry', this);" value="Set expiry date">
 							<input type="button" id="resetExpiryButton" class="action" onclick="EmbargoExpiry.reset('expiry', this);" value="Reset">
-						</div>
+						</p>
 					<% end_if %>
 				<% end_if %>
 			<% end_if %>
