@@ -53,7 +53,7 @@ class SiteConfigThreeStepWorkflow extends DataObjectDecorator {
 			$actionerGroupsField = new TreeMultiselectField("PublisherGroups", "Publisher groups")
 		));
 		
-		if(!Permission::check('CMS_EDIT_SITE_CONFIG')) {
+		if(!Permission::check('EDIT_SITECONFIG')) {
 			$fields->replaceField('CanApproveType', $approveTypeField->performReadonlyTransformation());
 			$fields->replaceField('ApproverGroups', $approverGroupsField->performReadonlyTransformation());
 			$fields->replaceField('CanPublishType', $actionTypeField->performReadonlyTransformation());
