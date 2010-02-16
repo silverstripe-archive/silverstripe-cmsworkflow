@@ -26,6 +26,8 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 				if ($expiryTimestamp)
 				
 				DB::query("UPDATE SiteTree_Live SET ExpiryDate = '$expiryTimestamp' WHERE ID = $pageID");
+			}
+		}
 
 				$this->owner->ApproverID = $member->ID;
 				$this->owner->Status = 'Completed';
