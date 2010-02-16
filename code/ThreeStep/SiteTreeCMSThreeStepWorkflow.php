@@ -233,7 +233,9 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 	 */
 	public function canPublish($member = null) {
 		if(!$member) $member = Member::currentUser();
-		$memberID = $member->ID;
+		if (!$member) return false;
+		if ($member instanceof Member) $memberID = $member->ID;
+		else $memberID = $member;
 		
 		if(isset(SiteTree::$cache_permissions['CanPublishType'][$this->owner->ID])) {
 			return SiteTree::$cache_permissions['CanPublishType'][$this->owner->ID];

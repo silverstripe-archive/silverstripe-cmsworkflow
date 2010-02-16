@@ -90,8 +90,9 @@ class SiteTreeCMSTwoStepWorkflow extends SiteTreeCMSWFDecorator {
 	 */
 	public function canPublish($member = null) {
 		if(!$member) $member = Member::currentUser();
-		if (is_numeric($member)) $memberID = $member;
-		else $memberID = $member->ID;
+		if (!$member) return false;
+		if ($member instanceof Member) $memberID = $member->ID;
+		else $memberID = $member;
 
 		if(isset(SiteTree::$cache_permissions['CanPublishType'][$this->owner->ID])) {
 			return SiteTree::$cache_permissions['CanPublishType'][$this->owner->ID];
