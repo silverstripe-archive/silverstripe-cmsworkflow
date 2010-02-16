@@ -121,6 +121,7 @@ class PagesScheduledForDeletionReport extends SSReport {
 		$records = singleton('SiteTree')->buildDataObjectSet($query->execute(), 'DataObjectSet', $query);
 
 		Versioned::reading_stage($stage);
+		SiteTree::prepopuplate_permission_cache('edit', $records->column('ID'));
 		
 		// Filter to only those with canEdit permission
 		$filteredRecords = new DataObjectSet();
