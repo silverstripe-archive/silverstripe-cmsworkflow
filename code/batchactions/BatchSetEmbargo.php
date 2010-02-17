@@ -23,8 +23,8 @@ class BatchSetEmbargo extends CMSBatchAction {
 			$dateField = new TZDateTimeField('EmbargoDate_Batch');
 		} else {
 			$dateField = new DatetimeField('EmbargoDate_Batch');
-			$dateField->setConfig('showcalendar', true);
-			$dateField->setConfig('showdropdown', true);
+			$dateField->getDateField()->setConfig('showcalendar', true);
+			$dateField->getTimeField()->setConfig('showdropdown', true);
 		}
 		
 		return new Fieldset($dateField);

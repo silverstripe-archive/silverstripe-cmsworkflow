@@ -23,8 +23,8 @@ class BatchSetExpiry extends CMSBatchAction {
 			$dateField = new TZDateTimeField('ExpiryDate_Batch');
 		} else {
 			$dateField = new DatetimeField('ExpiryDate_Batch');
-			$dateField->setConfig('showcalendar', true);
-			$dateField->setConfig('showdropdown', true);
+			$dateField->getDateField()->setConfig('showcalendar', true);
+			$dateField->getTimeField()->setConfig('showdropdown', true);
 		}
 		
 		return new Fieldset($dateField);
