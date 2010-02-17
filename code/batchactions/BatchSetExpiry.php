@@ -19,9 +19,15 @@ class BatchSetExpiry extends CMSBatchAction {
 	}
 	
 	function getParameterFields() {
-		return new Fieldset(
-			class_exists('TZDateTimeField') ? new TZDateTimeField('ExpiryDate_Batch') : new PopupDateTimeField('ExpiryDate_Batch')
-		);
+		if(class_exists('TZDateTimeField')) {
+			$dateField = new TZDateTimeField('ExpiryDate_Batch');
+		} else {
+			$dateField = new DatetimeField('ExpiryDate_Batch');
+			$dateField->setConfig('showcalendar', true);
+			$dateField->setConfig('showdropdown', true);
+		}
+		
+		return new Fieldset($dateField);
 	}
 	
 	function confirmationDialog($ids) {

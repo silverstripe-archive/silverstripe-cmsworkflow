@@ -19,9 +19,15 @@ class BatchSetEmbargo extends CMSBatchAction {
 	}
 	
 	function getParameterFields() {
-		return new Fieldset(
-			class_exists('TZDateTimeField') ? new TZDateTimeField('EmbargoDate_Batch') : new PopupDateTimeField('EmbargoDate_Batch')
-		);
+		if(class_exists('TZDateTimeField')) {
+			$dateField = new TZDateTimeField('EmbargoDate_Batch');
+		} else {
+			$dateField = new DatetimeField('EmbargoDate_Batch');
+			$dateField->setConfig('showcalendar', true);
+			$dateField->setConfig('showdropdown', true);
+		}
+		
+		return new Fieldset($dateField);
 	}
 
 	function applicablePages($ids) {
