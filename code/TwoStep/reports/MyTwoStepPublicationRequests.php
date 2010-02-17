@@ -9,6 +9,12 @@ class MyTwoStepPublicationRequests extends SS_Report {
 	function title() {
 		return _t('MyTwoStepPublicationRequests.TITLE',"Workflow: Awaiting publication");
 	}
+	function group() {
+		return "Workflow reports";
+	}
+	function sort() {
+		return 100;
+	}
 	function sourceRecords($params) {
 		if(Permission::check("ADMIN")) {
 			return WorkflowTwoStepRequest::get(

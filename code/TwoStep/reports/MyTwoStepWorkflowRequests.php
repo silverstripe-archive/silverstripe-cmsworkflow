@@ -8,6 +8,12 @@ class MyTwoStepWorkflowRequests extends SS_Report {
 	function title() {
 		return _t('MyTwoStepWorkflowRequests.TITLE',"Workflow: My requests pending review");
 	}
+	function group() {
+		return "Workflow reports";
+	}
+	function sort() {
+		return 100;
+	}
 	function sourceRecords($params) {
 		return WorkflowTwoStepRequest::get_by_author(
 			'WorkflowRequest',
