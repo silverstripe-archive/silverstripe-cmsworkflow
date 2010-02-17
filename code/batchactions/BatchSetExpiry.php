@@ -20,7 +20,7 @@ class BatchSetExpiry extends CMSBatchAction {
 	
 	function getParameterFields() {
 		return new Fieldset(
-			new TZDateTimeField('ExpiryDate_Batch')
+			class_exists('TZDateTimeField') ? new TZDateTimeField('ExpiryDate_Batch') : new PopupDateTimeField('ExpiryDate_Batch')
 		);
 	}
 	

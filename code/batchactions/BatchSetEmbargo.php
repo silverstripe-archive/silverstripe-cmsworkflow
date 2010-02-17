@@ -20,7 +20,7 @@ class BatchSetEmbargo extends CMSBatchAction {
 	
 	function getParameterFields() {
 		return new Fieldset(
-			new TZDateTimeField('EmbargoDate_Batch')
+			class_exists('TZDateTimeField') ? new TZDateTimeField('EmbargoDate_Batch') : new PopupDateTimeField('EmbargoDate_Batch')
 		);
 	}
 
