@@ -150,13 +150,17 @@ var EmbargoExpiry = {
 		var url = 'admin/cms_setembargoexpiry?wfRequest='+$('WorkflowRequest_ID').value;
 		var ids = EmbargoExpiry.ids(what);
 
-		timezone = $(ids.timezoneField).options[$(ids.timezoneField).selectedIndex].value;
 		if (what == 'embargo') {
-			url += '&EmbargoDate[Date]='+escape($(ids.dateField).value)+'&EmbargoDate[Time]='+escape($(ids.timeField).value)+'&EmbargoDate[TimeZone]='+escape(timezone);
+			url += '&EmbargoDate[Date]='+escape($(ids.dateField).value)+'&EmbargoDate[Time]='+escape($(ids.timeField).value);
 			EmbargoExpiry.embargoUnsaved = false;
 		} else if (what == 'expiry') {
-			url += '&ExpiryDate[Date]='+escape($(ids.dateField).value)+'&ExpiryDate[Time]='+escape($(ids.timeField).value)+'&ExpiryDate[TimeZone]='+escape(timezone);
+			url += '&ExpiryDate[Date]='+escape($(ids.dateField).value)+'&ExpiryDate[Time]='+escape($(ids.timeField).value);
 			EmbargoExpiry.expiryUnsaved = false;
+		}
+		
+		if ($(ids.timezoneField)) {
+			var timezone = $(ids.timezoneField).options[$(ids.timezoneField).selectedIndex].value;
+			url += '&EmbargoDate[TimeZone]='+escape(timezone);
 		}
 
 		if ($(ids.dateField).value == '' || $(ids.timeField).value == '') {
