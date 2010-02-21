@@ -9,12 +9,11 @@ class ThreeStepMyDeletionRequestsSideReport extends SS_Report {
 	function title() {
 		return _t('ThreeStepMyDeletionRequestsSideReport.TITLE',"My deletion requests");
 	}
+	
 	function group() {
-		return "Workflow reports";
+		return _t('WorkflowRequest.WORKFLOW', 'Workflow');
 	}
-	function sort() {
-		return -100;
-	}
+	
 	function sourceRecords($params) {
 		// Set stage, otherwise, we won't get any results
 		$currentStage = Versioned::current_stage();

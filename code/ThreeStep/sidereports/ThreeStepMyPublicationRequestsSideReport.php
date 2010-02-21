@@ -9,12 +9,11 @@ class ThreeStepMyPublicationRequestsSideReport extends SS_Report {
 	function title() {
 		return _t('ThreeStepMyPublicationRequestsSideReport.TITLE',"My publication requests");
 	}
+
 	function group() {
-		return "Workflow reports";
+		return _t('WorkflowRequest.WORKFLOW', 'Workflow');
 	}
-	function sort() {
-		return -200;
-	}
+
 	function sourceRecords($params) {
 		$res = WorkflowThreeStepRequest::get_by_author(
 			'WorkflowPublicationRequest',

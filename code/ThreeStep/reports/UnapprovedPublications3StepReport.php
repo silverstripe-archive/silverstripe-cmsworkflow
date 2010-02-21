@@ -98,6 +98,10 @@ class UnapprovedPublications3StepReport extends SS_Report {
 		);
 	}
 	
+	function group() {
+		return _t('WorkflowRequest.WORKFLOW', 'Workflow');
+	}
+
 	function canView() {
 		return Object::has_extension('SiteTree', 'SiteTreeCMSThreeStepWorkflow');
 	}

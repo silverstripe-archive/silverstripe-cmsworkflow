@@ -110,6 +110,10 @@ class ApprovedDeletions3StepReport extends SS_Report {
 		
 		return $params;
 	}
+	
+	function group() {
+		return _t('WorkflowRequest.WORKFLOW', 'Workflow');
+	}
 }
 
 ?>
