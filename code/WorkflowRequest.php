@@ -107,6 +107,20 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		if (!isset(self::$alerts[$class][$event])) self::$alerts[$class][$event] = array();
 		self::$alerts[$class][$event][$group] = $notify;
 	}
+
+	/**
+	 * @ignore
+	 */
+	protected static $force_publishers_to_use_workflow = false;
+	
+	/**
+	 * Set this to true to force publishers to use the "Request publication" button, rather than
+	 * "Save & Publish".  Workflow admins won't be affected by this change.
+	 */
+	static function set_force_publishers_to_use_workflow($val) {
+		self::$force_publishers_to_use_workflow = $val;
+	}
+	
 	
 	/**
 	 * Approve this request, notify interested parties

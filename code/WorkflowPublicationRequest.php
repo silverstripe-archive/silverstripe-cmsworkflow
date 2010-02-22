@@ -9,7 +9,6 @@
  * @package cmsworkflow
  */
 class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityProvider {
-	
 	public static function create_for_page($page, $author = null, $approvers = null, $notify = true) {
 		if(!$author && $author !== FALSE) $author = Member::currentUser();
 	
@@ -67,7 +66,7 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 		}
 		
 		// Remove the one click publish if they are not an admin/workflow admin.
-		if(!Permission::checkMember(Member::currentUser(), 'IS_WORKFLOW_ADMIN')) {
+		if(self::$force_publishers_to_use_workflow && !Permission::checkMember(Member::currentUser(), 'IS_WORKFLOW_ADMIN')) {
 			$actions->removeByName('action_publish');
 		}
 		
