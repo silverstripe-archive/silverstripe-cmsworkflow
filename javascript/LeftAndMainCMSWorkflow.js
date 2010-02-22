@@ -338,3 +338,25 @@ function action_publish_right(e) {
 	$('Form_EditForm').save(false, null, 'cms_publishwithcomment', true);
 	$('Form_EditForm').removeChild(messageEl);
 }
+
+/**
+ * UI behaviour for the "Access" tab
+ */
+Behaviour.register({
+	'#Form_EditForm_CanApproveType input': {
+		initialize: function() {
+			if(this.checked) this.click();
+		},
+		onclick: function() {
+			$('ApproverGroups').style.display = (this.value == 'OnlyTheseUsers') ? 'block' : 'none';
+		}
+	},
+	'#Form_EditForm_CanPublishType input': {
+		initialize: function() {
+			if(this.checked) this.click();
+		},
+		onclick: function() {
+			$('PublisherGroups').style.display = (this.value == 'OnlyTheseUsers') ? 'block' : 'none'
+		}
+	}
+});
