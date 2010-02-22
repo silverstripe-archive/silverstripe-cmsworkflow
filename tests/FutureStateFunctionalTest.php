@@ -24,7 +24,7 @@ class FutureStateFunctionalTest extends FunctionalTest {
 			
 		Versioned::reading_stage('Stage');
 
-		$this->logInWithPermssion('ADMIN');
+		$this->logInWithPermission('ADMIN');
 		foreach($pages as $page) {
 			$this->assertTrue($this->objFromFixture('Page', $page)->doPublish());
 		}
