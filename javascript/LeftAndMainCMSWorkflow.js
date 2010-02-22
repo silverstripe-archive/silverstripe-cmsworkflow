@@ -264,6 +264,7 @@ var EmbargoExpiry = {
 			EmbargoExpiry.originalValues = true;
 		}
 
+		ids = EmbargoExpiry.ids('embargo');
 		// Only call this logic if the date field & save button exist, otherwise it's unnecessary
 		if($(ids.dateField) && $(ids.saveButton)) {
 			if ($(ids.dateField).value == '' || $(ids.timeField).value == '') {
