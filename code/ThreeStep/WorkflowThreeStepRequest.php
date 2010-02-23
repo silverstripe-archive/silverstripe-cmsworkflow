@@ -136,7 +136,7 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 			return false;
 		}
 		
-		if ($notify) if($notify) $this->notifyPublished($comment);
+		if($notify) $this->notifyPublished($comment);
 
 		$this->owner->addNewChange($comment, 'Published', $member);
 		
