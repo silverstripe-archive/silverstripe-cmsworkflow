@@ -90,7 +90,7 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 			$this->owner->Page()->Title
 		);
 		
-		if (WorkflowRequest::should_send_alert(__CLASS__, 'approve', 'publisher')) {
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'approve', 'publisher')) {
 			$publishers = $this->owner->Page()->PublisherMembers();
 			foreach($publishers as $publisher){
 				// Notify publishers other than the one who is logged in 
@@ -107,7 +107,7 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 			}
 		}
 		
-		if (WorkflowRequest::should_send_alert(__CLASS__, 'approve', 'author')) {
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'approve', 'author')) {
 			$this->owner->sendNotificationEmail(
 				Member::currentUser(), // sender
 				$author, // recipient
@@ -122,11 +122,11 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 	function notifyComment($comment) {
 		// Comment recipients cover everyone except the person making the comment
 		$commentRecipients = array();
-		if (WorkflowRequest::should_send_alert(__CLASS__, 'comment', 'author')) {
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'comment', 'author')) {
 			if(Member::currentUserID() != $this->owner->Author()->ID) $commentRecipients[] = $this->owner->Author();
 		}
 		
-		if (WorkflowRequest::should_send_alert(__CLASS__, 'comment', 'publisher')) {
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'comment', 'publisher')) {
 			$receivers = $this->owner->Page()->ApproverMembers();
 			foreach($receivers as $receiver) $commentRecipients[] = $receiver;
 		}
@@ -152,7 +152,7 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 		$publishers = $this->owner->Page()->ApproverMembers();
 		$author = $this->owner->Author();
 
-		if (WorkflowRequest::should_send_alert(__CLASS__, 'request', 'publisher')) {
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'request', 'publisher')) {
 			foreach($publishers as $publisher){
 				$this->owner->sendNotificationEmail(
 					$author, // sender

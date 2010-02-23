@@ -100,6 +100,7 @@ Behaviour.register({
 	'#Form_EditForm_action_cms_requestedit' : CMSWorkflow.WorkflowButton,
 	'#Form_EditForm_action_cms_approve' : CMSWorkflow.WorkflowButton,
 	'#Form_EditForm_action_cms_deny' : CMSWorkflow.WorkflowButton,
+	'#Form_EditForm_action_cms_cancel' : CMSWorkflow.WorkflowButton,
 	'#Form_EditForm_action_cms_comment' : CMSWorkflow.WorkflowButton,
 	'#Form_EditForm_action_cms_publish' : CMSWorkflow.WorkflowButton,
 	'#WorkflowActions #Form_EditForm_action_cms_requestpublication' : CMSWorkflow.WorkflowButton,
