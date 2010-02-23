@@ -73,52 +73,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * Not all event/role combinations are neccessairily
 	 * implemented by all ApprovalPaths.
 	 */
-	static $alerts = array(
-		'WorkflowPublicationRequest' => array(
-			'request' => array(
-				'author' => false,
-				'publisher' => true
-			),
-			'publish' => array(
-				'author' => true,
-				'publisher' => true
-			),
-			'deny' => array(
-				'author' => true,
-				'publisher' => false
-			),
-			'cancel' => array(
-				'author' => true,
-				'publisher' => false
-			),
-			'comment' => array(
-				'author' => true,
-				'publisher' => true
-			)
-		),
-		'WorkflowDeletionRequest' => array(
-			'request' => array(
-				'author' => false,
-				'publisher' => true
-			),
-			'publish' => array(
-				'author' => true,
-				'publisher' => true
-			),
-			'deny' => array(
-				'author' => true,
-				'publisher' => false
-			),
-			'cancel' => array(
-				'author' => true,
-				'publisher' => false
-			),
-			'comment' => array(
-				'author' => true,
-				'publisher' => true
-			)
-		)
-	);
+	static $alerts = null;
 
 	protected $memberIdsEmailed = array();
 
@@ -141,6 +96,15 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 *
 	 */
 	public static function should_send_alert($class, $event, $group) {
+		if (self::$alerts === null) {
+			if (singleton('WorkflowRequest')->hasExtension('WorkflowTwoStepRequest')) {
+				self::$alerts = WorkflowTwoStepRequest::$default_alerts;
+			}
+			if (singleton('WorkflowRequest')->hasExtension('WorkflowThreeStepRequest')) {
+				self::$alerts = WorkflowThreeStepRequest::$default_alerts;
+			}
+		}
+		
 		if (!isset(self::$alerts[$class])) return false;
 		if (!isset(self::$alerts[$class][$event])) return false;
 		if (!isset(self::$alerts[$class][$event][$group])) return false;
@@ -148,6 +112,15 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	}
 	
 	public static function set_alert($class, $event, $group, $notify) {
+		if (self::$alerts === null) {
+			if (singleton('WorkflowRequest')->hasExtension('WorkflowTwoStepRequest')) {
+				self::$alerts = WorkflowTwoStepRequest::$default_alerts;
+			}
+			if (singleton('WorkflowRequest')->hasExtension('WorkflowThreeStepRequest')) {
+				self::$alerts = WorkflowThreeStepRequest::$default_alerts;
+			}
+		}
+		
 		if (!isset(self::$alerts[$class])) self::$alerts[$class] = array();
 		if (!isset(self::$alerts[$class][$event])) self::$alerts[$class][$event] = array();
 		self::$alerts[$class][$event][$group] = $notify;

@@ -8,6 +8,54 @@
  * @author Tom Rix
  */
 class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
+	
+	static $default_alerts = array(
+		'WorkflowPublicationRequest' => array(
+			'request' => array(
+				'author' => false,
+				'publisher' => true
+			),
+			'publish' => array(
+				'author' => true,
+				'publisher' => true
+			),
+			'deny' => array(
+				'author' => true,
+				'publisher' => false
+			),
+			'cancel' => array(
+				'author' => true,
+				'publisher' => false
+			),
+			'comment' => array(
+				'author' => true,
+				'publisher' => true
+			)
+		),
+		'WorkflowDeletionRequest' => array(
+			'request' => array(
+				'author' => false,
+				'publisher' => true
+			),
+			'publish' => array(
+				'author' => true,
+				'publisher' => true
+			),
+			'deny' => array(
+				'author' => true,
+				'publisher' => false
+			),
+			'cancel' => array(
+				'author' => true,
+				'publisher' => false
+			),
+			'comment' => array(
+				'author' => true,
+				'publisher' => true
+			)
+		)
+	);
+	
 	function approve($comment, $member = null, $notify = true) {
 		if(!$member) $member = Member::currentUser();
 		if(!$this->owner->Page()->canPublish($member)) {

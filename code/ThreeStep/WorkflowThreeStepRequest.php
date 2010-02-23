@@ -7,6 +7,74 @@
  * @subpackage ThreeStep
  */
 class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
+	
+	static $default_alerts = array(
+		'WorkflowPublicationRequest' => array(
+			'request' => array(
+				'author' => false,
+				'publisher' => false,
+				'approver' => true
+			),
+			'approve' => array(
+				'author' => true,
+				'publisher' => true,
+				'approver' => false
+			),
+			'publish' => array(
+				'author' => true,
+				'publisher' => false,
+				'approver' => true
+			),
+			'deny' => array(
+				'author' => true,
+				'publisher' => true,
+				'approver' => true
+			),
+			'cancel' => array(
+				'author' => true,
+				'publisher' => true,
+				'approver' => true
+			),
+			'comment' => array(
+				'author' => false,
+				'publisher' => false,
+				'approver' => false
+			)
+		),
+		'WorkflowDeletionRequest' => array(
+			'request' => array(
+				'author' => false,
+				'publisher' => false,
+				'approver' => true
+			),
+			'approve' => array(
+				'author' => true,
+				'publisher' => true,
+				'approver' => false
+			),
+			'publish' => array(
+				'author' => true,
+				'publisher' => false,
+				'approver' => true
+			),
+			'deny' => array(
+				'author' => true,
+				'publisher' => true,
+				'approver' => true
+			),
+			'cancel' => array(
+				'author' => true,
+				'publisher' => true,
+				'approver' => true
+			),
+			'comment' => array(
+				'author' => false,
+				'publisher' => false,
+				'approver' => false
+			)
+		)
+	);
+	
 	function approve($comment, $member = null, $notify = true) {
 		if(!$member) $member = Member::currentUser();
 		if(!$this->owner->Page()->canApprove($member)) {
@@ -68,9 +136,7 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 			return false;
 		}
 		
-		if ($notify) {
-			// Notify?
-		}
+		if ($notify) if($notify) $this->notifyPublished($comment);
 
 		$this->owner->addNewChange($comment, 'Published', $member);
 		
@@ -84,63 +150,89 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 	}
 	
 	function notifyApproved($comment) {
-		$author = $this->owner->Author();
-		$subject = sprintf(
-			_t("{$this->owner->class}.EMAIL_SUBJECT_APPROVED"),
-			$this->owner->Page()->Title
-		);
+		$emailsToSend = array();
+		$userWhoApproved = Member::currentUser();
 		
 		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'approve', 'publisher')) {
 			$publishers = $this->owner->Page()->PublisherMembers();
-			foreach($publishers as $publisher){
-				// Notify publishers other than the one who is logged in 
-				if(Member::currentUserID() != $publisher->ID) {
-					$this->owner->sendNotificationEmail(
-						Member::currentUser(), // sender
-						$publisher, // recipient
-						_t("{$this->owner->class}.EMAIL_SUBJECT_APPROVED_FOR_PUBLISHING"),
-						_t("{$this->owner->class}.EMAIL_PARA_APPROVED_FOR_PUBLISHING"),
-						$comment,
-						'WorkflowGenericEmail'
-					);
-				}
-			}
+			foreach($publishers as $publisher) $emailsToSend[] = array($userWhoApproved, $publisher);
+		}
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'approve', 'approver')) {
+			$approvers = $this->owner->Page()->ApproverMembers();
+			foreach($approvers as $approver) $emailsToSend[] = array($userWhoApproved, $approver);
+		}
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'approve', 'author')) {
+			$emailsToSend[] = array($userWhoApproved, $this->owner->Author());
 		}
 		
-		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'approve', 'author')) {
-			$this->owner->sendNotificationEmail(
-				Member::currentUser(), // sender
-				$author, // recipient
-				_t("{$this->owner->class}.EMAIL_SUBJECT_APPROVED_FOR_PUBLISHING"),
-				_t("{$this->owner->class}.EMAIL_PARA_APPROVED_FOR_PUBLISHING"),
-				$comment,
-				'WorkflowGenericEmail'
-			);
+		if (count($emailsToSend)) {
+			foreach($emailsToSend as $email) {
+				if ($email[1]->ID == Member::currentUserID()) continue;
+				$this->owner->sendNotificationEmail(
+					$email[0], // sender
+					$email[1], // recipient
+					$comment,
+					'approved changes'
+				);
+			}
+		}
+	}
+	
+	function notifyPublished($comment) {
+		$emailsToSend = array();
+		$userWhoPublished = Member::currentUser();
+		
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'publish', 'publisher')) {
+			$publishers = $this->owner->Page()->PublisherMembers();
+			foreach($publishers as $publisher) $emailsToSend[] = array($userWhoPublished, $publisher);
+		}
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'publish', 'approver')) {
+			$approvers = $this->owner->Page()->ApproverMembers();
+			foreach($approvers as $approver) $emailsToSend[] = array($userWhoPublished, $approver);
+		}
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'publish', 'author')) {
+			$emailsToSend[] = array($userWhoPublished, $this->owner->Author());
+		}
+		
+		if (count($emailsToSend)) {
+			foreach($emailsToSend as $email) {
+				if ($email[1]->ID == Member::currentUserID()) continue;
+				$this->owner->sendNotificationEmail(
+					$email[0], // sender
+					$email[1], // recipient
+					$comment,
+					'published changes'
+				);
+			}
 		}
 	}
 	
 	function notifyComment($comment) {
-		// Comment recipients cover everyone except the person making the comment
-		$commentRecipients = array();
-		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'comment', 'author')) {
-			if(Member::currentUserID() != $this->owner->Author()->ID) $commentRecipients[] = $this->owner->Author();
-		}
+		$commentor = Member::currentUser();
+		$emailsToSend = array();
 		
 		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'comment', 'publisher')) {
-			$receivers = $this->owner->Page()->ApproverMembers();
-			foreach($receivers as $receiver) $commentRecipients[] = $receiver;
+			$publishers = $this->owner->Page()->PublisherMembers();
+			foreach($publishers as $publisher) $emailsToSend[] = array($commentor, $publisher);
 		}
-
-		foreach($commentRecipients as $recipient) {
-			if(Member::currentUserID() != $receiver->ID) continue;
-			$this->owner->sendNotificationEmail(
-				Member::currentUser(), // sender
-				$recipient, // recipient
-				_t("{$this->owner->owner->class}.EMAIL_SUBJECT_COMMENT"),
-				_t("{$this->class}.EMAIL_PARA_COMMENT"),
-				$comment,
-				'WorkflowGenericEmail'
-			);
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'comment', 'approver')) {
+			$approvers = $this->owner->Page()->ApproverMembers();
+			foreach($approvers as $approver) $emailsToSend[] = array($commentor, $approver);
+		}
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'comment', 'author')) {
+			$emailsToSend[] = array($commentor, $this->owner->Author());
+		}
+		
+		if (count($emailsToSend)) {
+			foreach($emailsToSend as $email) {
+				if ($email[1]->ID == Member::currentUserID()) continue;
+				$this->owner->sendNotificationEmail(
+					$email[0], // sender
+					$email[1], // recipient
+					$comment,
+					'commented'
+				);
+			}
 		}
 	}
 	
@@ -149,18 +241,29 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 	 * is lodged.
 	 */
 	public function notifyAwaitingApproval($comment) {
-		$publishers = $this->owner->Page()->ApproverMembers();
+		
 		$author = $this->owner->Author();
-
+		$emailsToSend = array();
+		
 		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'request', 'publisher')) {
-			foreach($publishers as $publisher){
+			$publishers = $this->owner->Page()->PublisherMembers();
+			foreach($publishers as $publisher) $emailsToSend[] = array($author, $publisher);
+		}
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'request', 'approver')) {
+			$approvers = $this->owner->Page()->ApproverMembers();
+			foreach($approvers as $approver) $emailsToSend[] = array($author, $approver);
+		}
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'request', 'author')) {
+			$emailsToSend[] = array($author, $author);
+		}
+		
+		if (count($emailsToSend)) {
+			foreach($emailsToSend as $email) {
 				$this->owner->sendNotificationEmail(
-					$author, // sender
-					$publisher, // recipient
-					_t("{$this->class}.EMAIL_SUBJECT_AWAITINGAPPROVAL"),
-					_t("{$this->class}.EMAIL_PARA_AWAITINGAPPROVAL"),
+					$email[0], // sender
+					$email[1], // recipient
 					$comment,
-					'WorkflowGenericEmail'
+					'requested approval'
 				);
 			}
 		}
