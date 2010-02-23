@@ -36,7 +36,6 @@ Attach the following decorators in your `mysite/_config.php`:
 	Object::remove_extension('SiteTree', 'SiteTreeCMSTwoStepWorkflow');
 	Object::remove_extension('SiteConfig', 'SiteConfigTwoStepWorkflow');
 	// add three-step decorators
-	WorkflowTwoStepRequest::apply_alerts();
 	Object::add_extension('WorkflowRequest', 'WorkflowThreeStepRequest');
 	Object::add_extension('SiteTree', 'SiteTreeCMSThreeStepWorkflow');
 	Object::add_extension('LeftAndMain', 'LeftAndMainCMSThreeStepWorkflow');
@@ -48,5 +47,28 @@ Refresh your database schema through `http://<your-host>/dev/build`.
 
 Based on your permission levels, authors in the CMS will see different actions on a page,
 and a new "Workflow" tab listing open requests.
+
+## Email alerts
+
+Email alerts are configurable by the developer.
+
+The following line sets a config option
+
+    WorkflowRequest::set_alert(CLASS, EVENT, GROUP, NOTIFY);
+
+CLASS is one of either WorkflowPublicationRequest or WorkflowDeletionRequest
+
+EVENT is one of
+
+ * request
+ * publish
+ * approve (3 step only)
+ * deny
+ * cancel
+ * comment
+
+GROUP is either author or publisher
+
+NOTIFY is either true or false
 
 
