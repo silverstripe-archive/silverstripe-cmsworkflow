@@ -97,14 +97,16 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		} else {
 			$this->owner->addNewChange($comment, $this->owner->Status, $member);
 		}
-
-		if($notify) $this->notifyApproved($comment);
 		
 		return _t('SiteTreeCMSWorkflow.APPROVEDANDPUBLISHMESSAGE','Approved request and published changes to live version. Emailed %s.');
 	}
 	
 	function saveAndPublish($comment, $member = null, $notify = true) {
 		return $this->approve($comment, $member, $notify);
+	}
+
+	function notifyPublished($comment) {
+		$this->notifyApproved($comment);
 	}
 	
 	function notifyApproved($comment) {
