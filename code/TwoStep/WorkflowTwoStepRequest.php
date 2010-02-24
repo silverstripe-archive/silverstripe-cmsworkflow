@@ -13,45 +13,50 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		'WorkflowPublicationRequest' => array(
 			'request' => array(
 				'author' => false,
-				'publisher' => true
+				'publisher' => false
 			),
-			'publish' => array(
+			'approve' => array(
 				'author' => true,
 				'publisher' => true
 			),
 			'deny' => array(
 				'author' => true,
-				'publisher' => false
+				'publisher' => true
 			),
 			'cancel' => array(
 				'author' => true,
-				'publisher' => false
+				'publisher' => true
 			),
 			'comment' => array(
+				'author' => false,
+				'publisher' => false
+			),
+			'requestedit' => array(
 				'author' => true,
-				'publisher' => true
+				'publisher' => false,
+				'approver' => false
 			)
 		),
 		'WorkflowDeletionRequest' => array(
 			'request' => array(
 				'author' => false,
-				'publisher' => true
+				'publisher' => false
 			),
-			'publish' => array(
+			'approve' => array(
 				'author' => true,
 				'publisher' => true
 			),
 			'deny' => array(
 				'author' => true,
-				'publisher' => false
+				'publisher' => true
 			),
 			'cancel' => array(
 				'author' => true,
-				'publisher' => false
+				'publisher' => true
 			),
 			'comment' => array(
-				'author' => true,
-				'publisher' => true
+				'author' => false,
+				'publisher' => false
 			)
 		)
 	);
@@ -103,49 +108,52 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 	}
 	
 	function notifyApproved($comment) {
-		$author = $this->owner->Author();
-		$subject = sprintf(
-			_t("{$this->owner->class}.EMAIL_SUBJECT_APPROVED"),
-			$this->owner->Page()->Title
-		);
+		$emailsToSend = array();
+		$userWhoApproved = Member::currentUser();
 		
-		$publishers = $this->owner->Page()->PublisherMembers();
-		foreach($publishers as $publisher){
-			// Notify publishers other than the one who is logged in 
-			if(Member::currentUserID() != $publisher->ID) {
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'approve', 'publisher')) {
+			$publishers = $this->owner->Page()->PublisherMembers();
+			foreach($publishers as $publisher) $emailsToSend[] = array($userWhoApproved, $publisher);
+		}
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'approve', 'author')) {
+			$emailsToSend[] = array($userWhoApproved, $this->owner->Author());
+		}
+		
+		if (count($emailsToSend)) {
+			foreach($emailsToSend as $email) {
+				if ($email[1]->ID == Member::currentUserID()) continue;
 				$this->owner->sendNotificationEmail(
-					Member::currentUser(), // sender
-					$publisher, // recipient
+					$email[0], // sender
+					$email[1], // recipient
 					$comment,
-					'approved'
+					'approved changes'
 				);
 			}
 		}
-
-		$this->owner->sendNotificationEmail(
-			Member::currentUser(), // sender
-			$author, // recipient
-			$comment,
-			'approved'
-		);
 	}
 	
 	function notifyComment($comment) {
-		// Comment recipients cover everyone except the person making the comment
-		$commentRecipients = array();
-		if(Member::currentUserID() != $this->owner->Author()->ID) $commentRecipients[] = $this->owner->Author();
-		$publishers = $this->owner->Page()->PublisherMembers();
-		foreach($publishers as $publisher){
-			if(Member::currentUserID() != $publisher->ID) $commentRecipients[] = $publisher;
+		$commentor = Member::currentUser();
+		$emailsToSend = array();
+		
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'comment', 'publisher')) {
+			$publishers = $this->owner->Page()->PublisherMembers();
+			foreach($publishers as $publisher) $emailsToSend[] = array($commentor, $publisher);
 		}
-
-		foreach($commentRecipients as $recipient) {
-			$this->owner->sendNotificationEmail(
-				Member::currentUser(), // sender
-				$recipient, // recipient
-				$comment,
-				'comment'
-			);
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'comment', 'author')) {
+			$emailsToSend[] = array($commentor, $this->owner->Author());
+		}
+		
+		if (count($emailsToSend)) {
+			foreach($emailsToSend as $email) {
+				if ($email[1]->ID == Member::currentUserID()) continue;
+				$this->owner->sendNotificationEmail(
+					$email[0], // sender
+					$email[1], // recipient
+					$comment,
+					'commented'
+				);
+			}
 		}
 	}
 	
@@ -154,16 +162,26 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 	 * is lodged.
 	 */
 	public function notifyAwaitingApproval($comment) {
-		$publishers = $this->owner->Page()->PublisherMembers();
 		$author = $this->owner->Author();
+		$emailsToSend = array();
 		
-		foreach($publishers as $publisher){
-			$this->owner->sendNotificationEmail(
-				$author, // sender
-				$publisher, // recipient
-				$comment,
-				'awaiting approval'
-			);
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'request', 'publisher')) {
+			$publishers = $this->owner->Page()->PublisherMembers();
+			foreach($publishers as $publisher) $emailsToSend[] = array($author, $publisher);
+		}
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'request', 'author')) {
+			$emailsToSend[] = array($author, $author);
+		}
+		
+		if (count($emailsToSend)) {
+			foreach($emailsToSend as $email) {
+				$this->owner->sendNotificationEmail(
+					$email[0], // sender
+					$email[1], // recipient
+					$comment,
+					'requested approval'
+				);
+			}
 		}
 	}
 	

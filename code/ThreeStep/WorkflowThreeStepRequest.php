@@ -39,6 +39,11 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 				'author' => false,
 				'publisher' => false,
 				'approver' => false
+			),
+			'requestedit' => array(
+				'author' => true,
+				'publisher' => false,
+				'approver' => false
 			)
 		),
 		'WorkflowDeletionRequest' => array(

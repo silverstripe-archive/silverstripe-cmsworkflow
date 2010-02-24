@@ -395,43 +395,90 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	}
 	
 	function notifyDenied($comment) {
-		$publisher = Member::currentUser();
-		$author = $this->Author();
-
-		if (self::should_send_alert(__CLASS__, 'deny', 'author')) {
-			$this->sendNotificationEmail(
-				$publisher, // sender
-				$author, // recipient
-				$comment,
-				_t('WorkflowRequest.DENIED_REQUEST', 'denied the request')
-			);
+		$emailsToSend = array();
+		$userWhoDenied = Member::currentUser();
+		
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'deny', 'publisher')) {
+			$publishers = $this->owner->Page()->PublisherMembers();
+			foreach($publishers as $publisher) $emailsToSend[] = array($userWhoDenied, $publisher);
+		}
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'deny', 'approver')) {
+			$approvers = $this->owner->Page()->ApproverMembers();
+			foreach($approvers as $approver) $emailsToSend[] = array($userWhoDenied, $approver);
+		}
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'deny', 'author')) {
+			$emailsToSend[] = array($userWhoDenied, $this->owner->Author());
+		}
+		
+		if (count($emailsToSend)) {
+			foreach($emailsToSend as $email) {
+				if ($email[1]->ID == Member::currentUserID()) continue;
+				$this->owner->sendNotificationEmail(
+					$email[0], // sender
+					$email[1], // recipient
+					$comment,
+					'denied the request'
+				);
+			}
 		}
 	}
 	
 	function notifyCancelled($comment) {
-		$publisher = Member::currentUser();
-		$author = $this->Author();
-
-		if (self::should_send_alert(__CLASS__, 'cancel', 'author')) {
-			$this->sendNotificationEmail(
-				$publisher, // sender
-				$author, // recipient
-				$comment,
-				_t('WorkflowRequest.CANCELLED_REQUEST', 'cancelled changes')
-			);
+		$emailsToSend = array();
+		$userWhoCancelled = Member::currentUser();
+		
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'cancel', 'publisher')) {
+			$publishers = $this->owner->Page()->PublisherMembers();
+			foreach($publishers as $publisher) $emailsToSend[] = array($userWhoCancelled, $publisher);
+		}
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'cancel', 'approver')) {
+			$approvers = $this->owner->Page()->ApproverMembers();
+			foreach($approvers as $approver) $emailsToSend[] = array($userWhoCancelled, $approver);
+		}
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'cancel', 'author')) {
+			$emailsToSend[] = array($userWhoCancelled, $this->owner->Author());
+		}
+		
+		if (count($emailsToSend)) {
+			foreach($emailsToSend as $email) {
+				if ($email[1]->ID == Member::currentUserID()) continue;
+				$this->owner->sendNotificationEmail(
+					$email[0], // sender
+					$email[1], // recipient
+					$comment,
+					'cancelled changes'
+				);
+			}
 		}
 	}
 
 	function notifyAwaitingEdit($comment) {
-		$sender = Member::currentUser();
-		$author = $this->Author();
-
-		$this->sendNotificationEmail(
-			$sender, // sender
-			$author, // recipient
-			$comment,
-			_t('WorkflowRequest.REQUESTED_CHANGED', 'requested further changes')
-		);
+		$emailsToSend = array();
+		$userWhoRequestedEdits = Member::currentUser();
+		
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'requestedit', 'publisher')) {
+			$publishers = $this->owner->Page()->PublisherMembers();
+			foreach($publishers as $publisher) $emailsToSend[] = array($userWhoRequestedEdits, $publisher);
+		}
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'requestedit', 'approver')) {
+			$approvers = $this->owner->Page()->ApproverMembers();
+			foreach($approvers as $approver) $emailsToSend[] = array($userWhoRequestedEdits, $approver);
+		}
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'requestedit', 'author')) {
+			$emailsToSend[] = array($userWhoRequestedEdits, $this->owner->Author());
+		}
+		
+		if (count($emailsToSend)) {
+			foreach($emailsToSend as $email) {
+				if ($email[1]->ID == Member::currentUserID()) continue;
+				$this->owner->sendNotificationEmail(
+					$email[0], // sender
+					$email[1], // recipient
+					$comment,
+					'cancelled changes'
+				);
+			}
+		}
 	}
 
 	public function sendNotificationEmail($sender, $recipient, $comment, $requestedAction, $template = null) {
