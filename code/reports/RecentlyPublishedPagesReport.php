@@ -10,6 +10,9 @@ class RecentlyPublishedPagesReport extends SS_Report {
 	function title() {
 		return _t('RecentlyPublishedPagesReport.TITLE', 'Recently published pages');
 	}
+	function description() {
+		return _t('RecentlyPublishedPagesReport.DESCRIPTION', 'Note that this report only lists pages that still appear on the published site.');
+	}
 	
 	function columns() {
 		$fields = array(
@@ -38,10 +41,13 @@ class RecentlyPublishedPagesReport extends SS_Report {
 	function sourceRecords($params, $sort, $limit) {
 		increase_time_limit_to(120);
 		
+		$origStage = Versioned::current_stage();
+		Versioned::reading_stage('Live');
 		$q = singleton('SiteTree')->extendedSQL();
-		$q->select[] = '"SiteTree"."Title" AS "PageTitle"';
+		Versioned::reading_stage($origStage);
+		$q->select[] = '"SiteTree_Live"."Title" AS "PageTitle"';
 	
-		$q->leftJoin('WorkflowRequest', '"WorkflowRequest"."PageID" = "SiteTree"."ID"');
+		$q->leftJoin('WorkflowRequest', '"WorkflowRequest"."PageID" = "SiteTree_Live"."ID"');
 		$q->select[] = "\"WorkflowRequest\".\"LastEdited\" AS \"Published\"";
 		$q->where[] = "\"WorkflowRequest\".\"ClassName\" = 'WorkflowPublicationRequest'";
 		$q->where[] = "\"WorkflowRequest\".\"Status\" = 'Completed'";
@@ -98,9 +104,9 @@ class RecentlyPublishedPagesReport extends SS_Report {
 			if($field == 'AbsoluteLink') {
 				$sort = '"URLSegment" ' . $direction;
 			} elseif($field == '"Subsite"."Title"') {
-				$q->from[] = 'LEFT JOIN "Subsite" ON "Subsite"."ID" = "SiteTree"."SubsiteID"';
+				$q->from[] = 'LEFT JOIN "Subsite" ON "Subsite"."ID" = "SiteTree_Live"."SubsiteID"';
 			}
-		
+_		
 			$q->orderby = $sort;
 		}
 		$records = singleton('SiteTree')->buildDataObjectSet($q->execute(), 'DataObjectSet', $q);
