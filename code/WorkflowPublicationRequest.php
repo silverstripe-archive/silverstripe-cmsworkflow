@@ -110,7 +110,7 @@ class WorkflowPublicationRequest extends WorkflowRequest {
 	}
 	
 	public function ViewEmbargoedLink() {
-		return $this->Page()->Link() . '?futureDate=' . $this->dbObject('EmbargoDate')->URLDatetime();
+		return $this->Page()->AbsoluteLink() . '?futureDate=' . $this->dbObject('EmbargoDate')->URLDatetime();
 	}
 	
 	public function ViewExpiredLink() {
