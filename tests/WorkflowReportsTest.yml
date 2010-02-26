@@ -1,0 +1,75 @@
+Permission:
+   accesscmsmain1:
+      Code: CMS_ACCESS_CMSMain
+   accesscmsmain2:
+      Code: CMS_ACCESS_CMSMain
+   admin:
+      Code: ADMIN
+      
+Group:
+   publishers:
+      Title: publishersgroup
+      Permissions: =>Permission.accesscmsmain1
+   authors:
+      Title: authorsgroup
+      Permissions: =>Permission.accesscmsmain2
+   admins:
+      Title: adminsgroup
+      Permissions: =>Permission.admin
+      
+Member:
+   publisher:
+      Email: publisher@test.com
+      Groups: =>Group.publishers
+   author:
+      Email: customauthor@test.com
+      Groups: =>Group.authors
+   admin:
+      Email: admin@test.com
+      Groups: =>Group.admins
+
+SiteTree:
+    pagepub1:
+        Title: Page1
+    pagepub2:
+        Title: Page2
+        CanEditType: OnlyTheseUsers
+        CanEditGroups: =>Group.admins
+    pagepub3:
+        Title: Page3
+    pagedel1:
+        Title: Page1
+        ExpiryDate: 2010-02-10 15:00:00
+    pagedel2:
+        Title: Page2
+        CanEditType: OnlyTheseUsers
+        CanEditGroups: =>Group.admins
+        ExpiryDate: 2010-02-15 15:00:00
+    pagedel3:
+        Title: Page3
+        ExpiryDate: 2010-02-16 15:00:00
+        
+SiteConfig:
+    default:
+        CanPublishType: OnlyTheseUsers
+        PublisherGroups: =>Group.publishers
+
+WorkflowPublicationRequest:
+    workflow1:
+        Page: =>SiteTree.pagepub1
+        Author: =>Member.author
+        Approvers: =>Member.publisher
+        EmbargoDate: 2010-02-10 15:00:00
+        Status: Scheduled
+    workflow2:
+        Page: =>SiteTree.pagepub2
+        Author: =>Member.author
+        Approvers: =>Member.publisher
+        EmbargoDate: 2010-02-15 15:00:00
+        Status: Scheduled
+    workflow3:
+        Page: =>SiteTree.pagepub3
+        Author: =>Member.author
+        Approvers: =>Member.admin
+        EmbargoDate: 2010-02-16 15:00:00
+        Status: Scheduled

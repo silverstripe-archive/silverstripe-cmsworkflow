@@ -16,11 +16,18 @@ class MyTwoStepDeletionRequests extends SS_Report {
 		return 100;
 	}
 	function sourceRecords($params) {
-		return WorkflowTwoStepRequest::get_by_publisher(
-			'WorkflowDeletionRequest',
-			Member::currentUser(),
-			array('AwaitingApproval')
-		);
+		if(Permission::check("ADMIN")) {
+			return WorkflowTwoStepRequest::get(
+				'WorkflowDeletionRequest',
+				array('AwaitingApproval')
+			);
+		} else {
+			return WorkflowTwoStepRequest::get_by_publisher(
+				'WorkflowDeletionRequest',
+				Member::currentUser(),
+				array('AwaitingApproval')
+			);
+		}
 	}
 	function columns() {
 		return array(

@@ -74,6 +74,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * implemented by all ApprovalPaths.
 	 */
 	static $alerts = null;
+	static $enable_all_alerts = false;
 
 	protected $memberIdsEmailed = array();
 
@@ -96,15 +97,8 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 *
 	 */
 	public static function should_send_alert($class, $event, $group) {
-		if (self::$alerts === null) {
-			if (singleton('WorkflowRequest')->hasExtension('WorkflowTwoStepRequest')) {
-				self::$alerts = WorkflowTwoStepRequest::$default_alerts;
-			}
-			if (singleton('WorkflowRequest')->hasExtension('WorkflowThreeStepRequest')) {
-				self::$alerts = WorkflowThreeStepRequest::$default_alerts;
-			}
-		}
-		
+		self::load_default_alerts();
+		if (self::$enable_all_alerts) return true;
 		if (!isset(self::$alerts[$class])) return false;
 		if (!isset(self::$alerts[$class][$event])) return false;
 		if (!isset(self::$alerts[$class][$event][$group])) return false;
@@ -112,6 +106,13 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	}
 	
 	public static function set_alert($class, $event, $group, $notify) {
+		self::load_default_alerts();
+		if (!isset(self::$alerts[$class])) self::$alerts[$class] = array();
+		if (!isset(self::$alerts[$class][$event])) self::$alerts[$class][$event] = array();
+		self::$alerts[$class][$event][$group] = $notify;
+	}
+	
+	public static function load_default_alerts() {
 		if (self::$alerts === null) {
 			if (singleton('WorkflowRequest')->hasExtension('WorkflowTwoStepRequest')) {
 				self::$alerts = WorkflowTwoStepRequest::$default_alerts;
@@ -120,12 +121,8 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 				self::$alerts = WorkflowThreeStepRequest::$default_alerts;
 			}
 		}
-		
-		if (!isset(self::$alerts[$class])) self::$alerts[$class] = array();
-		if (!isset(self::$alerts[$class][$event])) self::$alerts[$class][$event] = array();
-		self::$alerts[$class][$event][$group] = $notify;
 	}
-
+	
 	/**
 	 * @ignore
 	 */
@@ -402,7 +399,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 			$publishers = $this->owner->Page()->PublisherMembers();
 			foreach($publishers as $publisher) $emailsToSend[] = array($userWhoDenied, $publisher);
 		}
-		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'deny', 'approver')) {
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'deny', 'approver') && $this->Page()->hasMethod('ApproverMembers')) {
 			$approvers = $this->owner->Page()->ApproverMembers();
 			foreach($approvers as $approver) $emailsToSend[] = array($userWhoDenied, $approver);
 		}
@@ -431,7 +428,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 			$publishers = $this->owner->Page()->PublisherMembers();
 			foreach($publishers as $publisher) $emailsToSend[] = array($userWhoCancelled, $publisher);
 		}
-		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'cancel', 'approver')) {
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'cancel', 'approver') && $this->Page()->hasMethod('ApproverMembers')) {
 			$approvers = $this->owner->Page()->ApproverMembers();
 			foreach($approvers as $approver) $emailsToSend[] = array($userWhoCancelled, $approver);
 		}
@@ -460,7 +457,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 			$publishers = $this->owner->Page()->PublisherMembers();
 			foreach($publishers as $publisher) $emailsToSend[] = array($userWhoRequestedEdits, $publisher);
 		}
-		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'requestedit', 'approver')) {
+		if (WorkflowRequest::should_send_alert(get_class($this->owner), 'requestedit', 'approver') && $this->Page()->hasMethod('ApproverMembers')) {
 			$approvers = $this->owner->Page()->ApproverMembers();
 			foreach($approvers as $approver) $emailsToSend[] = array($userWhoRequestedEdits, $approver);
 		}

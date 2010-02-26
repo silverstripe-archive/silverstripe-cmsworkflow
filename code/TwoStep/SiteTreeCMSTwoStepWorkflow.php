@@ -88,7 +88,7 @@ class SiteTreeCMSTwoStepWorkflow extends SiteTreeCMSWFDecorator {
 	 *
 	 * @return boolean True if the current user can publish this page.
 	 */
-	public function canPublish($member = null) {
+	public function canPublish($member = null, $dbg = false) {
 		if(!$member) $member = Member::currentUser();
 		if (!$member) return false;
 		if ($member instanceof Member) $memberID = $member->ID;
@@ -122,12 +122,12 @@ class SiteTreeCMSTwoStepWorkflow extends SiteTreeCMSWFDecorator {
 		return $this->PublisherMembers();
 	}
 	
-	function canDenyRequests() {
-		return $this->canPublish();
+	function canDenyRequests($member = null) {
+		return $this->canPublish($member);
 	}
 	
-	function canRequestEdit() {
-		return $this->canPublish();
+	function canRequestEdit($member = null) {
+		return $this->canPublish($member);
 	}
 	
 	/**

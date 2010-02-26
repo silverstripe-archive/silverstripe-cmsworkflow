@@ -63,9 +63,7 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 	
 	function approve($comment, $member = null, $notify = true) {
 		if(!$member) $member = Member::currentUser();
-		if(!$this->owner->Page()->canPublish($member)) {
-			return false;
-		}
+		if(!$this->owner->Page()->canPublish($member)) return false;
 		
 		if ($this->owner->ClassName == 'WorkflowDeletionRequest') {
 			if (isset($_REQUEST['DeletionScheduling']) && $_REQUEST['DeletionScheduling'] == 'scheduled') {
@@ -238,13 +236,13 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		if($status) {
 			$filter .= "AND {$bt}WorkflowRequest{$bt}.{$bt}Status{$bt} IN (" . $statusStr . ")";
 		} 
-		
+
 		$return = DataObject::get(
 			"SiteTree", 
 			$filter, 
 			"{$bt}SiteTree{$bt}.{$bt}LastEdited{$bt} DESC",
 			"LEFT JOIN {$bt}WorkflowRequest{$bt} ON {$bt}WorkflowRequest{$bt}.{$bt}PageID{$bt} = {$bt}SiteTree{$bt}.{$bt}ID{$bt} " .
-			"LEFT JOIN {$bt}WorkflowRequest_Publishers{$bt} ON {$bt}WorkflowRequest{$bt}.{$bt}ID{$bt} = {$bt}WorkflowRequest_Publishers{$bt}.{$bt}WorkflowRequestID{$bt}"
+			"LEFT JOIN {$bt}WorkflowRequest_Approvers{$bt} ON {$bt}WorkflowRequest{$bt}.{$bt}ID{$bt} = {$bt}WorkflowRequest_Approvers{$bt}.{$bt}WorkflowRequestID{$bt}"
 		);
 		
 		$canPublish = SiteTree::batch_permission_check($return->column('ID'), $publisher->ID, 'CanPublishType', 'SiteTree_PublisherGroups', 'canPublish');		

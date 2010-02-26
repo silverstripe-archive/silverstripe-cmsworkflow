@@ -3,6 +3,8 @@ Permission:
       Code: CMS_ACCESS_CMSMain
    accesscmsmain2:
       Code: CMS_ACCESS_CMSMain
+   accesscmsmain3:
+      Code: CMS_ACCESS_CMSMain
    grantaccess1:
       Code: SITETREE_GRANT_ACCESS
    admin:
@@ -14,6 +16,9 @@ Group:
    custompublishergroup:
       Title: custompublishergroup
       Permissions: =>Permission.accesscmsmain1,=>Permission.grantaccess1
+   customapprovergroup:
+      Title: customapprovergroup
+      Permissions: =>Permission.accesscmsmain3
    customauthorsgroup:
       Title: customauthorsgroup
       Permissions: =>Permission.accesscmsmain2
@@ -23,11 +28,14 @@ Group:
    workflowadmins:
       Title: WFAdmins
       Permissions: =>Permission.workflowadmin
+      
 Member:
    randomuser:
       Email: randomuser@test.com
    defaultpublisher:
       Email: defaultpublisher@test.com
+   defaultapprover:
+      Email: defaultapprover@test.com
    custompublisher:
       Email: publisher@test.com
       Groups: =>Group.custompublishergroup
@@ -48,6 +56,8 @@ SiteConfig:
       CanEditType: LoggedInUsers
       CanPublishType: OnlyTheseUsers
       PublisherGroups: =>Group.custompublishergroup
+      CanApproveType: OnlyTheseUsers
+      ApproverGroups: =>Group.customapprovergroup
 SiteTree:
    defaultpublisherspage:
       Title: defaultpublisherspage

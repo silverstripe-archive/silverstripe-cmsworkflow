@@ -63,7 +63,7 @@ class SiteConfigTwoStepWorkflow extends DataObjectDecorator {
 			return $members;
 		} else if ($this->owner->CanPublishType == 'LoggedInUsers') {
 			// We don't want to return every user in the CMS....
-			return new DataObjectSet();
+			return Permission::get_members_by_permission('CMS_ACCESS_CMSMain');
 		} else {
 			$group = Permission::get_groups_by_permission('ADMIN')->first();
 			return $group->Members();
