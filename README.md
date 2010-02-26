@@ -67,7 +67,7 @@ EVENT is one of
  * cancel
  * comment
 
-GROUP is either author or publisher
+GROUP is either author or publisher or approver
 
 NOTIFY is either true or false
 
