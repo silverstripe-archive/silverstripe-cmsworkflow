@@ -36,7 +36,10 @@ class WorkflowRequestChangeTest extends FunctionalTest {
 		$page->write();
 		
 		$request = WorkflowPublicationRequest::create_for_page($page);
-		$request->request("Please publish this"); 
+		$request->request("Please publish this");
+		
+		// We need to sleep a little here to let the time tick up a bit 
+		sleep(1.25);
 		
 		$this->assertEquals(
 			1,
@@ -80,6 +83,27 @@ class WorkflowRequestChangeTest extends FunctionalTest {
 			$change->PageLiveVersion,
 			"Change has the corrent draft version"
 		);
+		$page->doPublish();
+		$page->doPublish();
+		$page->doPublish();
+		
+		$changes = $request->Changes()->toArray();
+
+		$firstChange = $changes[0];
+		$secondChange = $changes[1];
+		
+		$this->assertTrue($firstChange->NextChange()->ID == $secondChange->ID);
+		$this->assertTrue($secondChange->PreviousChange()->ID == $firstChange->ID);
+		
+		$this->assertEquals($firstChange->getStatusDescription(), 'Awaiting Approval');
+		$this->assertEquals($firstChange->getDiffLinkToLastPublished(), 'admin/compareversions/2/?From=2&To=3');
+		$this->assertEquals($secondChange->getDiffLinkToLastPublished(), 'admin/compareversions/2/?From=3&To=3');
+		$this->assertEquals($secondChange->getDiffLinkToOriginalRequest(), 'admin/compareversions/2/?From=2&To=3');
+		$this->assertEquals($secondChange->getDiffLinkOriginalToLastPublished(), 'admin/compareversions/2/?From=3&To=3');
+		$this->assertEquals($secondChange->getDiffLinkToPrevious(), 'admin/compareversions/2/?From=2&To=3');
+		$this->assertEquals($secondChange->getDiffLinkContentToPrevious(), '<a href="admin/compareversions/2/?From=2&To=3" target="_blank" class="externallink">Show</a>');
+		
+		
 		
 		$this->session()->inst_set('loggedInAs', null);
 	}
