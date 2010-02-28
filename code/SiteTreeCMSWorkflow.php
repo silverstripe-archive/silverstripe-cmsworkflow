@@ -138,14 +138,14 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	 * Can we change the embargo date - only if there is an open workflow request
 	 */
 	function canChangeEmbargo() {
-		return (bool)$this->openWorkflowRequest();
+		return $this->openWorkflowRequest() && $this->openWorkflowRequest()->EmbargoField();
 	}
 
 	/**
 	 * Can we change the embargo date - only if there is an open workflow request
 	 */
 	function canChangeExpiry() {
-		return (bool)$this->openWorkflowRequest();
+		return $this->openWorkflowRequest() && $this->openWorkflowRequest()->ExpiryField();
 	}
 	
 	/**
@@ -330,7 +330,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			return $wf;
 		} else if(is_subclass_of($workflowClass, 'WorkflowRequest')) {
 			// TODO: How to avoid eval() here? (Tom R:) below should do it.
-			// return call_user_func(array($workflowClass, 'create_for_page'), $this->owner, null, null, $nofify);
+			// return call_user_func(array($workflowClass, 'create_for_page'), $this->owner, null, null, $notify);
 			return eval("return $workflowClass::create_for_page(\$this->owner, null, null, \$notify);");
 		} else {
 			user_error("SiteTreeCMSWorkflow::openOrNewWorkflowRequest(): Bad workflow class '$workflowClass'", E_USER_WARNING);

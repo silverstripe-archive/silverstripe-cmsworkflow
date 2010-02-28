@@ -9,25 +9,21 @@ class BatchSetExpiry extends CMSBatchAction {
 	}
 
 	function run(DataObjectSet $pages) {
-		$tzConverter = new TZDateTimeField('TZConvert', $_REQUEST['ExpiryDate_Batch'], SiteConfig::current_site_config()->Timezone);
-		$tzConverter->setValue($_REQUEST['ExpiryDate_Batch']);
-		$date = date('d/m/Y', strtotime($tzConverter->Value()));
-		$time = date('h:i a', strtotime($tzConverter->Value()));
+		if(class_exists('TZDateTimeField')) $datefield = new TZDateTimeField('TZConvert', $_REQUEST['ExpiryDate_Batch'], SiteConfig::current_site_config()->Timezone);
+		else $datefield = new PopupDateTimeField('ExpiryDate_Batch');
+		$datefield->setValue($_REQUEST['ExpiryDate_Batch']);
+		
+		$date = date('d/m/Y', strtotime($datefield->Value()));
+		$time = date('h:i a', strtotime($datefield->Value()));
 		return $this->batchaction($pages, 'setExpiry',
 			_t('BatchSetExpiry.ACTIONED_PAGES', 'Set expiry date on %d pages, %d failures'),
 		array($date, $time));
 	}
 	
 	function getParameterFields() {
-		if(class_exists('TZDateTimeField')) {
-			$dateField = new TZDateTimeField('ExpiryDate_Batch');
-		} else {
-			$dateField = new DatetimeField('ExpiryDate_Batch');
-			$dateField->getDateField()->setConfig('showcalendar', true);
-			$dateField->getTimeField()->setConfig('showdropdown', true);
-		}
-		
-		return new Fieldset($dateField);
+		if(class_exists('TZDateTimeField'))	$dateField = new TZDateTimeField('ExpiryDate_Batch');
+		else $dateField = new PopupDateTimeField('ExpiryDate_Batch');
+		return new FieldSet($dateField);
 	}
 	
 	function confirmationDialog($ids) {

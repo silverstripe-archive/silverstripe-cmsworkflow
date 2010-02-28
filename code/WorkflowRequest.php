@@ -377,7 +377,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	}
 	
 	function ExpiryDate() {
-		return $this->Page()->getField('ExpiryDate') != '0000-00-00 00:00:00' && $this->Page()->getField('ExpiryDate') != null ? $this->Page()->getField('ExpiryDate') : null;
+		return $this->Page()->ExpiryDate != '0000-00-00 00:00:00' && $this->Page()->ExpiryDate != null ? $this->Page()->ExpiryDate : null;
 	}
 	
 	function WorkflowTimezone() {
