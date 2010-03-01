@@ -135,22 +135,22 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 		return _t('SiteTreeCMSWorkflow.APPROVEMESSAGE','Approved request. Emailed %s.');
 	}
 	
-	function publish($comment, $member = null, $notify = true) {
-		if(!$member) $member = Member::currentUser();
-		if(!$this->owner->Page()->canPublish($member)) {
-			return false;
-		}
-		
-		if($notify) $this->notifyPublished($comment);
-
-		$this->owner->addNewChange($comment, 'Published', $member);
-		
-		return $this->owner->publish($comment, $member, $notify);
-	}
+	// function publish($comment, $member = null, $notify = true) {
+	// 	if(!$member) $member = Member::currentUser();
+	// 	if(!$this->owner->Page()->canPublish($member)) {
+	// 		return false;
+	// 	}
+	// 	
+	// 	if($notify) $this->notifyPublished($comment);
+	// 
+	// 	$this->owner->addNewChange($comment, 'Published', $member);
+	// 	
+	// 	return $this->owner->publish($comment, $member, $notify);
+	// }
 	
 	function saveAndPublish($comment, $member = null, $notify = true) {
-		$this->approve($comment, $member, $notify);
-		$this->publish($comment, $member, $notify);
+		$this->owner->approve($comment, $member, $notify);
+		$this->owner->publish($comment, $member, $notify);
 		return _t('WorkflowThreeStepRequest.PUBLISHMESSAGE','Published changes to live version. Emailed %s.');
 	}
 	
@@ -286,6 +286,7 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 		if($this->owner->Status == 'Approved' && $this->owner->Page()->canPublish()) {
 			$actions['cms_publish'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_ACTION", "Publish changes");
 			if (get_class($this->owner) != 'WorkflowDeletionRequest') $actions['cms_requestedit'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_REQUESTEDIT", "Request edit");
+			if (WorkflowRequest::$allow_deny) $actions['cms_deny'] = _t("SiteTreeCMSWorkflow.WORKFLOW_ACTION_DENY","Deny");
 		} elseif($this->owner->Status == 'Scheduled' && $this->owner->Page()->canApprove()) {
 			$actions['cms_requestedit'] = _t("SiteTreeCMSWorkflow.WORKFLOWACTION_REQUESTEDIT", "Request edit");
 		} elseif($this->owner->Status == 'AwaitingApproval' && $this->owner->Page()->canApprove()) {

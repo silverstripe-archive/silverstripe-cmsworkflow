@@ -148,7 +148,7 @@ class TwoStepWorkflowTest extends FunctionalTest {
 		));
 
 		$sc->CanPublishType = 'LoggedInUsers';
-		$this->assertEquals(3, $sc->PublisherMembers()->Count(), 'PublisherMembers returns the 3 users that have CMS access');
+		$this->assertEquals(4, $sc->PublisherMembers()->Count(), 'PublisherMembers returns the 4 users that have CMS access');
 	}
 	
 	function testPageMemberRetrievalFunctions() {
@@ -189,7 +189,7 @@ class TwoStepWorkflowTest extends FunctionalTest {
 
 		// Test 'all' users
 		$page->CanPublishType = 'LoggedInUsers';
-		$this->assertEquals(3, $page->PublisherMembers()->Count(), 'PublisherMembers returns the 3 users that have CMS access');
+		$this->assertEquals(4, $page->PublisherMembers()->Count(), 'PublisherMembers returns the 4 users that have CMS access');
 	}
 
 	function testManipulatingGroupsDuringAWorkflow() {

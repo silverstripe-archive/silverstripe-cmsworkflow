@@ -5,6 +5,7 @@
  * @package cmsworkflow
  * @subpackage ThreeStep
  */
+// @codeCoverageIgnoreStart
 class ThreeStepMyDeletionRequestsSideReport extends SS_Report {
 	function title() {
 		return _t('ThreeStepMyDeletionRequestsSideReport.TITLE',"My deletion requests");
@@ -54,5 +55,5 @@ class ThreeStepMyDeletionRequestsSideReport extends SS_Report {
 		return Object::has_extension('SiteTree', 'SiteTreeCMSThreeStepWorkflow');
 	}
 }
-
+// @codeCoverageIgnoreEnd
 ?>

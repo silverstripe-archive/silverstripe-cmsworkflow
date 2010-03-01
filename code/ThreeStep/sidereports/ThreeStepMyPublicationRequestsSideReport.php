@@ -5,6 +5,7 @@
  * @package cmsworkflow
  * @subpackage ThreeStep
  */
+// @codeCoverageIgnoreStart
 class ThreeStepMyPublicationRequestsSideReport extends SS_Report {
 	function title() {
 		return _t('ThreeStepMyPublicationRequestsSideReport.TITLE',"My publication requests");
@@ -49,5 +50,5 @@ class ThreeStepMyPublicationRequestsSideReport extends SS_Report {
 		return Object::has_extension('SiteTree', 'SiteTreeCMSThreeStepWorkflow');
 	}
 }
-
+// @codeCoverageIgnoreEnd
 ?>

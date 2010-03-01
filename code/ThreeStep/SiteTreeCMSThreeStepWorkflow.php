@@ -291,6 +291,7 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 		}
 	}
 
+	// @codeCoverageIgnoreStart
 	/**
 	 * Setup the default groups
 	 * 
@@ -346,4 +347,5 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 			)
 		);
 	}
+	// @codeCoverageIgnoreEnd
 }

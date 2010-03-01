@@ -8,7 +8,7 @@
  *
  * @package cmsworkflow
  */
-class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityProvider {
+class WorkflowPublicationRequest extends WorkflowRequest {
 	public static function create_for_page($page, $author = null, $approvers = null, $notify = true) {
 		if(!$author && $author !== FALSE) $author = Member::currentUser();
 	
@@ -171,66 +171,6 @@ class WorkflowPublicationRequest extends WorkflowRequest implements i18nEntityPr
 		$this->Status = 'Approved';
 		$this->write();
 		$this->notifyApproved($comment);
-	}
-	
-	function provideI18nEntities() {
-		$entities = array();
-		$entities["{$this->class}.EMAIL_SUBJECT_AWAITINGAPPROVAL"] = array(
-			"Publication of change requested: %s",
-			PR_MEDIUM,
-			'Email subject with page title'
-		);
-		$entities["{$this->class}.EMAIL_PARA_AWAITINGAPPROVAL"] = array(
-			"%s has asked that you review and publish following change to the \"%s\" page",
-			PR_MEDIUM,
-			'Intro paragraph for workflow email, with a name and a page title'
-		);
-
-		$entities["{$this->class}.EMAIL_SUBJECT_APPROVED"] = array(
-			"Change published: \"%s\"",
-			PR_MEDIUM,
-			'Email subject with page title'
-		);
-		$entities["{$this->class}.EMAIL_PARA_APPROVED"] = array(
-			"%s has approved and published the changes to the \"%s\" page.",
-			PR_MEDIUM,
-			'Intro paragraph for workflow email, with a name and a page title'
-		);
-
-		$entities["{$this->class}.EMAIL_SUBJECT_DENIED"] = array(
-			"Change rejected: \"%s\"",
-			PR_MEDIUM,
-			'Email subject with page title'
-		);
-		$entities["{$this->class}.EMAIL_PARA_DENIED"] = array(
-			"%s has rejected the changes to the \"%s\" page.",
-			PR_MEDIUM,
-			'Intro paragraph for workflow email, with a name and a page title'
-		);
-
-		$entities["{$this->class}.EMAIL_SUBJECT_AWAITINGEDIT"] = array(
-			"Revision requested: \"%s\"",
-			PR_MEDIUM,
-			'Email subject with page title'
-		);
-		$entities["{$this->class}.EMAIL_PARA_AWAITINGEDIT"] = array(
-			"%s asked you to revise your changes to the \"%s\" page.",
-			PR_MEDIUM,
-			'Intro paragraph for workflow email, with a name and a page title'
-		);
-
-		$entities["{$this->class}.EMAIL_SUBJECT_COMMENT"] = array(
-			"Comment on publication request: \"%s\"",
-			PR_MEDIUM,
-			'Email subject with page title'
-		);
-		$entities["{$this->class}.EMAIL_PARA_COMMENT"] = array(
-			"%s commented on the requested change to the \"%s\" page.",
-			PR_MEDIUM,
-			'Intro paragraph for workflow email, with a name and a page title'
-		);
-
-		return $entities;
 	}
 }
 ?>

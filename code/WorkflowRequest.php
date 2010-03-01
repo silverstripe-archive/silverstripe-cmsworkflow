@@ -665,50 +665,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 			"LEFT JOIN {$bt}Member{$bt} ON {$bt}Member{$bt}.{$bt}ID{$bt} = {$bt}WorkflowRequest{$bt}.{$bt}AuthorID{$bt}"
 		);
 	}
-	
-	/**
-	 * Get all publication requests assigned to a specific approver
-	 * 
-	 * @param string $class WorkflowRequest subclass
-	 * @param Member $approver
-	 * @param array $status One or more stati from the $Status property
-	 * @return DataObjectSet
-	 */
-	public static function get_by_approver($class, $approver, $status = null) {
-		// To ensure 2.3 and 2.4 compatibility
-		$bt = defined('DB::USE_ANSI_SQL') ? "\"" : "`";
 
-		if($status) $statusStr = "'".implode("','", $status)."'";
-
-		$classes = (array)ClassInfo::subclassesFor($class);
-		$classes[] = $class;
-		$classesSQL = implode("','", $classes);
-		
-		// build filter
-		$filter = '';
-		// check for admin permission
-		if (Permission::checkMember($approver, 'ADMIN') || Permission::checkMember($approver, 'IS_WORKFLOW_ADMIN')) {
-			// Admins can approve/publish anything
-			$filter = "{$bt}WorkflowRequest{$bt}.ClassName IN ('$classesSQL')";
-		} else {
-			$filter = "{$bt}WorkflowRequest_Approvers{$bt}.MemberID = {$approver->ID}
-				AND {$bt}WorkflowRequest{$bt}.ClassName IN ('$classesSQL')
-			";
-		}
-
-		if($status) {
-			$filter .= "AND {$bt}WorkflowRequest{$bt}.Status IN (" . $statusStr . ")";
-		} 
-		
-		return DataObject::get(
-			"SiteTree", 
-			$filter, 
-			"{$bt}SiteTree{$bt}.{$bt}LastEdited{$bt} DESC",
-			"LEFT JOIN {$bt}WorkflowRequest{$bt} ON {$bt}WorkflowRequest{$bt}.PageID = {$bt}SiteTree{$bt}.ID " .
-			"LEFT JOIN {$bt}WorkflowRequest_Approvers{$bt} ON {$bt}WorkflowRequest{$bt}.ID = {$bt}WorkflowRequest_Approvers{$bt}.WorkflowRequestID"
-		);
-	}
-	
 	/**
 	 * Get publication requests from all users
 	 * @param string $class WorkflowRequest subclass
@@ -791,6 +748,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		return $labels;
 	}
 	
+	// @codeCoverageIgnoreStart
 	function provideI18nEntities() {
 		$entities = array();
 		$entities['WorkflowRequest.EMAIL_SUBJECT_GENERIC'] = array(
@@ -806,6 +764,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		
 		return $entities;
 	}
+	// @codeCoverageIgnoreEnd
 	
 	public function setSchedule() {
 		if ($this->EmbargoDate) {

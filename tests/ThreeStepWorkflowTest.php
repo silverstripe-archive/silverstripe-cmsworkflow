@@ -23,57 +23,120 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 	static $extensionsToReapply = array();
 	static $extensionsToRemoveAfter = array();
 	
+	function testWorkflowActions() {
+		$custompublisher = $this->objFromFixture('Member', 'custompublisher');
+		$customapprover = $this->objFromFixture('Member', 'customapprover');
+		$customauthor = $this->objFromFixture('Member', 'customauthor');
+		$this->logInAs($customauthor);
+		
+		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
+		$request = $page->openOrNewWorkflowRequest('WorkflowPublicationRequest');
+	
+		WorkflowRequest::$allow_deny = true;
+	
+		// awaiting approval
+			// author
+			$this->logInAs($customauthor);
+			$actions = array_flip($request->WorkflowActions());
+			$this->assertContains('cms_cancel', $actions);
+			$this->assertContains('cms_comment', $actions);
+			$this->assertNotContains('cms_approve', $actions);
+			$this->assertNotContains('cms_deny', $actions);
+			// approver
+			$this->logInAs($customapprover);
+			$actions = array_flip($request->WorkflowActions());
+			$this->assertContains('cms_cancel', $actions);
+			$this->assertContains('cms_comment', $actions);
+			$this->assertContains('cms_requestedit', $actions);
+			$this->assertContains('cms_approve', $actions);
+			$this->assertContains('cms_deny', $actions);
+			// publisher
+			$this->logInAs($custompublisher);
+			$actions = array_flip($request->WorkflowActions());
+			$this->assertContains('cms_cancel', $actions);
+			$this->assertContains('cms_comment', $actions);
+			$this->assertContains('cms_requestedit', $actions);
+			$this->assertContains('cms_approve', $actions);
+			$this->assertContains('cms_deny', $actions);
+			$request->approve("app");
+		// approved
+			// author
+			$this->logInAs($customauthor);
+			$actions = array_flip($request->WorkflowActions());
+			$this->assertContains('cms_cancel', $actions);
+			$this->assertContains('cms_comment', $actions);
+			$this->assertNotContains('cms_approve', $actions);
+			$this->assertNotContains('cms_publish', $actions);
+			$this->assertNotContains('cms_deny', $actions);
+			// approver
+			$this->logInAs($customapprover);
+			$actions = array_flip($request->WorkflowActions());
+			$this->assertContains('cms_cancel', $actions);
+			$this->assertContains('cms_comment', $actions);
+			$this->assertNotContains('cms_requestedit', $actions);
+			$this->assertNotContains('cms_approve', $actions);
+			$this->assertNotContains('cms_publish', $actions);
+			$this->assertNotContains('cms_deny', $actions);
+			// publisher
+			$this->logInAs($custompublisher);
+			$actions = array_flip($request->WorkflowActions());
+			$this->assertContains('cms_cancel', $actions);
+			$this->assertContains('cms_comment', $actions);
+			$this->assertContains('cms_requestedit', $actions);
+			$this->assertNotContains('cms_approve', $actions);
+			$this->assertContains('cms_publish', $actions);
+			$this->assertContains('cms_deny', $actions);
+			$request->requestedit("reqed");
+		// awaiting edit
+			$actions = array_flip($request->WorkflowActions());
+			$this->assertContains('cms_cancel', $actions);
+			$this->assertContains('cms_comment', $actions);
+			$this->assertContains('cms_requestpublication', $actions);
+			$request->cancel("cancel");
+	}
 		
 	function testWorkflowPublicationApprovalTransition() {
+		WorkflowRequest::$enable_all_alerts = true;
+		
 		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
 	
 		$custompublisher = $this->objFromFixture('Member', 'custompublisher');
+		$customapprover = $this->objFromFixture('Member', 'customapprover');
 		$customauthor = $this->objFromFixture('Member', 'customauthor');
 	
-		// awaiting approval 
+		// nothing -> awaiting approval 
 		$customauthor->logIn();
-		$request1 = $page->openOrNewWorkflowRequest('WorkflowPublicationRequest');
-		$this->assertNotNull($request1);
-		$this->assertEquals(
-			$request1->AuthorID,
-			$customauthor->ID,
-			"Logged-in member is set as the author of the request"
-		);
-		$this->assertEquals(
-			$request1->Status,
-			'AwaitingApproval',
-			"Request is set to AwaitingApproval after requestPublication() is called"
-		);
+		$request = $page->openOrNewWorkflowRequest('WorkflowPublicationRequest');
+		$request->request("ARGGGGG!");
+		$this->assertNotNull($request);
+		$this->assertEquals($request->AuthorID, $customauthor->ID, "Logged-in member is set as the author of the request");
+		$this->assertEquals($request->Status, 'AwaitingApproval', "Request is set to AwaitingApproval after requestPublication() is called");
 		
+		// awaiting approval -> approved
+		$customapprover->logIn();
+		$request->approve('Looks good');
+		$this->assertEquals($request->Status, 'Approved', "Request is set to Approved after page is approved");
+		$this->assertEquals($request->ApproverID, $customapprover->ID, "Currently logged-in user is set as the Approver for this request");
+		
+		// place comment
+		$customauthor->logIn();
+		$request->comment("YARRRRRR!");
+		
+		// approved -> completed
 		$custompublisher->logIn();
-	
-		$request1->approve('Looks good');
-	
-		$this->assertEquals(
-			$request1->Status,
-			'Approved',
-			"Request is set to Approved after page is approved"
-		);
+		$request->publish('Avast, ye scoundrels!', $custompublisher, false);
+		$this->assertEquals($request->Status, 'Completed', "Request is set to Completed after page is published");
+		$this->assertEquals($request->PublisherID, $custompublisher->ID, "Currently logged-in user is set as the Publisher for this request");
 		
-		$this->assertEquals(
-			$request1->ApproverID,
-			$custompublisher->ID,
-			"Currently logged-in user is set as the Approver for this request"
-		);
+		// Test save and publish
+		$this->objFromFixture('Member', 'admin')->logIn();
+		$this->assertTrue(is_string($page->openOrNewWorkflowRequest('WorkflowPublicationRequest')->saveAndPublish("S&P")));
 		
-		$request1->publish('Avast, ye scoundrels!', $custompublisher, false);
-		
-		$this->assertEquals(
-			$request1->Status,
-			'Completed',
-			"Request is set to Completed after page is published"
-		);
-		
-		$this->assertEquals(
-			$request1->PublisherID,
-			$custompublisher->ID,
-			"Currently logged-in user is set as the Publisher for this request"
-		);
+		// Test the get_by_* functions. These are cursory tests, covering functionality
+		// but none of the multitude of edge cases
+		$this->assertContains($page->ID, WorkflowThreeStepRequest::get_by_author('WorkflowPublicationRequest', $customauthor)->column('ID'));
+		$this->assertContains($page->ID, WorkflowThreeStepRequest::get_by_approver('WorkflowPublicationRequest', $customapprover)->column('ID'));
+		$this->assertContains($page->ID, WorkflowThreeStepRequest::get_by_publisher('WorkflowPublicationRequest', $custompublisher)->column('ID'));
 	}
 	
 	function testManipulatingGroupsDuringAWorkflow() {
@@ -86,7 +149,7 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		// awaiting approval 
 		$customauthor->logIn();
 		$request = $page->openOrNewWorkflowRequest('WorkflowPublicationRequest');
-
+	
 		// Asset publisher can approve but author cannot
 		SiteTree::reset();
 		$this->assertFalse($page->canApprove($customauthor));
@@ -198,12 +261,33 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		$this->assertEquals($liveVirtualPage->Content, '<p>Pre-embargo</p>');
 	}
 	
-	function testBatchActions() {
+	function testCmsFields() {
+		$page = new Page();
+		
+		// Test fields as admin, make sure they are editable
+		// $this->logInAs($this->objFromFixture('Member', 'admin'));
+		// $form = $page->getCMSFields();
+		// $this->assertTrue($form->fieldByName('Root.Access.CanApproveType') instanceof OptionsetField);
+		// $this->assertTrue($form->fieldByName('Root.Access.ApproverGroups') instanceof TreeMultiselectField);
+		// $this->assertTrue($form->fieldByName('Root.Access.CanPublishType') instanceof OptionsetField);
+		// $this->assertTrue($form->fieldByName('Root.Access.PublisherGroups') instanceof TreeMultiselectField);
+
+		// Test fields as admin, make sure they are editable
+		$this->logInAs($this->objFromFixture('Member', 'randomuser'));
+		$form = $page->getCMSFields();
+		$this->assertFalse($form->fieldByName('Root.Access.CanApproveType') instanceof OptionsetField);
+		$this->assertFalse($form->fieldByName('Root.Access.ApproverGroups') instanceof TreeMultiselectField);
+		$this->assertFalse($form->fieldByName('Root.Access.CanPublishType') instanceof OptionsetField);
+		$this->assertFalse($form->fieldByName('Root.Access.PublisherGroups') instanceof TreeMultiselectField);
+	}
+	
+	function testBatchActionsAndFilters() {
 		// Get fixtures
 		$page1 = $this->objFromFixture('SiteTree', 'batchTest1');
 		$page2 = $this->objFromFixture('SiteTree', 'batchTest2');
 		$page3 = $this->objFromFixture('SiteTree', 'batchTest3');
 		$page4 = $this->objFromFixture('SiteTree', 'batchTest4');
+		$page5 = $this->objFromFixture('SiteTree', 'batchTest5');
 		$custompublisher = $this->objFromFixture('Member', 'custompublisher');
 		$customauthor = $this->objFromFixture('Member', 'customauthor');
 	
@@ -212,6 +296,7 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		$page2->Title = rand();$page2->write();
 		$page3->Title = rand();$page3->write();
 		$page4->Title = rand();$page4->write();
+		$page5->Title = rand();$page5->write();
 	
 		// Create WF requests for each of em
 		$customauthor->logIn();
@@ -219,6 +304,7 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		$wf2 = $page2->openOrNewWorkflowRequest('WorkflowPublicationRequest');
 		$wf3 = $page3->openOrNewWorkflowRequest('WorkflowPublicationRequest');
 		$wf4 = $page4->openOrNewWorkflowRequest('WorkflowPublicationRequest');
+		$wf5 = $page5->openOrNewWorkflowRequest('WorkflowPublicationRequest');
 		
 		// // Create dataset
 		$doSet = new DataObjectSet();
@@ -227,27 +313,187 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		$doSet->push($page3);
 		$doSet->push($page4);
 		
+		// Test awaiting approval filters
+		$filter = new CMSWorkflowThreeStepFilters_PagesAwaitingApproval();
+		$this->assertTrue(is_string(CMSWorkflowThreeStepFilters_PagesAwaitingApproval::title()));
+		$filter->getTree();
+		$this->assertTrue($filter->includeInTree($page1));
+		$this->assertTrue($filter->includeInTree($page2));
+		$this->assertTrue($filter->includeInTree($page3));
+		$this->assertTrue($filter->includeInTree($page4));
+		
 		// Batch approve
 		$custompublisher->logIn();
 		$this->session()->inst_set('loggedInAs', $custompublisher->ID);
-		$page1->batchApprove();
-		$page2->batchApprove();
-		$page3->batchApprove();
-		$page4->batchApprove();
+		
+		$_REQUEST['ajax'] = 1;
+		
+		$pageIds = $doSet->column('ID');
+		
+		$action = new BatchApprovePages();
+		$this->assertTrue(is_string($action->getActionTitle()));
+		$this->assertTrue(is_string($action->getDoingText()));
+		$this->assertEquals($pageIds, $action->applicablePages($pageIds),
+			'applicableIds only returns pages with open requests');
+		$action->run($doSet);
+		
+		$page1 = DataObject::get_by_id('SiteTree', $pageIds[0]);
+		$page2 = DataObject::get_by_id('SiteTree', $pageIds[1]);
+		$page3 = DataObject::get_by_id('SiteTree', $pageIds[2]);
+		$page4 = DataObject::get_by_id('SiteTree', $pageIds[3]);
+		$doSet = new DataObjectSet();
+		$doSet->push($page1);
+		$doSet->push($page2);
+		$doSet->push($page3);
+		$doSet->push($page4);
+		
 		$this->assertEquals($page1->openWorkflowRequest()->Status, 'Approved', 'Workflow status is approved after batch action');
 		$this->assertEquals($page2->openWorkflowRequest()->Status, 'Approved', 'Workflow status is approved after batch action');
 		$this->assertEquals($page3->openWorkflowRequest()->Status, 'Approved', 'Workflow status is approved after batch action');
 		$this->assertEquals($page4->openWorkflowRequest()->Status, 'Approved', 'Workflow status is approved after batch action');
-
+	
+		// Test awaiting publication filters
+		$filter = new CMSWorkflowThreeStepFilters_PagesAwaitingPublishing();
+		$this->assertTrue(is_string(CMSWorkflowThreeStepFilters_PagesAwaitingPublishing::title()));
+		$filter->getTree();
+		$this->assertTrue($filter->includeInTree($page1));
+		$this->assertTrue($filter->includeInTree($page2));
+		$this->assertTrue($filter->includeInTree($page3));
+		$this->assertTrue($filter->includeInTree($page4));
+		
 		// Batch publish
-		$page1->batchPublish();
-		$page2->batchPublish();
-		$page3->batchPublish();
-		$page4->batchPublish();
+		$action = new BatchPublishPages();
+		$this->assertTrue(is_string($action->getActionTitle()));
+		$this->assertTrue(is_string($action->getDoingText()));
+		$this->assertEquals($pageIds, $action->applicablePages($doSet->column('ID')),
+			'applicableIds only returns pages with open requests');
+		$action->run($doSet);
+		
+		$page1 = DataObject::get_by_id('SiteTree', $pageIds[0]);
+		$page2 = DataObject::get_by_id('SiteTree', $pageIds[1]);
+		$page3 = DataObject::get_by_id('SiteTree', $pageIds[2]);
+		$page4 = DataObject::get_by_id('SiteTree', $pageIds[3]);
+		
 		$this->assertNull($page1->openWorkflowRequest(), 'No open workflow after publishing live');
 		$this->assertNull($page2->openWorkflowRequest(), 'No open workflow after publishing live');
 		$this->assertNull($page3->openWorkflowRequest(), 'No open workflow after publishing live');
 		$this->assertNull($page4->openWorkflowRequest(), 'No open workflow after publishing live');
+	}
+	
+	function testSiteConfigFields() {
+		// Ensure admins can see the permission fields and edit them
+		$this->logInAs($this->objFromFixture('Member', 'admin'));
+		$fields = singleton('SiteConfig')->getFormFields();
+		$this->assertNotNull($fields->fieldByName('Root.Access.CanPublishType'));
+		$this->assertNotNull($fields->fieldByName('Root.Access.PublisherGroups'));
+		$this->assertNotNull($fields->fieldByName('Root.Access.ApproverGroups'));
+		$this->assertFalse($fields->fieldByName('Root.Access.CanPublishType') instanceof ReadonlyField);
+		$this->assertFalse($fields->fieldByName('Root.Access.PublisherGroups') instanceof ReadonlyField);
+		$this->assertFalse($fields->fieldByName('Root.Access.ApproverGroups') instanceof ReadonlyField);
+		
+		// Make sure none admins can see them, but not edit
+		$this->logInAs($this->objFromFixture('Member', 'customauthor'));
+		$fields = singleton('SiteConfig')->getFormFields();
+		$this->assertTrue($fields->fieldByName('Root.Access.CanPublishType') instanceof LookupField);
+		$this->assertTrue($fields->fieldByName('Root.Access.CanApproveType') instanceof LookupField);
+		$this->assertTrue($fields->fieldByName('Root.Access.PublisherGroups') instanceof TreeMultiselectField_Readonly);
+		$this->assertTrue($fields->fieldByName('Root.Access.ApproverGroups') instanceof TreeMultiselectField_Readonly);
+	}
+	
+	function testSiteConfigMemberRetrievalFunctions() {
+		$sc = SiteConfig::current_site_config();
+		$sc->CanPublishType = 'OnlyTheseUsers';
+		$sc->CanApproveType = 'OnlyTheseUsers';
+		$sc->PublisherGroups()->removeAll();
+		$sc->ApproverGroups()->removeAll();
+		
+		$this->assertEquals($sc->PublisherMembers()->column('Email'), array(
+			'admin@test.com'
+		), 'With CanPublishType set to OnlyTheseUsers, but no groups set up, should return admins');
+		$this->assertEquals($sc->ApproverMembers()->column('Email'), array(
+			'admin@test.com'
+		), 'With CanApproveType set to OnlyTheseUsers, but no groups set up, should return admins');
+		
+		// Should now return two authors
+		$sc->PublisherGroups()->add($this->objFromFixture('Group', 'customauthorsgroup'));
+		$this->assertEquals($sc->PublisherMembers()->column('Email'), array(
+			'customauthor@test.com',
+			'customauthor2@test.com'
+		));
+		
+		$sc->ApproverGroups()->add($this->objFromFixture('Group', 'customauthorsgroup'));
+		$this->assertEquals($sc->ApproverMembers()->column('Email'), array(
+			'customauthor@test.com',
+			'customauthor2@test.com'
+		));
+	
+		$sc->CanPublishType = 'LoggedInUsers';
+		$this->assertEquals(4, $sc->PublisherMembers()->Count(), 'PublisherMembers returns the 4 users that have CMS access');
+		$sc->CanApproveType = 'LoggedInUsers';
+		$this->assertEquals(4, $sc->ApproverMembers()->Count(), 'ApproverMembers returns the 4 users that have CMS access');
+	}
+	
+	function testPageMemberRetrievalFunctions() {
+		$sc = SiteConfig::current_site_config();
+		$sc->CanPublishType = 'OnlyTheseUsers';
+		$sc->PublisherGroups()->removeAll();
+		$sc->PublisherGroups()->add($this->objFromFixture('Group', 'customauthorsgroup'));
+		$sc->write();
+		$sc->CanApproveType = 'OnlyTheseUsers';
+		$sc->ApproverGroups()->removeAll();
+		$sc->ApproverGroups()->add($this->objFromFixture('Group', 'customauthorsgroup'));
+		$sc->write();
+		
+		$page = new Page();
+		
+		// Test inherit
+		$page->CanPublishType = 'Inherit';
+		$this->assertEquals($page->PublisherMembers()->column('Email'), array(
+			'customauthor@test.com',
+			'customauthor2@test.com'
+		));
+		$page->CanApproveType = 'Inherit';
+		$this->assertEquals($page->ApproverMembers()->column('Email'), array(
+			'customauthor@test.com',
+			'customauthor2@test.com'
+		));
+		
+		// Test specific groups
+		$page->CanPublishType = 'OnlyTheseUsers';
+		$this->assertEquals($page->PublisherMembers()->column('Email'), array(
+			'admin@test.com'
+		), 'With CanPublishType set to OnlyTheseUsers, but no groups set up, should return admins');
+		
+		$page->PublisherGroups()->add($this->objFromFixture('Group', 'custompublishergroup'));
+		$this->assertEquals($page->PublisherMembers()->column('Email'), array(
+			'publisher@test.com'
+		));
+		
+		$page->CanApproveType = 'OnlyTheseUsers';
+		$this->assertEquals($page->ApproverMembers()->column('Email'), array(
+			'admin@test.com'
+		), 'With CanApproveType set to OnlyTheseUsers, but no groups set up, should return admins');
+		
+		$page->ApproverGroups()->add($this->objFromFixture('Group', 'custompublishergroup'));
+		$this->assertEquals($page->ApproverMembers()->column('Email'), array(
+			'publisher@test.com'
+		));
+		
+		
+		$page->CanPublishType = 'Inherit';
+		$page->CanApproveType = 'Inherit';
+		$page->write();
+		
+		// Test passthru methods
+		$this->assertTrue($page->canPublish($this->objFromFixture('Member', 'customauthor')));
+		$this->assertTrue($page->canApprove($this->objFromFixture('Member', 'customauthor')));
+		$this->assertTrue($page->canRequestEdit($this->objFromFixture('Member', 'customauthor')));
+
+		// Test 'all' users
+		$page->CanPublishType = 'LoggedInUsers';
+		$page->CanApproveType = 'LoggedInUsers';
+		$this->assertEquals(4, $page->PublisherMembers()->Count(), 'PublisherMembers returns the 4 users that have CMS access');
+		$this->assertEquals(4, $page->ApproverMembers()->Count(), 'ApproverMembers returns the 4 users that have CMS access');
 	}
 }
 ?>

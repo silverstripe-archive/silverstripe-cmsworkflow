@@ -39,6 +39,9 @@ Member:
    custompublisher:
       Email: publisher@test.com
       Groups: =>Group.custompublishergroup
+   customapprover:
+      Email: approver@test.com
+      Groups: =>Group.customapprovergroup
    customauthor:
       Email: customauthor@test.com
       Groups: =>Group.customauthorsgroup
@@ -68,6 +71,8 @@ SiteTree:
       CanEditType: LoggedInUsers
       CanPublishType: OnlyTheseUsers
       PublisherGroups: =>Group.custompublishergroup
+      CanApproveType: OnlyTheseUsers
+      ApproverGroups: =>Group.customapprovergroup
    openpublishworkflowpage:
       Title: Open Publish Workflow
    opendeleteworkflowpage:
@@ -92,6 +97,10 @@ SiteTree:
       Title: BatchTestPage4
       CanPublishType: OnlyTheseUsers
       PublisherGroups: =>Group.custompublishergroup
+   batchTest5:
+      Title: BatchTestPage4
+      CanPublishType: OnlyTheseUsers
+      PublisherGroups: =>Group.custompublishergroup
       
 WorkflowPublicationRequest:
    openpublishworkflow:
@@ -103,4 +112,3 @@ WorkflowPublicationRequest:
 WorkflowDeletionRequest:
    opendeleteworkflow:
       Page: =>SiteTree.opendeleteworkflowpage
-   
