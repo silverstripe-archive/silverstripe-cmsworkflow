@@ -35,7 +35,7 @@ Attach the following decorators in your `mysite/_config.php`:
 	Object::remove_extension('WorkflowRequest', 'WorkflowTwoStepRequest');
 	Object::remove_extension('SiteTree', 'SiteTreeCMSTwoStepWorkflow');
 	Object::remove_extension('SiteConfig', 'SiteConfigTwoStepWorkflow');
-	// add three-step decorators
+	i// add three-step decorators
 	Object::add_extension('WorkflowRequest', 'WorkflowThreeStepRequest');
 	Object::add_extension('SiteTree', 'SiteTreeCMSThreeStepWorkflow');
 	Object::add_extension('LeftAndMain', 'LeftAndMainCMSThreeStepWorkflow');
@@ -47,6 +47,14 @@ Refresh your database schema through `http://<your-host>/dev/build`.
 
 Based on your permission levels, authors in the CMS will see different actions on a page,
 and a new "Workflow" tab listing open requests.
+
+## Popup alerts
+
+You can allow Administrator users to Publish without giving a comment. 
+by placing the following in your mysite/_config.php file:
+This will disable the popup for this situation.
+
+	LeftAndMainCMSWorkflow::set_prompt_admin_for_comments(false);
 
 ## Email alerts
 

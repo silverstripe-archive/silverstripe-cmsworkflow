@@ -1,6 +1,6 @@
 <?php
 class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
-	private static $promptAdminForComments = true;
+	private static $prompt_admin_for_comments = true;
 	
 	public static $allowed_actions = array(
 		'cms_requestpublication',
@@ -10,8 +10,8 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		'cms_setembargoexpiry',
 	);
 
-	public static function setPromptAdminForComments($enable) {
-		self::$promptAdminForComments = $enable;
+	public static function set_prompt_admin_for_comments($enable) {
+		self::$prompt_admin_for_comments = $enable;
 	}
 
 	function cms_setembargoexpiry($data) {
@@ -128,7 +128,7 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		
 		Requirements::javascript('cmsworkflow/javascript/LeftAndMainCMSWorkflow.js');
 
-		Requirements::customScript("CMSWorkflow.setOption('noPromptForAdmin', " . Convert::raw2json(!self::$promptAdminForComments) . ')');
+		Requirements::customScript("CMSWorkflow.setOption('noPromptForAdmin', " . Convert::raw2json(!self::$prompt_admin_for_comments) . ')');
 		RSSFeed::linkToFeed(Director::absoluteURL('admin/cms/changes.rss'), 'All content changes');
 	}
 	
