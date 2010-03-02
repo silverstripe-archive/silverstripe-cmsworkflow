@@ -39,7 +39,7 @@ class PagesScheduledForDeletionReport extends SS_Report {
 				'title' => 'Will be deleted at',
 				'casting' => 'SS_Datetime->Full'
 			),
-			'ApproverName' => 'Approved by',
+			'ApproverName' => 'Approver',
 			'AbsoluteLink' => array(
 				'title' => 'URL',
 				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a target=\"_blank\" href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a target=\"_blank\" href=\"$value?stage=Stage\">(draft)</a> <a target=\"_blank\" href=\"$PageDomain/home?futureDate=$ExpiryDate\">(view site on expiry date)</a>'
