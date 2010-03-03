@@ -77,7 +77,7 @@ class ApprovedPublications3StepReport extends SS_Report {
 				"title" => "Requested",
 				'casting' => 'SS_Datetime->Full'
 			),
-			'HasEmbargoOrExpiry' => 'Embargo',
+			'HasExpiry' => 'Expiry',
 			'AbsoluteLink' => array(
 				'title' => 'URL',
 				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a target=\"_blank\" href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a target=\"_blank\" href=\"$value?stage=Stage\">(draft)</a>'
