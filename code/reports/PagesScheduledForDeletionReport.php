@@ -138,7 +138,7 @@ class PagesScheduledForDeletionReport extends SS_Report {
 		// Filter to only those with canEdit permission
 		$filteredRecords = new DataObjectSet();
 		if($records) foreach($records as $record) {
-			$record->BacklinkCount = $record->BackLinkTracking()->Count();
+			$record->BacklinkCount = $record->DependentPagesCount(false);
 			if (class_exists('Subsite')) $record->PageDomain = $record->Subsite()->absoluteBaseURL();
 			else $record->PageDomain = Director::absoluteBaseURL();
 			if($record->canEdit()) {
