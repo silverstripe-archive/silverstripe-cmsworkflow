@@ -203,7 +203,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			if ($this->owner->BackLinkTracking() && $this->owner->BackLinkTracking()->Count() > 0) {
 				$fields->addFieldsToTab('Root.Expiry', array(
 					new HeaderField("Please check these pages", 2),
-					new LiteralField('ExpiryBacklinkWarning', "This page is scheduled to expire, but the following pages link to it"),
+					new LiteralField('ExpiryBacklinkWarning', "<p>This page is scheduled to expire, but the following pages link to it.</p>"),
 					$this->BacklinkTable()
 				));
 			}
@@ -217,29 +217,31 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	}
 	
 	function BacklinkTable() {
-	 	$backLinksTable = new TableListField(
-			'BackLinkTrackingWorkflow',
-			'SiteTree',
-			array(
-				'Title' => 'Title',
-				'AbsoluteLink' => 'URL'
-			),
-			'"ChildID" = ' . $this->owner->ID,
-			'',
-			'LEFT JOIN "SiteTree_LinkTracking" ON "SiteTree"."ID" = "SiteTree_LinkTracking"."SiteTreeID"'
+		$dependentColumns = array(
+			'Title' => 'Title',
+			'Subsite.Title' => 'Subsite',
+			'AbsoluteLink' => 'URL',
+			'DependentLinkType' => 'Link type',
 		);
-
-		$backLinksTable->setFieldFormatting(array(
+		if(!class_exists('Subsite')) unset($dependentColumns['Subsite.Title']);
+		
+		$dependentNote = new LiteralField('DependentNote', '<p>' . _t('SiteTree.DEPENDENT_NOTE', 'The following pages depend on this page. This includes virtual pages, redirector pages, and pages with content links.') . '</p>');
+		$dependentTable = new TableListField(
+			'DependentPages',
+			'SiteTree',
+			$dependentColumns
+		);
+		$dependentTable->setCustomSourceItems($this->owner->DependentPages(false));
+		$dependentTable->setFieldFormatting(array(
 			'Title' => '<a href=\"admin/show/$ID\">$Title</a>',
-			'AbsoluteLink' => '$value " . ($AbsoluteLiveLink ? "<a target=\"_blank\" href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a target=\"_blank\" href=\"$value?stage=Stage\">(draft)</a>'
+			'AbsoluteLink' => '<a href=\"$value\">$value</a>',
 		));
-
-		$backLinksTable->setPermissions(array(
+		$dependentTable->setPermissions(array(
 			'show',
 			'export'
 		));
 		
-		return $backLinksTable;
+		return $dependentTable;
 	}
 	
 	/**

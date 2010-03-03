@@ -32,7 +32,7 @@ class BatchSetExpiry extends CMSBatchAction {
 		$pagesWithBacklinks = array();
 		foreach($ids as $id) {
 			$page = DataObject::get_by_id('SiteTree', $id);
-			if ($page->BacklinkTracking()->Count()) $pagesWithBacklinks[] = $page->AbsoluteLink();
+			if ($page->DependentPagesCount(false)) $pagesWithBacklinks[] = $page->AbsoluteLink();
 		}
 		
 		return array(

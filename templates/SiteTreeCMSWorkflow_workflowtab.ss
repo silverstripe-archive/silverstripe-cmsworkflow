@@ -124,13 +124,14 @@
 		</div>
 
 		<% control Page %>
-			<% if BackLinkTracking %>
-				<% if BackLinkTracking.Count %>
+			<% if DependentPagesCount %>
+				<% if DependentPagesCount %>
 					<div class="warningBox">
-						<p>There are $BackLinkTracking.Count page(s) that link to here:</p>
+						<p>This page has $DependentPagesCount dependent page(s). These will be
+						    affected by the removal of this page.</p>
 					<ul>
-					<% control BackLinkTracking %>
-						<li><a href="admin/show/$ID">$AbsoluteLink</a>
+					<% control DependentPages %>
+						<li>$DependentLinkType <a href="admin/show/$ID">$AbsoluteLink</a>
 						<% if AbsoluteLiveLink %><a href="$AbsoluteLiveLink">(live)</a><% end_if %>
 						<a href="$AbsoluteLink?stage=Stage">(draft)</a>
 						</li>
