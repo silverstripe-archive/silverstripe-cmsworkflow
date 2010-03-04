@@ -227,7 +227,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		
 		$dependentNote = new LiteralField('DependentNote', '<p>' . _t('SiteTree.DEPENDENT_NOTE', 'The following pages depend on this page. This includes virtual pages, redirector pages, and pages with content links.') . '</p>');
 		$dependentTable = new TableListField(
-			'DependentPages',
+			'DependentPagesOnExpiry',
 			'SiteTree',
 			$dependentColumns
 		);
