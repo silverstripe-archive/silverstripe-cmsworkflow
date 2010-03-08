@@ -123,14 +123,15 @@
 			<% end_if %>
 		</div>
 
+        <% if EmbargoDate %>
 		<% control Page %>
-			<% if DependentPagesCount %>
-				<% if DependentPagesCount %>
-					<div class="warningBox">
-						<p>This page has $DependentPagesCount dependent page(s). These will be
+			<% if DependentPagesCount(0) %>
+				<% if DependentPagesCount(0) %>
+					<div id="ExpiryWorkflowWarning" class="warningBox" style="margin-top: 1em">
+						<p>This page has $DependentPagesCount(0) dependent page(s). These will be
 						    affected by the removal of this page.</p>
 					<ul>
-					<% control DependentPages %>
+					<% control DependentPages(0) %>
 						<li>$DependentLinkType <a href="admin/show/$ID">$AbsoluteLink</a>
 						<% if AbsoluteLiveLink %><a href="$AbsoluteLiveLink">(live)</a><% end_if %>
 						<a href="$AbsoluteLink?stage=Stage">(draft)</a>
@@ -141,6 +142,7 @@
 				<% end_if %>
 			<% end_if %>
 		<% end_control %>
+		<% end_if %>
 
 		<h2>Actions</h2>
 		<p>

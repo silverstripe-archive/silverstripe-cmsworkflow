@@ -64,3 +64,7 @@
 #batchactions_options #ExpiryDate_Batch_Date {
 	padding: 0;
 }
+
+#ExpiryWorkflowWarning {
+	margin-top: 1em;
+}

@@ -133,6 +133,11 @@ var EmbargoExpiry = {
 	embargoUnsaved: false,
 	expiryUnsaved: false,
 	init: function() {
+		$('EmbargoDate_Date').addEventListener('change', EmbargoExpiry.embargoChange, false);
+		$('EmbargoDate_Time').addEventListener('change', EmbargoExpiry.embargoChange, false);
+		$('ExpiryDate_Date').addEventListener('change', EmbargoExpiry.expiryChange, false);
+		$('ExpiryDate_Time').addEventListener('change', EmbargoExpiry.expiryChange, false);
+
 		EmbargoExpiry.fieldCheck();
 
 		var ids = EmbargoExpiry.ids('embargo');
@@ -296,22 +301,24 @@ var EmbargoExpiry = {
 			if ($(ids.dateField).value == '' || $(ids.timeField).value == '') {
 				EmbargoExpiry.dButton(ids.saveButton);
 				EmbargoExpiry.dButton(ids.resetButton);
+				EmbargoExpiry.setExpiryWarning(false);
 			} else {
 				EmbargoExpiry.eButton(ids.saveButton);
 				EmbargoExpiry.eButton(ids.resetButton);
+				EmbargoExpiry.setExpiryWarning(true);
 			}
 		}
+	},
+	setExpiryWarning: function(shouldDisplay) {
+		var el = $('ExpiryWorkflowWarning');
+		if(el) el.style.display = shouldDisplay ? '' : 'none';
 	}
 };
 
 Behaviour.register({
 	'#EmbargoDate_Time' : {
 		initialize: EmbargoExpiry.init,
-		onchange: EmbargoExpiry.embargoChange
-	},
-	'#EmbargoDate_Date' : { onchange: EmbargoExpiry.embargoChange },
-	'#ExpiryDate_Date' : { onchange: EmbargoExpiry.expiryChange },
-	'#ExpiryDate_Time' : { onchange: EmbargoExpiry.expiryChange }
+	}
 });
 
 var autoSave_original = autoSave;
