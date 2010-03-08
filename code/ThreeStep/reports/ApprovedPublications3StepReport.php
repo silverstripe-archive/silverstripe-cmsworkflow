@@ -77,7 +77,10 @@ class ApprovedPublications3StepReport extends SS_Report {
 				"title" => "Requested",
 				'casting' => 'SS_Datetime->Full'
 			),
-			'HasExpiry' => 'Expiry',
+			'HasExpiry' => array(
+				'title' => 'Expiry',
+				'formatting' => '" . ($value == "0000-00-00 00:00:00" ? "no" : $value) . "'
+			),
 			'AbsoluteLink' => array(
 				'title' => 'URL',
 				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a target=\"_blank\" href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a target=\"_blank\" href=\"$value?stage=Stage\">(draft)</a>'
