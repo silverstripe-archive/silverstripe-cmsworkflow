@@ -70,7 +70,7 @@ class WorkflowPublicationRequest extends WorkflowRequest {
 			$actions->removeByName('action_publish');
 		}
 		
-		$liveVersion = Versioned::get_one_by_stage('SiteTree', 'Live', "SiteTree_Live.ID = {$page->ID}");
+		$liveVersion = Versioned::get_one_by_stage('SiteTree', 'Live', "\"SiteTree_Live\".\"ID\" = {$page->ID}");
 		if ($liveVersion && $liveVersion->ExpiryDate != null && $liveVersion->ExpiryDate != '0000-00-00 00:00:00') {
 			if ($page->canApprove()) {
 				$actions->push(new FormAction(

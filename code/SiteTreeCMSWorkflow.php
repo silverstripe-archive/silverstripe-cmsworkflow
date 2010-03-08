@@ -154,7 +154,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	public function cancelexpiry() {
 		if(!$this->owner->canApprove()) return false;
 		
-		DB::query('UPDATE "SiteTree_Live" SET "ExpiryDate" = \'0000-00-00 00:00:00\' WHERE ID = '.$this->owner->ID);
+		DB::query('UPDATE "SiteTree_Live" SET "ExpiryDate" = \'0000-00-00 00:00:00\' WHERE "ID" = '.$this->owner->ID);
 	}
 	
 	public function updateCMSFields(&$fields) {
@@ -165,7 +165,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		}
 		
 		// Check if there is an expiry date...
-		$liveVersion = Versioned::get_one_by_stage('SiteTree', 'Live', "SiteTree_Live.ID = {$this->owner->ID}");
+		$liveVersion = Versioned::get_one_by_stage('SiteTree', 'Live', "\"SiteTree_Live\".\"ID\" = {$this->owner->ID}");
 		if ($liveVersion && $liveVersion->ExpiryDate != null && $liveVersion->ExpiryDate != '0000-00-00 00:00:00') {
 			$tzConverter = new TZDateTimeField('ExpiryDate', 'Expiry Date', $liveVersion->ExpiryDate, SiteConfig::current_site_config()->Timezone);
 			$fields->addFieldsToTab('Root.Expiry', array(
