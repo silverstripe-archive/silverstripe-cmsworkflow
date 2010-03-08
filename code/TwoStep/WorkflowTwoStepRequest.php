@@ -76,7 +76,7 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 			
 				if ($expiryTimestamp)
 				
-				DB::query("UPDATE SiteTree_Live SET ExpiryDate = '$expiryTimestamp' WHERE ID = $pageID");
+				DB::query("UPDATE \"SiteTree_Live\" SET \"ExpiryDate\" = '$expiryTimestamp' WHERE \"ID\" = $pageID");
 			}
 		}
 
