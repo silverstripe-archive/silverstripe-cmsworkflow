@@ -89,11 +89,11 @@ class PagesScheduledForDeletionReport extends SS_Report {
 		Versioned::reading_stage('Live');
 		
 		$query = singleton("SiteTree")->extendedSQL(join(' AND ', $wheres), null, null, 
-			"LEFT JOIN WorkflowRequest on WorkflowRequest.PageID = SiteTree_Live.ID"
+			"LEFT JOIN \"WorkflowRequest\" on \"WorkflowRequest\".\"PageID\" = \"SiteTree_Live\".\"ID\""
 		);
 
 		
-		$query->from[] = "LEFT JOIN Member AS Approver ON WorkflowRequest.ApproverID = Approver.ID";
+		$query->from[] = "LEFT JOIN \"Member\" AS \"Approver\" ON \"WorkflowRequest\".\"ApproverID\" = \"Approver\".\"ID\"";
 		$query->select[] = Member::get_title_sql('Approver').' AS ApproverName';
 			
 		
@@ -104,7 +104,7 @@ class PagesScheduledForDeletionReport extends SS_Report {
 			$direction = $parts[1];
 			
 			if($field == 'AbsoluteLink') {
-				$sort = 'URLSegment ' . $direction;
+				$sort = '"URLSegment" ' . $direction;
 			}
 			
 			if($field == 'Subsite.Title') {
