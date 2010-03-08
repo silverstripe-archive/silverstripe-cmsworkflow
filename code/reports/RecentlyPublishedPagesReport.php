@@ -27,7 +27,7 @@ class RecentlyPublishedPagesReport extends SS_Report {
 			'PublisherTitle' => 'Publisher',
 			'AbsoluteLink' => array(
 				'title' => 'URL',
-				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a target=\"_blank\" href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a target=\"_blank\" href=\"$value?stage=Stage\">(draft)</a>'
+				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a target=\"_blank\" href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " " . (!$IsDeletedFromStage ? "<a target=\"_blank\" href=\"$AbsoluteLink\">(draft)</a>" : "") . "'
 			),
 			'ExpiryDate' => array(
 				'title' => 'Expiry',
