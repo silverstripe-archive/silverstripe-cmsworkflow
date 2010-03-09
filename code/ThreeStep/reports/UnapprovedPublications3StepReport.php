@@ -65,7 +65,7 @@ class UnapprovedPublications3StepReport extends SS_Report {
 			),
 			'HasEmbargo' => array(
 				'title' => 'Embargo',
-				'formatting' => '" . ($value == "0000-00-00 00:00:00" ? "no" : $value) . "'
+				'formatting' => '" . ($value ? date("j M Y g:ia", strtotime($value)) : "no") . "',
 			),
 			'AbsoluteLink' => array(
 				'title' => 'URL',
