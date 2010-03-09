@@ -10,16 +10,19 @@
 	z-index: 100;
 }
 
-#FutureStateDatePopup .popupdatetime {
+#FutureStateDatePopup .calendardate, #FutureStateDatePopup .dropdowntime {
 	float: left;
 	margin: 5px;
+	width: 45%;
 }
 
-#FutureStateDate_Date-calendar {
+#FutureStateDate-date-icon, #FutureStateDate-time-icon { margin-left: 4px; }
+
+#FutureStateDate-date-calendar.calendarpopup {
 	top: -180px;
 }
 
-#FutureStateDate_Time-dropdowntime {
+#FutureStateDate-time-dropdowntime.dropdownpopup {
 	top: -245px;
 }
 
@@ -27,7 +30,8 @@
 	float: left;
 	display: block;
 	color: black !important;
-	margin: 5px;
+	/*margin: 5px;*/
+	margin-top: -5px;
 	font-size: 14px !important;
 	border: none !important;
 	float: right;
@@ -36,7 +40,7 @@
 #FutureStateDatePopup a.close {
 	color: blue;
 	text-align: right;
-	width: 80%;
+	width: 95%;
 	border: none !important;
 	cursor: pointer;
 }
