@@ -123,7 +123,6 @@
 			<% end_if %>
 		</div>
 
-        <% if EmbargoDate %>
 		<% control Page %>
 			<% if DependentPagesCount(0) %>
 				<% if DependentPagesCount(0) %>
@@ -142,7 +141,6 @@
 				<% end_if %>
 			<% end_if %>
 		<% end_control %>
-		<% end_if %>
 
 		<h2>Actions</h2>
 		<p>
