@@ -244,7 +244,9 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 			"LEFT JOIN {$bt}WorkflowRequest{$bt} ON {$bt}WorkflowRequest{$bt}.{$bt}PageID{$bt} = {$bt}SiteTree{$bt}.{$bt}ID{$bt} " .
 			"LEFT JOIN {$bt}WorkflowRequest_Approvers{$bt} ON {$bt}WorkflowRequest{$bt}.{$bt}ID{$bt} = {$bt}WorkflowRequest_Approvers{$bt}.{$bt}WorkflowRequestID{$bt}"
 		);
-		
+		if (!$return) {
+			return null;
+		}
 		$canPublish = SiteTree::batch_permission_check($return->column('ID'), $publisher->ID, 'CanPublishType', 'SiteTree_PublisherGroups', 'canPublish');		
 		foreach($return as $page) {
 			if (!isset($canPublish[$page->ID]) || !$canPublish[$page->ID]) {
