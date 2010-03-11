@@ -1,19 +1,19 @@
 (function($) {
-	$('#FutureStateLink').livequery('click',
+	$('#FutureStateLink').live('click',
 		function() {
 			$('#FutureStateDatePopup').toggle();
 			return false;
 		}
 	);
 	
-	$('#FutureStateDatePopup a.close').livequery('click',
+	$('#FutureStateDatePopup a.close').live('click',
 		function() {
 			$('#FutureStateDatePopup').hide();
 			return false;
 		}
 	);
 	
-	$('#FutureStateGoLink').livequery('click',
+	$('#FutureStateGoLink').live('click',
 		function() {
 			var date = $('#FutureStateDate_Date').val();
 			// Javascript is silly, so we need to convert to US date format first
