@@ -21,7 +21,7 @@ class SiteConfigTwoStepWorkflow extends DataObjectDecorator {
 	 * @param FieldSet $fields 
 	 * @return void
 	 */
-	function updateEditFormFields(&$fields) {
+	function updateCMSFields(&$fields) {
 		$fields->addFieldsToTab("Root.Access", array(
 			new HeaderField(_t('SiteConfigCMSWorkflow.PUBLISHAPPROVEDHEADER', "Who can publish requests inside the CMS?"), 2),
 			$actionTypeField = new OptionsetField(

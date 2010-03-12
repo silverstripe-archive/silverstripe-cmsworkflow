@@ -24,7 +24,7 @@ class SiteConfigThreeStepWorkflow extends DataObjectDecorator {
 	 * @param FieldSet $fields 
 	 * @return void
 	 */
-	function updateEditFormFields(&$fields) {
+	function updateCMSFields(&$fields) {
 		$fields->addFieldsToTab("Root.Access", array(
 			new HeaderField(_t('SiteTreeCMSWorkflow.APPROVEHEADER', "Who can approve requests inside the CMS?"), 2),
 			$approveTypeField = new OptionsetField(
