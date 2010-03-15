@@ -66,7 +66,13 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	 * @param string $time 
 	 * @return boolean
 	 */
-	function setEmbargo($date, $time) {
+	function setEmbargo($date, $time = null) {
+		if (!$time) {
+			// split $date by space to get two time components, which happens on form submission
+			$parts = explode(" ", $date);
+			$date = $parts[0];
+			$time = isset($parts[1]) ? $parts[1] : "00:00:00";
+		}
 		if ($wf = $this->openWorkflowRequest()) {
 			if ($wf->EmbargoField()) {
 				if (count(explode('/', $date)) != 3) return false;
@@ -89,7 +95,13 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	 * @param string $time 
 	 * @return boolean
 	 */
-	function setExpiry($date, $time) {
+	function setExpiry($date, $time = null) {
+		if (!$time) {
+			// split $date by space to get two time components, which happens on form submission
+			$parts = explode(" ", $date);
+			$date = $parts[0];
+			$time = isset($parts[1]) ? $parts[1] : "00:00:00";
+		}
 		if ($wf = $this->openWorkflowRequest()) {
 			if ($wf->ExpiryField()) {
 				if (count(explode('/', $date)) != 3) return false;
