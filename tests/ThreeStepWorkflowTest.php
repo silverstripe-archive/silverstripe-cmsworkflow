@@ -383,7 +383,7 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 	function testSiteConfigFields() {
 		// Ensure admins can see the permission fields and edit them
 		$this->logInAs($this->objFromFixture('Member', 'admin'));
-		$fields = singleton('SiteConfig')->getFormFields();
+		$fields = singleton('SiteConfig')->getCMSFields();
 		$this->assertNotNull($fields->fieldByName('Root.Access.CanPublishType'));
 		$this->assertNotNull($fields->fieldByName('Root.Access.PublisherGroups'));
 		$this->assertNotNull($fields->fieldByName('Root.Access.ApproverGroups'));
@@ -393,7 +393,7 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		
 		// Make sure none admins can see them, but not edit
 		$this->logInAs($this->objFromFixture('Member', 'customauthor'));
-		$fields = singleton('SiteConfig')->getFormFields();
+		$fields = singleton('SiteConfig')->getCMSFields();
 		$this->assertTrue($fields->fieldByName('Root.Access.CanPublishType') instanceof LookupField);
 		$this->assertTrue($fields->fieldByName('Root.Access.CanApproveType') instanceof LookupField);
 		$this->assertTrue($fields->fieldByName('Root.Access.PublisherGroups') instanceof TreeMultiselectField_Readonly);

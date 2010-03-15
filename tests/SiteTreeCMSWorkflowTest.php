@@ -9,7 +9,9 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 	 * Created in setUp() to ensure defaults are created *before* inserting new fixtures,
 	 * as they rely on certain default groups being present.
 	 */
-	//static $fixture_file = 'cmsworkflow/tests/SiteTreeCMSWorkflowTest.yml';
+	static $fixture_file = 'cmsworkflow/tests/SiteTreeCMSWorkflowTest.yml';
+	
+	protected $requireDefaultRecordsFrom = array('SiteTreeCMSTwoStepWorkflow');
 	
 	protected $requiredExtensions = array(
 		'SiteTree' => array('SiteTreeCMSTwoStepWorkflow'),
@@ -24,18 +26,18 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 		'SiteConfig' => array('SiteConfigThreeStepWorkflow'),
 	);
 
-	function setUp() {
-		parent::setUp();
-
-		// default records are not created in TestRunner by default
-		singleton('SiteTreeCMSTwoStepWorkflow')->augmentDefaultRecords();
-		$fixtureFile = 'cmsworkflow/tests/SiteTreeCMSWorkflowTest.yml';
-		$fixture = new YamlFixture($fixtureFile);
-		$fixture->saveIntoDatabase();
-		// Duplicated to be compatible with 2.3 and 2.4
-		$this->fixtures = array($fixture);
-		$this->fixture = $fixture;
-	} 
+	// function setUp() {
+	// 	parent::setUp();
+	// 
+	// 	// default records are not created in TestRunner by default
+	// 	singleton('SiteTreeCMSTwoStepWorkflow')->augmentDefaultRecords();
+	// 	$fixtureFile = 'cmsworkflow/tests/SiteTreeCMSWorkflowTest.yml';
+	// 	$fixture = new YamlFixture($fixtureFile);
+	// 	$fixture->saveIntoDatabase();
+	// 	// Duplicated to be compatible with 2.3 and 2.4
+	// 	$this->fixtures = array($fixture);
+	// 	$this->fixture = $fixture;
+	// } 
 
 	function testAlternateCanPublishLimitsToPublisherGroups() {
 		// Check for default record group assignments
@@ -169,17 +171,17 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 		
 		// test "publish" action for publisher
 		$this->session()->inst_set('loggedInAs', $custompublisher->ID);
-		$this->assertNotContains(
+		$this->assertContains(
 			'action_publish',
 			$unpublishedRecord->getCMSActions()->column('Name'),
 			'Publisher cant trigger publish button'
 		);
-		$this->assertNotContains(
+		$this->assertContains(
 			'action_publish',
 			$publishedRecord->getCMSActions()->column('Name'),
 			'Publisher cant trigger publish button'
 		);
-		$this->assertNotContains(
+		$this->assertContains(
 			'action_publish',
 			$changedOnStageRecord->getCMSActions()->column('Name'),
 			'Publisher cant trigger publish button'
