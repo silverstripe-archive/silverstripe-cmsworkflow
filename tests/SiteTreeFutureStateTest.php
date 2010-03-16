@@ -6,41 +6,54 @@
 class SiteTreeFutureStateTest extends SapphireTest {
 	static $fixture_file = 'cmsworkflow/tests/SiteTreeFutureStateTest.yml';
 
+	protected $illegalExtensions = array(
+		'SiteTree' => array('SiteTreeCMSTwoStepWorkflow'),
+		'WorkflowRequest' => array('WorkflowTwoStepRequest'),
+	);
+
+	protected $requiredExtensions = array(
+		'SiteTree' => array('SiteTreeCMSThreeStepWorkflow'),
+		'WorkflowRequest' => array('WorkflowThreeStepRequest'),
+		'LeftAndMain' => array('LeftAndMainCMSThreeStepWorkflow'),
+		'SiteConfig' => array('SiteConfigThreeStepWorkflow'),
+	);
+
 	function testPagesWithBothEmbargoAndExpiryAreDisplayedCorrectlyInFutureState() {
 		Versioned::reading_stage('Stage');
 		
-		$product5 = $this->objFromFixture('Page', 'embargotest');
+		$product6 = $this->objFromFixture('Page', 'embargotest');
 		
-		$product5->publish('Stage', 'Live');
+		$product6->publish('Stage', 'Live');
 		
-		$product5->Title = 'New Title';
-		$product5->write();
-		$request = $product5->openOrNewWorkflowRequest('WorkflowPublicationRequest');
-		$product5->setEmbargo('01/06/2020', '3:00pm');
-		$product5->setExpiry('07/06/2020', '3:00pm');
-		$product5->write();
+		$product6->Title = 'New Title';
+		$product6->write();
+		$request = $product6->openOrNewWorkflowRequest('WorkflowPublicationRequest');
+		$product6->setEmbargo('01/06/2020', '3:00pm');
+		$product6->setExpiry('07/06/2020', '3:00pm');
+		$product6->write();
 		
-		$request = $product5->openWorkflowRequest('WorkflowPublicationRequest');
+		$request = $product6->openWorkflowRequest('WorkflowPublicationRequest');
 
 		$request->approve('Looks good.');
 		
-		$prodDraft = DataObject::get_one('SiteTree', 'URLSegment = \'product-5\'');
-		$this->assertEquals($prodDraft->Title, 'New Title', 'Correct page on draft site.');
+		$prodDraft = DataObject::get_one('SiteTree', 'URLSegment = \'product-6\'');
+		$this->assertEquals('New Title', $prodDraft->Title, 'Correct page on draft site.');
 		
-		$prodLiveNow = Versioned::get_one_by_stage('SiteTree', 'Live', 'URLSegment = \'product-5\'');
-		$this->assertEquals($prodLiveNow->Title, 'Product 5', 'Correct page on live site.');
+		$prodLiveNow = Versioned::get_one_by_stage('SiteTree', 'Live', 'URLSegment = \'product-6\'');
+		$this->assertEquals('Product 6', $prodLiveNow->Title, 'Correct page on live site.');
 		
 		SiteTreeFutureState::set_future_datetime('2020-06-01 14:00:00');
-		$prodBeforeEmbargo = DataObject::get_one('SiteTree', 'URLSegment = \'product-5\'');
-		$this->assertEquals($prodBeforeEmbargo->Title, 'Product 5', 'Correct page before embargo.');
-		
+		$prodBeforeEmbargo = DataObject::get_one('SiteTree', 'URLSegment = \'product-6\'');
+		$this->assertEquals('Product 6', $prodBeforeEmbargo->Title, 'Correct page before embargo.');
+
 		SiteTreeFutureState::set_future_datetime('2020-06-02 16:00:00');
-		$prodAfterEmbargo = DataObject::get_one('SiteTree', 'URLSegment = \'product-5\'');
-		$this->assertEquals($prodAfterEmbargo->Title, 'New Title', 'Correct page after embargo.');
+		$prodAfterEmbargo = DataObject::get_one('SiteTree', 'URLSegment = \'product-6\'');
+
+		$this->assertEquals('New Title', $prodAfterEmbargo->Title, 'Correct page after embargo.');
 		
 
 		SiteTreeFutureState::set_future_datetime('2020-06-07 16:00:00');
-		$prodAfterExpiry = DataObject::get_one('SiteTree', 'URLSegment = \'product-5\'');
+		$prodAfterExpiry = DataObject::get_one('SiteTree', 'URLSegment = \'product-6\'');
 		$this->assertFalse($prodAfterExpiry, 'No page after expiry.');
 		
 		
@@ -250,7 +263,9 @@ class SiteTreeFutureStateTest extends SapphireTest {
 		// Publish all but the embargoed content and switch view to Live
 		$pages = array('home', 'about', 'staff', 'staffduplicate','products', 'product1', 
 			'product2', 'product5', 'contact', 'virtuals');
-		foreach($pages as $page) $this->objFromFixture('Page', $page)->doPublish();
+		foreach($pages as $page) {
+			$this->assertTrue($this->objFromFixture('Page', $page)->doPublish());
+		}
 
 		$this->objFromFixture('ErrorPage', 404)->doPublish();
 		$this->objFromFixture('VirtualPage', 'vproduct1')->doPublish();
