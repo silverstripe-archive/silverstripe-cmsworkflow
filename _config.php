@@ -29,16 +29,20 @@ Director::addRules(200, array(
 // Register main reports
 if(class_exists('Subsite') && class_exists('SubsiteReportWrapper')) {
 	SS_Report::register('ReportAdmin', 'SubsiteReportWrapper("UnapprovedPublications3StepReport")',20);
+	SS_Report::register('ReportAdmin', 'SubsiteReportWrapper("UnapprovedPublications2StepReport")',20);
 	SS_Report::register('ReportAdmin', 'SubsiteReportWrapper("ApprovedPublications3StepReport")',20);
 	SS_Report::register('ReportAdmin', 'SubsiteReportWrapper("UnapprovedDeletions3StepReport")',20);
+	SS_Report::register('ReportAdmin', 'SubsiteReportWrapper("UnapprovedDeletions2StepReport")',20);
 	SS_Report::register('ReportAdmin', 'SubsiteReportWrapper("ApprovedDeletions3StepReport")',20);
 	SS_Report::register('ReportAdmin', 'SubsiteReportWrapper("PagesScheduledForPublishingReport")',20);
 	SS_Report::register('ReportAdmin', 'SubsiteReportWrapper("PagesScheduledForDeletionReport")',20);
 	SS_Report::register('ReportAdmin', 'SubsiteReportWrapper("RecentlyPublishedPagesReport")',20);
 } else {
 	SS_Report::register('ReportAdmin', 'UnapprovedPublications3StepReport',20);
+	SS_Report::register('ReportAdmin', 'UnapprovedPublications2StepReport',20);
 	SS_Report::register('ReportAdmin', 'ApprovedPublications3StepReport',20);
 	SS_Report::register('ReportAdmin', 'UnapprovedDeletions3StepReport',20);
+	SS_Report::register('ReportAdmin', 'UnapprovedDeletions2StepReport',20);
 	SS_Report::register('ReportAdmin', 'ApprovedDeletions3StepReport',20);
 	SS_Report::register('ReportAdmin', 'PagesScheduledForPublishingReport',20);
 	SS_Report::register('ReportAdmin', 'PagesScheduledForDeletionReport',20);

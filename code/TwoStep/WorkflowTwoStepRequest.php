@@ -88,7 +88,7 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		
 		// Action it immediately... if it's not scheduled
 		if ($this->owner->Status != 'Scheduled') {
-			$this->owner->publish($comment, $member, $notify);
+			$this->owner->publish($comment, $member, false);
 
 		// Only do these actions here if we've scheduled the action; otherwise publish() will
 		// comment for us
