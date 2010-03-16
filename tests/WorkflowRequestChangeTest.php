@@ -65,6 +65,8 @@ class WorkflowRequestChangeTest extends FunctionalTest {
 		);
 		
 		$this->session()->inst_set('loggedInAs', $custompublisher->ID);
+		$page->Content = "third";
+		$page->write();
 		$page->doPublish();
 		$request->flushCache();
 		$this->assertEquals(
