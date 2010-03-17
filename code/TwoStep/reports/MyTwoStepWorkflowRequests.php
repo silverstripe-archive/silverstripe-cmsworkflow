@@ -30,7 +30,7 @@ class MyTwoStepWorkflowRequests extends SS_Report {
 		);
 	}
 	function canView() {
-		return false; Object::has_extension('SiteTree', 'SiteTreeCMSTwoStepWorkflow');
+		return Object::has_extension('SiteTree', 'SiteTreeCMSTwoStepWorkflow');
 	}
 }
 

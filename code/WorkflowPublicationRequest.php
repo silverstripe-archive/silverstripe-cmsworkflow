@@ -128,7 +128,6 @@ class WorkflowPublicationRequest extends WorkflowRequest {
 		if($page->getIsModifiedOnStage()) {
 			$page->doPublish();
 		}
-		
 		if($notify) $this->notifyPublished($comment);
 		
 		$this->addNewChange($comment, $this->Status, DataObject::get_by_id('Member', $this->PublisherID));

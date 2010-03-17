@@ -20,7 +20,7 @@ class TwoStepWorkflowReportsTest extends FunctionalTest {
 	);
 	
 	function testDeletionRequestsINeedToApproveReport() {
-		$report = new MyTwoStepDeletionRequests();
+		$report = new SideReportWrapper('UnapprovedDeletions2StepReport');
 		$this->assertTrue(is_string($report->title()));
 		$this->assertTrue(is_string($report->group()));
 		$this->assertTrue(is_numeric($report->sort()));
@@ -40,7 +40,7 @@ class TwoStepWorkflowReportsTest extends FunctionalTest {
 	}
 	
 	function testPublicationRequestsINeedToApproveReport() {
-		$report = new MyTwoStepPublicationRequests();
+		$report = new SideReportWrapper('UnapprovedPublications2StepReport');
 		$this->assertTrue(is_string($report->title()));
 		$this->assertTrue(is_string($report->group()));
 		$this->assertTrue(is_numeric($report->sort()));

@@ -53,8 +53,8 @@ if(class_exists('Subsite') && class_exists('SubsiteReportWrapper')) {
 // Register site reports
 
 // 2 Step
-SS_Report::register('SideReport', 'MyTwoStepDeletionRequests', 20);
-SS_Report::register('SideReport', 'MyTwoStepPublicationRequests', 20);
+SS_Report::register('SideReport', 'SideReportWrapper("UnapprovedDeletions2StepReport")', 20);
+SS_Report::register('SideReport', 'SideReportWrapper("UnapprovedPublications2StepReport")', 20);
 SS_Report::register('SideReport', 'MyTwoStepWorkflowRequests', 20);
 
 // 3 Step
