@@ -479,6 +479,8 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	}
 
 	public function sendNotificationEmail($sender, $recipient, $comment, $requestedAction, $template = null) {
+		if (!$recipient->Email) return;
+		
 		$this->addMemberEmailed($recipient);
 
 		if(!$template) {
