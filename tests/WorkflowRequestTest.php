@@ -19,6 +19,10 @@ class WorkflowRequestTest extends FunctionalTest {
 		'SiteConfig' => array('SiteConfigThreeStepWorkflow'),
 	);
 	
+	protected $requireDefaultRecordsFrom = array(
+		'WorkflowSystemMember'
+	);
+	
 	function testEachPageCanHaveOnlyOpenOpenRequest() {
 		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
 		

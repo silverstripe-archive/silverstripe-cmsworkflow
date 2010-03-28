@@ -25,6 +25,7 @@ class TwoStepWorkflowReportsTest extends FunctionalTest {
 		$this->assertTrue(is_string($report->group()));
 		$this->assertTrue(is_numeric($report->sort()));
 		$this->assertTrue(is_array($report->columns()));
+		$this->assertTrue(is_array(singleton('UnapprovedDeletions2StepReport')->columns()));
 		$this->assertTrue($report->canView());
 		
 		$publisher = $this->objFromFixture('Member', 'publisher');
@@ -45,6 +46,7 @@ class TwoStepWorkflowReportsTest extends FunctionalTest {
 		$this->assertTrue(is_string($report->group()));
 		$this->assertTrue(is_numeric($report->sort()));
 		$this->assertTrue(is_array($report->columns()));
+		$this->assertTrue(is_array(singleton('UnapprovedPublications2StepReport')->columns()));
 		$this->assertTrue($report->canView());
 		
 		$publisher = $this->objFromFixture('Member', 'publisher');

@@ -118,6 +118,7 @@ class TwoStepWorkflowTest extends FunctionalTest {
 	function testSiteConfigFields() {
 		// Ensure admins can see the permission fields and edit them
 		$this->logInAs($this->objFromFixture('Member', 'admin'));
+		$this->assertTrue(is_array(singleton('SiteConfigTwoStepWorkflow')->extraStatics()));
 		$fields = singleton('SiteConfig')->getCMSFields();
 		$this->assertNotNull($fields->fieldByName('Root.Access.CanPublishType'));
 		$this->assertNotNull($fields->fieldByName('Root.Access.PublisherGroups'));
@@ -133,6 +134,14 @@ class TwoStepWorkflowTest extends FunctionalTest {
 	
 	function testSiteConfigMemberRetrievalFunctions() {
 		$sc = SiteConfig::current_site_config();
+		
+		$sc->CanPublishType = null;
+		$sc->PublisherGroups()->removeAll();
+		$this->assertEquals($sc->PublisherMembers()->column('Email'), array(
+			'admin@test.com'
+		), 'With CanPublishType set to null, should return admins');
+		
+		
 		$sc->CanPublishType = 'OnlyTheseUsers';
 		$sc->PublisherGroups()->removeAll();
 		

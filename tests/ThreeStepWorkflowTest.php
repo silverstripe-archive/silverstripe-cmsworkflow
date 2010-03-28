@@ -383,6 +383,7 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 	function testSiteConfigFields() {
 		// Ensure admins can see the permission fields and edit them
 		$this->logInAs($this->objFromFixture('Member', 'admin'));
+		
 		$fields = singleton('SiteConfig')->getCMSFields();
 		$this->assertNotNull($fields->fieldByName('Root.Access.CanPublishType'));
 		$this->assertNotNull($fields->fieldByName('Root.Access.PublisherGroups'));
@@ -402,6 +403,20 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 	
 	function testSiteConfigMemberRetrievalFunctions() {
 		$sc = SiteConfig::current_site_config();
+		
+		$sc->CanPublishType = null;
+		$sc->CanApproveType = null;
+		$sc->PublisherGroups()->removeAll();
+		$sc->ApproverGroups()->removeAll();
+		
+		$this->assertEquals($sc->PublisherMembers()->column('Email'), array(
+			'admin@test.com'
+		), 'With CanPublishType set to null, should return admins');
+		$this->assertEquals($sc->ApproverMembers()->column('Email'), array(
+			'admin@test.com'
+		), 'With CanApproveType set to null, should return admins');
+		
+		
 		$sc->CanPublishType = 'OnlyTheseUsers';
 		$sc->CanApproveType = 'OnlyTheseUsers';
 		$sc->PublisherGroups()->removeAll();
