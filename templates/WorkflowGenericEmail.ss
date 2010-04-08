@@ -41,9 +41,9 @@
 			<tbody>
 				<tr>
 					<td scope="row" colspan="2" class="typography">
-						<% sprintf(_t('WorkflowRequest.EMAILGREETING','Hi %s'),$Recipient.Name) %>,<br />
+						<% sprintf(_t('WorkflowRequest.EMAILGREETING','Hi %s'),$Recipient.Title) %>,<br />
 						
-						<p>$Sender.Title has made changes to $Page.Title and has $RequestedAction</p>
+						<p>$Sender.Title has made changes to $Page.Title and has $RequestedAction.</p>
 						
 						<% if Comment %>
 						<h2><% _t('WorkflowRequest.COMMENT_HEADING','Comment') %></h2>
@@ -63,8 +63,8 @@
 						
 						<h2>Actions</h2>
 						<ul>
-							<li><a href="$PageCMSLink"><% _t('WorkflowRequest.VIEWCMSLINK','View this page in the CMS to action it') %></a></li>
-							<li><a href="$LiveSiteLink"><% _t('WorkflowRequest.VIEWPUBLISHEDLINK','View this page on your website') %></a></li>
+							<li><a href="$PageCMSLink"><% _t('WorkflowRequest.VIEWCMSLINK','View this page in the CMS to action the request') %></a></li>
+							<li><a href="$LiveSiteLink"><% _t('WorkflowRequest.VIEWPUBLISHEDLINK','View this page on thr website') %></a></li>
 						</ul>
 						<br />
 						<% sprintf(_t('WorkflowRequest.EMAILTHANKS','Thanks, the %s web team'), $SiteConfig.Title) %>

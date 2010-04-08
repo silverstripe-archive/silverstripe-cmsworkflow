@@ -487,7 +487,8 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 			$template = 'WorkflowGenericEmail';
 		}
 		
-		$subject = sprintf(_t('WorkflowRequest.EMAIL_SUBJECT', 'CMS Workflow: %s - Page: %s - Status: %s'), SiteConfig::current_site_config()->Title, $this->Page()->Title, self::get_status_description($this->Status));
+		if (class_exists('Subsite')) $subject = sprintf(_t('WorkflowRequest.EMAIL_SUBJECT_SITENAME', 'CMS Workflow: %s - Page: %s - Status: %s'), SiteConfig::current_site_config()->Title, $this->Page()->Title, self::get_status_description($this->Status));
+		else $subject = sprintf(_t('WorkflowRequest.EMAIL_SUBJECT', 'Website Workflow - Page: %s - Status: %s'), $this->Page()->Title, self::get_status_description($this->Status));
 
 		$email = new Email();
 		$email->setTo($recipient->Email);
@@ -547,35 +548,21 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	public function Diff() {
 		$diff = new DataDifferencer($this->fromRecord(), $this->toRecord());
 		
-		// $dataObjectFields = array_flip($this->fromRecord()->record);
-		// asort($dataObjectFields);
-		// $cmsFields = array();
-		// 
-		// $cms = $this->getCMSFields();
-		// var_dump($cms);
-		// 
-		// foreach($this->getCMSFields() as $tab1) {
-		// 	if ($tab1 instanceof TabSet) {
-		// 		echo $tab1->Name().get_class($tab1).' 1<br/>';
-		// 		foreach($tab1->Tabs() as $tab2) {
-		// 			echo $tab2->Name().get_class($tab2).' 2<br/>';
-		// 			if ($tab2 instanceof TabSet) {
-		// 				foreach($tab2->Tabs() as $tab3) {
-		// 					echo $tab3->Name().get_class($tab3).' 3<br/>';
-		// 					foreach($tab3->Fields() as $field) $cmsFields[] = $field->Name();
-		// 				}
-		// 			} else {
-		// 				foreach($tab2->Fields() as $field) $cmsFields[] = $field->Name();
-		// 			}
-		// 		}
-		// 	} else {
-		// 		foreach($tab1->Fields() as $field) $cmsFields[] = $field->Name();
-		// 	}
-		// }
-		// 
-		// print_r($cmsFields);
-		// 
-		// $diff->ignoreFields(array_diff($cmsFields, $dataObjectFields));
+		$dataObjectFields = array_keys($this->fromRecord()->record);
+		asort($dataObjectFields);
+		$cmsFields = array();
+		
+		foreach($this->fromRecord()->getCMSFields()->dataFields() as $f) {
+			if (!($f instanceof HiddenField)) $cmsFields[] = $f->Name();
+		}
+		
+		$cmsFields[] = 'LastEdited';
+		$cmsFields[] = 'Sort';
+		$cmsFields[] = 'Created';
+		$cmsFields[] = 'Status';
+		$cmsFields[] = 'ProvideComments';
+		
+		$diff->ignoreFields(array_diff($dataObjectFields, $cmsFields));
 		
 		return $diff;
 	}
