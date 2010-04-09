@@ -179,6 +179,9 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		$page->CanApproveType = 'OnlyTheseUsers';
 		$page->write();
 		$page->ApproverGroups()->add($customauthorgroup);
+		// Clear permission cache
+		SiteTree::on_db_reset();
+		
 		$this->assertTrue($page->canApprove($customauthor));
 		
 		$custompublisher->logIn();

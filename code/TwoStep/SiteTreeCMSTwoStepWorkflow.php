@@ -95,10 +95,11 @@ class SiteTreeCMSTwoStepWorkflow extends SiteTreeCMSWFDecorator {
 		if (!$member) return false;
 		if ($member instanceof Member) $memberID = $member->ID;
 		else $memberID = $member;
-
-		if(isset(SiteTree::$cache_permissions['CanPublishType'][$this->owner->ID])) {
-			return SiteTree::$cache_permissions['CanPublishType'][$this->owner->ID];
-		}
+		
+		// can_publish_multiple will check the cache so this isn't necessary
+		//if(isset(SiteTree::$cache_permissions['CanPublishType'][$this->owner->ID])) {
+		//	return SiteTree::$cache_permissions['CanPublishType'][$this->owner->ID];
+		//}
 		
 		// DANGER, WILL ROBINSON!
 		// we currently have not implemented extensions here. if you do
