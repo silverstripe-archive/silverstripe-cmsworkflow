@@ -10,6 +10,7 @@
 
 ## Requirements
  * SilverStripe 2.4 or newer
+ * `legacydatetimefields` module (see http://silverstripe.org/legacydatetimefields-module)
 
 
 ## Installation
