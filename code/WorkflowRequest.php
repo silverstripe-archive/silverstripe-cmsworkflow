@@ -547,22 +547,23 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 */
 	public function Diff() {
 		$diff = new DataDifferencer($this->fromRecord(), $this->toRecord());
-		
-		$dataObjectFields = array_keys($this->fromRecord()->record);
-		asort($dataObjectFields);
-		$cmsFields = array();
-		
-		foreach($this->fromRecord()->getCMSFields()->dataFields() as $f) {
-			if (!($f instanceof HiddenField)) $cmsFields[] = $f->Name();
-		}
-		
-		$cmsFields[] = 'LastEdited';
-		$cmsFields[] = 'Sort';
-		$cmsFields[] = 'Created';
-		$cmsFields[] = 'Status';
-		$cmsFields[] = 'ProvideComments';
-		
-		$diff->ignoreFields(array_diff($dataObjectFields, $cmsFields));
+//// This is commented out, pending a solution to infinite loop.
+//// Looping is called, as getCMSFields() calls updateCMSFields() which renders .ss template, which refers to this fn, $Diff. 
+//		$dataObjectFields = array_keys($this->fromRecord()->record);
+//		asort($dataObjectFields);
+//		$cmsFields = array();
+//		
+//		foreach($this->fromRecord()->getCMSFields()->dataFields() as $f) {
+//			if (!($f instanceof HiddenField)) $cmsFields[] = $f->Name();
+//		}
+//		
+//		$cmsFields[] = 'LastEdited';
+//		$cmsFields[] = 'Sort';
+//		$cmsFields[] = 'Created';
+//		$cmsFields[] = 'Status';
+//		$cmsFields[] = 'ProvideComments';
+//		
+//		$diff->ignoreFields(array_diff($dataObjectFields, $cmsFields));
 		
 		return $diff;
 	}
