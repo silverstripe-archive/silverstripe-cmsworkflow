@@ -205,7 +205,7 @@ $lang['en_US']['WorkflowRequest']['TITLE'] = array(
 	50,
 	'Title for this request, shown e.g. in the workflow status overview for a page'
 );
-$lang['en_US']['WorkflowRequest']['VIEWPUBLISHEDLINK'] = 'View this page on your website';
+$lang['en_US']['WorkflowRequest']['VIEWPUBLISHEDLINK'] = 'View this page on the website';
 $lang['en_US']['WorkflowRequestChange']['PLURALNAME'] = array(
 	'Workflow Request Changs',
 	50,
