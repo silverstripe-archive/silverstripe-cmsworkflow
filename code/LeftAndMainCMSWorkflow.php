@@ -182,7 +182,6 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 	
 	public function cms_publishwithcomment($urlParams, $form) {
 		$className = 'SiteTree';
-		$result = '';
 
 		$SQL_id = Convert::raw2sql($_REQUEST['ID']);
 		if(substr($SQL_id,0,3) != 'new') {
@@ -252,12 +251,12 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 
 			if($added = DataObjectLog::getAdded('SiteTree')) {
 				foreach($added as $page) {
-					if($page->ID != $record->ID) $result .= $this->addTreeNodeJS($page);
+					if($page->ID != $record->ID) FormResponse::add($this->addTreeNodeJS($page));
 				}
 			}
 			if($deleted = DataObjectLog::getDeleted('SiteTree')) {
 				foreach($deleted as $page) {
-					if($page->ID != $record->ID) $result .= $this->deleteTreeNodeJS($page);
+					if($page->ID != $record->ID) FormResponse::add($this->deleteTreeNodeJS($page));
 				}
 			}
 			if($changed = DataObjectLog::getChanged('SiteTree')) {
