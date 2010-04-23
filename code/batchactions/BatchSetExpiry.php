@@ -22,7 +22,7 @@ class BatchSetExpiry extends CMSBatchAction {
 	
 	function getParameterFields() {
 		if(class_exists('TZDateTimeField'))	$dateField = new TZDateTimeField('ExpiryDate_Batch');
-		else $dateField = new PopupDateTimeField('ExpiryDate_Batch');
+		else $dateField = new DateField('ExpiryDate_Batch');
 		return new FieldSet($dateField);
 	}
 	
