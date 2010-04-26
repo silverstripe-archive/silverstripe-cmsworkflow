@@ -208,7 +208,7 @@ class SiteTreeFutureState_SilverStripeNavigatorItem extends SilverStripeNavigato
 		// $datetimeField = new DatetimeField('FutureStateDate', 'Date');
 		// $datetimeField->getDateField()->setConfig('showcalendar', true);
 		// $datetimeField->getTimeField()->setConfig('showdropdown', true);
-		$datetimeField = new PopupDateTimeField('FutureStateDate', 'Date');
+		$datetimeField = new DatetimeField('FutureStateDate', 'Date');
 		$datetime = SiteTreeFutureState::get_future_datetime();
 		if($datetime) {
 			$datetimeField->setValue($datetime);

@@ -365,7 +365,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	}
 	function ExpiryField() {
 		if (class_exists('TZDateTimeField')) return new TZDateTimeField('ExpiryDate', 'Expiry Date', $this->ExpiryDate, SiteConfig::current_site_config()->Timezone);
-		else return new PopupDateTimeField('ExpiryDate', 'Expiry Date', $this->ExpiryDate);
+		else return new DatetimeField('ExpiryDate', 'Expiry Date', $this->ExpiryDate);
 	}
 	
 	function getEmbargoDate() {

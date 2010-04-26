@@ -22,7 +22,7 @@ class BatchSetEmbargo extends CMSBatchAction {
 	
 	function getParameterFields() {
 		if(class_exists('TZDateTimeField')) $dateField = new TZDateTimeField('EmbargoDate_Batch');
-		else $dateField = new DateField('EmbargoDate_Batch');
+		else $dateField = new DatetimeField('EmbargoDate_Batch');
 		
 		return new FieldSet($dateField);
 	}
