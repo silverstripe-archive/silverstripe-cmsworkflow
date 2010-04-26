@@ -361,7 +361,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 */
 	function EmbargoField() {
 		if (class_exists('TZDateTimeField')) return new TZDateTimeField('EmbargoDate', 'Embargo Date', $this->EmbargoDate, SiteConfig::current_site_config()->Timezone);
-		else return new PopupDateTimeField('EmbargoDate', 'Embargo Date', $this->EmbargoDate);
+		else return new DatetimeField('EmbargoDate', 'Embargo Date', $this->EmbargoDate);
 	}
 	function ExpiryField() {
 		if (class_exists('TZDateTimeField')) return new TZDateTimeField('ExpiryDate', 'Expiry Date', $this->ExpiryDate, SiteConfig::current_site_config()->Timezone);
