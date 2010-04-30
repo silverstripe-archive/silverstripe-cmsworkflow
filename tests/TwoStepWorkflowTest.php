@@ -40,7 +40,7 @@ class TwoStepWorkflowTest extends FunctionalTest {
 			'AwaitingApproval',
 			"Request is set to AwaitingApproval after requestPublication() is called"
 		);
-
+	
 		$this->assertContains(
 			'cms_cancel',
 			array_flip($request1->WorkflowActions()),
@@ -153,7 +153,7 @@ class TwoStepWorkflowTest extends FunctionalTest {
 		sort($compare1);
 		sort($compare2);
 		$this->assertEquals($compare1, $compare2);
-
+	
 		$sc->CanPublishType = 'LoggedInUsers';
 		$this->assertEquals(4, $sc->PublisherMembers()->Count(), 'PublisherMembers returns the 4 users that have CMS access');
 	}
@@ -195,12 +195,12 @@ class TwoStepWorkflowTest extends FunctionalTest {
 		$this->assertTrue($page->canPublish($this->objFromFixture('Member', 'customauthor')));
 		$this->assertTrue($page->canApprove($this->objFromFixture('Member', 'customauthor')));
 		$this->assertTrue($page->canRequestEdit($this->objFromFixture('Member', 'customauthor')));
-
+	
 		// Test 'all' users
 		$page->CanPublishType = 'LoggedInUsers';
 		$this->assertEquals(4, $page->PublisherMembers()->Count(), 'PublisherMembers returns the 4 users that have CMS access');
 	}
-
+	
 	function testManipulatingGroupsDuringAWorkflow() {
 		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
 	
@@ -230,7 +230,7 @@ class TwoStepWorkflowTest extends FunctionalTest {
 		$page = $this->objFromFixture('SiteTree', 'embargoexpirypage');
 		$custompublisher = $this->objFromFixture('Member', 'custompublisher');
 		$customauthor = $this->objFromFixture('Member', 'customauthor');
-
+	
 		$this->session()->inst_set('loggedInAs', $customauthor->ID);
 		$request = $page->openWorkflowRequest('WorkflowPublicationRequest');
 		$this->assertNotNull($request);
@@ -258,9 +258,9 @@ class TwoStepWorkflowTest extends FunctionalTest {
 		$this->session()->inst_set('loggedInAs', $custompublisher->ID);
 		$this->assertEquals(true, $request->approve('Looks good. Will go out a bit later'),
 			'Publisher ('.Member::currentUser()->Email.') can approve page');
-
+	
 		$request = $page->openWorkflowRequest('WorkflowPublicationRequest');
-
+	
 		$this->assertEquals(
 			$request->Status,
 			'Scheduled',
@@ -360,26 +360,26 @@ class TwoStepWorkflowTest extends FunctionalTest {
 		$wf->approve("Yes, looks good now.");
 		
 		$this->session()->inst_set('loggedInAs', null);
-		
 		$changes = $wf->Changes();
+		$changes->sort('ID'); // Ordering by created might not be accurate enough
 		$this->assertEquals(array(
 			"Can you please publish this?",
 			"No, you've got a spelling mistake.",
 			"Is it better now?",
 			"Yes, looks good now.",
-		), array_reverse($changes->column('Comment')));
+		), $changes->column('Comment'));
 		$this->assertEquals(array(
 			$customauthor->ID,
 			$custompublisher->ID,
 			$customauthor->ID,
 			$custompublisher->ID,
-		), array_reverse($changes->column('AuthorID')));
+		), $changes->column('AuthorID'));
 		$this->assertEquals(array(
 			'AwaitingApproval',
 			'Denied',
 			'AwaitingApproval',
 			'Completed',
-		), array_reverse($changes->column('Status')));
+		), $changes->column('Status'));
 	}
 }
 ?>
