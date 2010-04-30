@@ -34,7 +34,7 @@ class WorkflowReportsTest extends FunctionalTest {
 		
 		// Test with no dates set
 		SS_Datetime::set_mock_now('2010-02-14 00:00:00');
-		$results = $report->sourceRecords(array(), 'Title DESC', false);
+		$results = $report->sourceRecords(array(), '"Title" DESC', false);
 		$this->assertEquals($results->column('Title'), array(
 			'Page3',
 			'Page2'
@@ -81,9 +81,9 @@ class WorkflowReportsTest extends FunctionalTest {
 		// Test that records you cannot edit do not appear
 		SS_Datetime::set_mock_now('2010-02-01 00:00:00');
 		$this->logInAs($this->objFromFixture('Member', 'admin'));
-		$this->assertEquals($report->sourceRecords(array(), 'Title DESC', false)->Count(), 3);
+		$this->assertEquals($report->sourceRecords(array(), '"Title" DESC', false)->Count(), 3);
 		$this->logInAs($this->objFromFixture('Member', 'publisher'));
-		$this->assertEquals($report->sourceRecords(array(), 'Title DESC', false)->Count(), 2);
+		$this->assertEquals($report->sourceRecords(array(), '"Title" DESC', false)->Count(), 2);
 		
 		SS_Datetime::clear_mock_now();
 	}
@@ -103,7 +103,7 @@ class WorkflowReportsTest extends FunctionalTest {
 		
 		// Test with no dates set
 		SS_Datetime::set_mock_now('2010-02-14 00:00:00');
-		$results = $report->sourceRecords(array(), 'Title DESC', false);
+		$results = $report->sourceRecords(array(), '"Title" DESC', false);
 		$this->assertEquals($results->column('Title'), array(
 			'Page3',
 			'Page2'
@@ -150,9 +150,9 @@ class WorkflowReportsTest extends FunctionalTest {
 		// Test that records you cannot edit do not appear
 		SS_Datetime::set_mock_now('2010-02-01 00:00:00');
 		$this->logInAs($this->objFromFixture('Member', 'admin'));
-		$this->assertEquals($report->sourceRecords(array(), 'BacklinkCount DESC', false)->Count(), 3);
+		$this->assertEquals($report->sourceRecords(array(), '', false)->Count(), 3);
 		$this->logInAs($this->objFromFixture('Member', 'publisher'));
-		$this->assertEquals($report->sourceRecords(array(), 'Title DESC', false)->Count(), 2);
+		$this->assertEquals($report->sourceRecords(array(), '"Title" DESC', false)->Count(), 2);
 		
 		SS_Datetime::clear_mock_now();
 	}
@@ -190,7 +190,7 @@ class WorkflowReportsTest extends FunctionalTest {
 		
 		SS_Datetime::set_mock_now('2010-02-14 00:00:00');
 		// Test with no dates set
-		$results = $report->sourceRecords(array(), 'Title DESC', false);//die();
+		$results = $report->sourceRecords(array(), '"Title" DESC', false);//die();
 		$this->assertEquals($results->column('Title'), array(
 			'Page3',
 			'Page2'
@@ -202,7 +202,7 @@ class WorkflowReportsTest extends FunctionalTest {
 				'Date' => '14/02/2010',
 				'Time' => '12:00 am'
 			)
-		), 'Title DESC', false);
+		), '"Title" DESC', false);
 		$this->assertEquals($results->column('Title'), array(
 			'Page3',
 			'Page2'
@@ -214,7 +214,7 @@ class WorkflowReportsTest extends FunctionalTest {
 				'Date' => '14/02/2010',
 				'Time' => '12:00 am'
 			)
-		), 'Title ASC', false);
+		), '"Title" ASC', false);
 		$this->assertEquals($results->column('Title'), array(
 			'Page1'
 		));
@@ -229,7 +229,7 @@ class WorkflowReportsTest extends FunctionalTest {
 				'Date' => '12/02/2010',
 				'Time' => '12:00 am'
 			)
-		), 'Title DESC', false);
+		), '"Title" DESC', false);
 		$this->assertEquals($results->column('Title'), array(
 			'Page1'
 		));

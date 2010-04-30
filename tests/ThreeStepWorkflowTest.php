@@ -231,7 +231,7 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		SS_Datetime::set_mock_now('2009-06-15 15:00:00');
 		$sp->run(new SS_HTTPRequest('GET', '/'));
 		
-		$onLive = Versioned::get_by_stage('Page', 'Live', "SiteTree_Live.ID = ".$page->ID);
+		$onLive = Versioned::get_by_stage('Page', 'Live', "\"SiteTree_Live\".\"ID\" = ".$page->ID);
 		$this->assertNull($onLive, 'Page has expired from live');
 		
 		SS_Datetime::clear_mock_now();
@@ -431,16 +431,18 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		
 		// Should now return two authors
 		$sc->PublisherGroups()->add($this->objFromFixture('Group', 'customauthorsgroup'));
-		$this->assertEquals($sc->PublisherMembers()->column('Email'), array(
-			'customauthor@test.com',
-			'customauthor2@test.com'
-		));
+		$compare1=$sc->PublisherMembers()->column('Email');
+		$compare2=array('customauthor@test.com','customauthor2@test.com');
+		sort($compare1);
+		sort($compare2);
+		$this->assertEquals($compare1, $compare2);
 		
 		$sc->ApproverGroups()->add($this->objFromFixture('Group', 'customauthorsgroup'));
-		$this->assertEquals($sc->ApproverMembers()->column('Email'), array(
-			'customauthor@test.com',
-			'customauthor2@test.com'
-		));
+		$compare1=$sc->ApproverMembers()->column('Email');
+		$compare2=array('customauthor@test.com','customauthor2@test.com');
+		sort($compare1);
+		sort($compare2);
+		$this->assertEquals($compare1, $compare2);
 	
 		$sc->CanPublishType = 'LoggedInUsers';
 		$this->assertEquals(4, $sc->PublisherMembers()->Count(), 'PublisherMembers returns the 4 users that have CMS access');
@@ -463,15 +465,17 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		
 		// Test inherit
 		$page->CanPublishType = 'Inherit';
-		$this->assertEquals($page->PublisherMembers()->column('Email'), array(
-			'customauthor@test.com',
-			'customauthor2@test.com'
-		));
+		$compare1=$page->PublisherMembers()->column('Email');
+		$compare2=array('customauthor@test.com','customauthor2@test.com');
+		sort($compare1);
+		sort($compare2);
+		$this->assertEquals($compare1, $compare2);
 		$page->CanApproveType = 'Inherit';
-		$this->assertEquals($page->ApproverMembers()->column('Email'), array(
-			'customauthor@test.com',
-			'customauthor2@test.com'
-		));
+		$compare1=$page->ApproverMembers()->column('Email');
+		$compare2=array('customauthor@test.com', 'customauthor2@test.com');
+		sort($compare1);
+		sort($compare2);
+		$this->assertEquals($compare1, $compare2);
 		
 		// Test specific groups
 		$page->CanPublishType = 'OnlyTheseUsers';

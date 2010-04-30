@@ -36,24 +36,24 @@ class SiteTreeFutureStateTest extends SapphireTest {
 
 		$request->approve('Looks good.');
 		
-		$prodDraft = DataObject::get_one('SiteTree', 'URLSegment = \'product-6\'');
+		$prodDraft = DataObject::get_one('SiteTree', '"URLSegment" = \'product-6\'');
 		$this->assertEquals('New Title', $prodDraft->Title, 'Correct page on draft site.');
 		
-		$prodLiveNow = Versioned::get_one_by_stage('SiteTree', 'Live', 'URLSegment = \'product-6\'');
+		$prodLiveNow = Versioned::get_one_by_stage('SiteTree', 'Live', '"URLSegment" = \'product-6\'');
 		$this->assertEquals('Product 6', $prodLiveNow->Title, 'Correct page on live site.');
 		
 		SiteTreeFutureState::set_future_datetime('2020-06-01 14:00:00');
-		$prodBeforeEmbargo = DataObject::get_one('SiteTree', 'URLSegment = \'product-6\'');
+		$prodBeforeEmbargo = DataObject::get_one('SiteTree', '"URLSegment" = \'product-6\'');
 		$this->assertEquals('Product 6', $prodBeforeEmbargo->Title, 'Correct page before embargo.');
 
 		SiteTreeFutureState::set_future_datetime('2020-06-02 16:00:00');
-		$prodAfterEmbargo = DataObject::get_one('SiteTree', 'URLSegment = \'product-6\'');
+		$prodAfterEmbargo = DataObject::get_one('SiteTree', '"URLSegment" = \'product-6\'');
 
 		$this->assertEquals('New Title', $prodAfterEmbargo->Title, 'Correct page after embargo.');
 		
 
 		SiteTreeFutureState::set_future_datetime('2020-06-07 16:00:00');
-		$prodAfterExpiry = DataObject::get_one('SiteTree', 'URLSegment = \'product-6\'');
+		$prodAfterExpiry = DataObject::get_one('SiteTree', '"URLSegment" = \'product-6\'');
 		$this->assertFalse($prodAfterExpiry, 'No page after expiry.');
 		
 		
@@ -65,15 +65,15 @@ class SiteTreeFutureStateTest extends SapphireTest {
 		// The top-level items have no embargo/expiry, and so should be unaffected by the embargoes
 		// of their children
 		
-		$items1 = DataObject::get("SiteTree", "ParentID = 0 AND ShowInMenus = 1")->column("Title");
+		$items1 = DataObject::get("SiteTree", "\"ParentID\" = 0 AND \"ShowInMenus\" = 1")->column("Title");
 		SiteTreeFutureState::set_future_datetime('2020-01-01 10:00:00');
-		$items2 = DataObject::get("SiteTree", "ParentID = 0 AND ShowInMenus = 1")->column("Title");
+		$items2 = DataObject::get("SiteTree", "\"ParentID\" = 0 AND \"ShowInMenus\" = 1")->column("Title");
 		SiteTreeFutureState::set_future_datetime('2020-01-01 10:59:00');
-		$items3 = DataObject::get("SiteTree", "ParentID = 0 AND ShowInMenus = 1")->column("Title");
+		$items3 = DataObject::get("SiteTree", "\"ParentID\" = 0 AND \"ShowInMenus\" = 1")->column("Title");
 		SiteTreeFutureState::set_future_datetime('2020-01-01 11:01:00');
-		$items4 = DataObject::get("SiteTree", "ParentID = 0 AND ShowInMenus = 1")->column("Title");
+		$items4 = DataObject::get("SiteTree", "\"ParentID\" = 0 AND \"ShowInMenus\" = 1")->column("Title");
 		SiteTreeFutureState::set_future_datetime('2020-01-03 11:01:00');
-		$items5 = DataObject::get("SiteTree", "ParentID = 0 AND ShowInMenus = 1")->column("Title");
+		$items5 = DataObject::get("SiteTree", "\"ParentID\" = 0 AND \"ShowInMenus\" = 1")->column("Title");
 		
 		$this->assertEquals(array('Home', 'About Us', 'Products', 'Contact Us'), $items1);
 		$this->assertEquals(array('Home', 'About Us', 'Products', 'Contact Us'), $items2);

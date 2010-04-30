@@ -42,7 +42,7 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 	function testAlternateCanPublishLimitsToPublisherGroups() {
 		// Check for default record group assignments
 		$defaultpublisherspage = $this->objFromFixture('SiteTree', 'defaultpublisherspage');
-		$defaultpublishersgroup = DataObject::get_one('Group', "Code = 'site-content-publishers'");
+		$defaultpublishersgroup = DataObject::get_one('Group', "\"Code\" = 'site-content-publishers'");
 		$defaultpublisher = $this->objFromFixture('Member', 'defaultpublisher');
 		
 		// Workaround because defaults aren't written in unit tests
