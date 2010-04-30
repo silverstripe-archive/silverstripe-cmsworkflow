@@ -640,7 +640,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$classesSQL = implode("','", $classes);
 		
 		// build filter
-		$filter = "{$bt}Member{$bt}.ID = {$author->ID}  
+		$filter = "{$bt}Member{$bt}.{$bt}ID{$bt} = {$author->ID}  
 			AND {$bt}WorkflowRequest{$bt}.{$bt}ClassName{$bt} IN ('$classesSQL')
 		";
 		if($status) {

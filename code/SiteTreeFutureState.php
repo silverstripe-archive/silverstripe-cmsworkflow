@@ -129,7 +129,7 @@ class SiteTreeFutureState extends DataObjectDecorator {
 			self::$temp_tables[$tmpID] = DB::createTable($tmpID, array(
 				"ID" => "INT NOT NULL",
 				"Version" => "INT NOT NULL",
-				"ExpiryDate" => "DATETIME"
+				"ExpiryDate" => DB::getConn()->SS_Datetime(array()),
 			), null, array('temporary' => true));
 		}
 		
@@ -139,7 +139,7 @@ class SiteTreeFutureState extends DataObjectDecorator {
 			
 			// Insert current live data
 			DB::query("INSERT INTO \"$tempTable\"
-				SELECT \"ID\", Version, ExpiryDate FROM \"{$baseTable}_Live\"");
+				SELECT \"ID\", \"Version\", \"ExpiryDate\" FROM \"{$baseTable}_Live\"");
 
 			// Remove pages that will be included by the embargo line below, so that we can update
 			// without duplication
