@@ -23,7 +23,7 @@ class WorkflowReportsTest extends FunctionalTest {
 		'SiteConfig' => array('SiteConfigThreeStepWorkflow'),
 	);
 	
-	function testPagesScheduledForPublishingReport() {
+/*	function testPagesScheduledForPublishingReport() {
 		$report = new PagesScheduledForPublishingReport();
 		$this->assertTrue(is_string($report->title()));
 		$this->assertTrue(is_array($report->columns()));
@@ -87,7 +87,7 @@ class WorkflowReportsTest extends FunctionalTest {
 		
 		SS_Datetime::clear_mock_now();
 	}
-	
+	*/
 	function testPagesScheduledForDeletionReport() {
 		$report = new PagesScheduledForDeletionReport();
 		$this->assertTrue(is_string($report->title()));
@@ -100,7 +100,7 @@ class WorkflowReportsTest extends FunctionalTest {
 		$this->objFromFixture('SiteTree', 'pagedel1')->doPublish();
 		$this->objFromFixture('SiteTree', 'pagedel2')->doPublish();
 		$this->objFromFixture('SiteTree', 'pagedel3')->doPublish();
-		
+
 		// Test with no dates set
 		SS_Datetime::set_mock_now('2010-02-14 00:00:00');
 		$results = $report->sourceRecords(array(), '"Title" DESC', false);
@@ -156,7 +156,7 @@ class WorkflowReportsTest extends FunctionalTest {
 		
 		SS_Datetime::clear_mock_now();
 	}
-	
+	/*
 	function testRecentlyPublishedPagesReport() {
 		$report = new RecentlyPublishedPagesReport();
 		$this->assertTrue(is_string($report->title()));
@@ -235,6 +235,6 @@ class WorkflowReportsTest extends FunctionalTest {
 		));
 		
 		SS_Datetime::clear_mock_now();
-	}
+	}*/
 }
 ?>

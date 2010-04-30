@@ -192,20 +192,20 @@ class SiteTreeFutureStateTest extends SapphireTest {
 		Versioned::reading_stage('Live');
 		
 		$pages = DataObject::get("SiteTree")->column("ID");
-		$this->assertContains($this->idFromFixture('Page', 'product5'), $pages);
-		$this->assertContains($this->idFromFixture('VirtualPage', 'vproduct5'), $pages);
+		$this->assertTrue(in_array($this->idFromFixture('Page', 'product5'), $pages));
+		$this->assertTrue(in_array($this->idFromFixture('VirtualPage', 'vproduct5'), $pages));
 		
 		SiteTreeFutureState::set_future_datetime('2020-01-01 9:00:00');
 
 		$pages = DataObject::get("SiteTree")->column("ID");
-		$this->assertContains($this->idFromFixture('Page', 'product5'), $pages);
-		$this->assertContains($this->idFromFixture('VirtualPage', 'vproduct5'), $pages);
+		$this->assertTrue(in_array($this->idFromFixture('Page', 'product5'), $pages));
+		$this->assertTrue(in_array($this->idFromFixture('VirtualPage', 'vproduct5'), $pages));
 
 		SiteTreeFutureState::set_future_datetime('2020-01-01 14:00:00');
 
 		$pages = DataObject::get("SiteTree")->column("ID");
-		$this->assertNotContains($this->idFromFixture('Page', 'product5'), $pages);
-		$this->assertNotContains($this->idFromFixture('VirtualPage', 'vproduct5'), $pages);
+		$this->assertFalse(in_array($this->idFromFixture('Page', 'product5'), $pages));
+		$this->assertFalse(in_array($this->idFromFixture('VirtualPage', 'vproduct5'), $pages));
 		
 	}
 

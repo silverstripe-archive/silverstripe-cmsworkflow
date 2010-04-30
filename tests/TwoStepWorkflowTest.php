@@ -137,17 +137,14 @@ class TwoStepWorkflowTest extends FunctionalTest {
 		
 		$sc->CanPublishType = null;
 		$sc->PublisherGroups()->removeAll();
-		$this->assertEquals($sc->PublisherMembers()->column('Email'), array(
-			'admin@test.com'
-		), 'With CanPublishType set to null, should return admins');
+		$pEmails = $sc->PublisherMembers()->column('Email');
+		$this->assertTrue(in_array(strtolower($pEmails[0]),array('admin@example.org','admin@test.com')), 'With CanPublishType set to null, should return admins');
 		
 		
 		$sc->CanPublishType = 'OnlyTheseUsers';
 		$sc->PublisherGroups()->removeAll();
-		
-		$this->assertEquals($sc->PublisherMembers()->column('Email'), array(
-			'admin@test.com'
-		), 'With CanPublishType set to OnlyTheseUsers, but no groups set up, should return admins');
+		$pEmails = $sc->PublisherMembers()->column('Email');
+		$this->assertTrue(in_array(strtolower($pEmails[0]),array('admin@example.org','admin@test.com')), 'With CanPublishType set to OnlyTheseUsers, but no groups set up, should return admins');
 		
 		// Should now return two authors
 		$sc->PublisherGroups()->add($this->objFromFixture('Group', 'customauthorsgroup'));
@@ -182,9 +179,8 @@ class TwoStepWorkflowTest extends FunctionalTest {
 		
 		// Test specific groups
 		$page->CanPublishType = 'OnlyTheseUsers';
-		$this->assertEquals($page->PublisherMembers()->column('Email'), array(
-			'admin@test.com'
-		), 'With CanPublishType set to OnlyTheseUsers, but no groups set up, should return admins');
+		$pEmails = $page->PublisherMembers()->column('Email');
+		$this->assertTrue(in_array(strtolower($pEmails[0]),array('admin@test.com', 'admin@example.org')),'With CanPublishType set to OnlyTheseUsers, but no groups set up, should return admins');
 		
 		$page->PublisherGroups()->add($this->objFromFixture('Group', 'custompublishergroup'));
 		$this->assertEquals($page->PublisherMembers()->column('Email'), array(
@@ -371,19 +367,19 @@ class TwoStepWorkflowTest extends FunctionalTest {
 			"No, you've got a spelling mistake.",
 			"Is it better now?",
 			"Yes, looks good now.",
-		), $changes->column('Comment'));
+		), array_reverse($changes->column('Comment')));
 		$this->assertEquals(array(
 			$customauthor->ID,
 			$custompublisher->ID,
 			$customauthor->ID,
 			$custompublisher->ID,
-		), $changes->column('AuthorID'));
+		), array_reverse($changes->column('AuthorID')));
 		$this->assertEquals(array(
 			'AwaitingApproval',
 			'Denied',
 			'AwaitingApproval',
 			'Completed',
-		), $changes->column('Status'));
+		), array_reverse($changes->column('Status')));
 	}
 }
 ?>

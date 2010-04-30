@@ -409,12 +409,10 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		$sc->PublisherGroups()->removeAll();
 		$sc->ApproverGroups()->removeAll();
 		
-		$this->assertEquals($sc->PublisherMembers()->column('Email'), array(
-			'admin@test.com'
-		), 'With CanPublishType set to null, should return admins');
-		$this->assertEquals($sc->ApproverMembers()->column('Email'), array(
-			'admin@test.com'
-		), 'With CanApproveType set to null, should return admins');
+		$pEmails = $sc->PublisherMembers()->column('Email');
+		$this->assertTrue(in_array(strtolower($pEmails[0]),array('admin@example.org','admin@test.com')),'With CanPublishType set to null, should return admins');
+		$aEmails = $sc->ApproverMembers()->column('Email');
+		$this->assertTrue(in_array(strtolower($aEmails[0]),array('admin@example.org','admin@test.com')), 'With CanApproveType set to null, should return admins');
 		
 		
 		$sc->CanPublishType = 'OnlyTheseUsers';
@@ -422,12 +420,11 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		$sc->PublisherGroups()->removeAll();
 		$sc->ApproverGroups()->removeAll();
 		
-		$this->assertEquals($sc->PublisherMembers()->column('Email'), array(
-			'admin@test.com'
-		), 'With CanPublishType set to OnlyTheseUsers, but no groups set up, should return admins');
-		$this->assertEquals($sc->ApproverMembers()->column('Email'), array(
-			'admin@test.com'
-		), 'With CanApproveType set to OnlyTheseUsers, but no groups set up, should return admins');
+		$pEmails = $sc->PublisherMembers()->column('Email');
+		$this->assertTrue(in_array(strtolower($pEmails[0]),array('admin@example.org','admin@test.com')), 'With CanPublishType set to OnlyTheseUsers, but no groups set up, should return admins');
+		
+		$aEmails = $sc->ApproverMembers()->column('Email');
+		$this->assertTrue(in_array(strtolower($aEmails[0]),array('admin@example.org','admin@test.com')), 'With CanApproveType set to OnlyTheseUsers, but no groups set up, should return admins');
 		
 		// Should now return two authors
 		$sc->PublisherGroups()->add($this->objFromFixture('Group', 'customauthorsgroup'));
@@ -479,9 +476,8 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		
 		// Test specific groups
 		$page->CanPublishType = 'OnlyTheseUsers';
-		$this->assertEquals($page->PublisherMembers()->column('Email'), array(
-			'admin@test.com'
-		), 'With CanPublishType set to OnlyTheseUsers, but no groups set up, should return admins');
+		$pEmails = $page->PublisherMembers()->column('Email');
+		$this->assertTrue(in_array(strtolower($pEmails[0]),array('admin@example.org','admin@test.com')), 'With CanPublishType set to OnlyTheseUsers, but no groups set up, should return admins');
 		
 		$page->PublisherGroups()->add($this->objFromFixture('Group', 'custompublishergroup'));
 		$this->assertEquals($page->PublisherMembers()->column('Email'), array(
@@ -489,9 +485,8 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		));
 		
 		$page->CanApproveType = 'OnlyTheseUsers';
-		$this->assertEquals($page->ApproverMembers()->column('Email'), array(
-			'admin@test.com'
-		), 'With CanApproveType set to OnlyTheseUsers, but no groups set up, should return admins');
+		$aEmails = $page->ApproverMembers()->column('Email');
+		$this->assertTrue(in_array(strtolower($aEmails[0]),array('admin@example.org','admin@test.com')),'With CanApproveType set to OnlyTheseUsers, but no groups set up, should return admins');
 		
 		$page->ApproverGroups()->add($this->objFromFixture('Group', 'custompublishergroup'));
 		$this->assertEquals($page->ApproverMembers()->column('Email'), array(
