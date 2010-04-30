@@ -37,25 +37,25 @@ class PagesScheduledForPublishingReport extends SS_Report {
 		}
 		
 		if ($startDate && $endDate) {
-			$wheres[] = "EmbargoDate >= '".Convert::raw2sql($startDate)."' AND EmbargoDate <= '".Convert::raw2sql($endDate)."'";
+			$wheres[] = "\"EmbargoDate\" >= '".Convert::raw2sql($startDate)."' AND \"EmbargoDate\" <= '".Convert::raw2sql($endDate)."'";
 		} else if ($startDate && !$endDate) {
-			$wheres[] = "EmbargoDate >= '".Convert::raw2sql($startDate)."'";
+			$wheres[] = "\"EmbargoDate\" >= '".Convert::raw2sql($startDate)."'";
 		} else if (!$startDate && $endDate) {
-			$wheres[] = "EmbargoDate <= '".Convert::raw2sql($endDate)."'";
+			$wheres[] = "\"EmbargoDate\" <= '".Convert::raw2sql($endDate)."'";
 		} else {
-			$wheres[] = "EmbargoDate >= '".SS_Datetime::now()->URLDate()."'";
+			$wheres[] = "\"EmbargoDate\" >= '".SS_Datetime::now()->URLDate()."'";
 		}
 		
-		$wheres[] = "WorkflowRequest.Status = 'Scheduled'";
+		$wheres[] = "\"WorkflowRequest\".\"Status\" = 'Scheduled'";
 		
 		$query = singleton("SiteTree")->extendedSQL(join(' AND ', $wheres), null, null, 
-			"LEFT JOIN WorkflowRequest on WorkflowRequest.PageID = SiteTree.ID"
+			"LEFT JOIN \"WorkflowRequest\" ON \"WorkflowRequest\".\"PageID\" = \"SiteTree\".\"ID\""
 		);
 		
-		$query->select[] = "WorkflowRequest.EmbargoDate AS EmbargoDate";
+		$query->select[] = "\"WorkflowRequest\".\"EmbargoDate\" AS \"EmbargoDate\"";
 		
-		$query->from[] = "LEFT JOIN Member AS Approver ON WorkflowRequest.ApproverID = Approver.ID";
-		$query->select[] = Member::get_title_sql('Approver').' AS ApproverName';
+		$query->from[] = "LEFT JOIN \"Member\" AS \"Approver\" ON \"WorkflowRequest\".\"ApproverID\" = \"Approver\".\"ID\"";
+		$query->select[] = Member::get_title_sql('Approver').' AS "ApproverName"';
 		
 		$join = '';
 		if($sort) {
@@ -64,7 +64,7 @@ class PagesScheduledForPublishingReport extends SS_Report {
 			$direction = $parts[1];
 			
 			if($field == 'AbsoluteLink') {
-				$sort = 'URLSegment ' . $direction;
+				$sort = '"URLSegment" ' . $direction;
 			}
 			
 			if($field == 'Subsite.Title') {
@@ -73,6 +73,11 @@ class PagesScheduledForPublishingReport extends SS_Report {
 		}
 		
 		if($sort) $query->orderby = $sort;
+		
+		// Postgres and MSSQL require these fields in the groupby[] array:
+		$query->groupby[]="\"WorkflowRequest\".\"EmbargoDate\"";
+		$query->groupby[]="\"Approver\".\"Surname\"";
+		$query->groupby[]="\"Approver\".\"FirstName\"";
 		
 		// Turn a query into records
 		$records = singleton('SiteTree')->buildDataObjectSet($query->execute(), 'DataObjectSet', $query);

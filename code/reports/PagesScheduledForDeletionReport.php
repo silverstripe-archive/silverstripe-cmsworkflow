@@ -76,13 +76,13 @@ class PagesScheduledForDeletionReport extends SS_Report {
 		}
 		
 		if($startDate && $endDate) {
-			$wheres[] = "ExpiryDate >= '".Convert::raw2sql($startDate)."' AND ExpiryDate <= '".Convert::raw2sql($endDate)."'";
+			$wheres[] = "\"ExpiryDate\" >= '".Convert::raw2sql($startDate)."' AND \"ExpiryDate\" <= '".Convert::raw2sql($endDate)."'";
 		} else if($startDate && !$endDate) {
-			$wheres[] = "ExpiryDate >= '".Convert::raw2sql($startDate)."'";
+			$wheres[] = "\"ExpiryDate\" >= '".Convert::raw2sql($startDate)."'";
 		} else if(!$startDate && $endDate) {
-			$wheres[] = "ExpiryDate <= '".Convert::raw2sql($endDate)."'";
+			$wheres[] = "\"ExpiryDate\" <= '".Convert::raw2sql($endDate)."'";
 		} else {
-			$wheres[] = "ExpiryDate >= '".SS_Datetime::now()->URLDate()."'";
+			$wheres[] = "\"ExpiryDate\" >= '".SS_Datetime::now()->URLDate()."'";
 		}
 		
 		$stage = Versioned::current_stage();
@@ -94,7 +94,7 @@ class PagesScheduledForDeletionReport extends SS_Report {
 
 		
 		$query->from[] = "LEFT JOIN \"Member\" AS \"Approver\" ON \"WorkflowRequest\".\"ApproverID\" = \"Approver\".\"ID\"";
-		$query->select[] = Member::get_title_sql('Approver').' AS ApproverName';
+		$query->select[] = Member::get_title_sql('Approver').' AS "ApproverName"';
 			
 		
 		$join = '';
@@ -112,12 +112,17 @@ class PagesScheduledForDeletionReport extends SS_Report {
 			}
 			
 			if($field == 'BacklinkCount') {
-				$query->select[] = '(SELECT COUNT(*) FROM "SiteTree_LinkTracking" WHERE "SiteTree_LinkTracking"."ChildID" = "SiteTree"."ID") AS BacklinkCount';
+				$query->select[] = '(SELECT COUNT(*) FROM "SiteTree_LinkTracking" WHERE "SiteTree_LinkTracking"."ChildID" = "SiteTree"."ID") AS "BacklinkCount"';
 			}
 		}
 		
 		// Turn a query into records
 		if($sort) $query->orderby = $sort;
+		
+		// Postgres and MSSQL require these fields in the groupby[] array:
+		$query->groupby[]="\"Approver\".\"Surname\"";
+		$query->groupby[]="\"Approver\".\"FirstName\"";
+		
 		$records = singleton('SiteTree')->buildDataObjectSet($query->execute(), 'DataObjectSet', $query);
 
 		Versioned::reading_stage($stage);

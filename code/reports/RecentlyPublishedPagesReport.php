@@ -37,20 +37,20 @@ class RecentlyPublishedPagesReport extends SS_Report {
 	
 	function sourceRecords($params, $sort, $limit) {
 		$q = singleton('SiteTree')->extendedSQL();
-		$q->select[] = 'SiteTree.Title AS PageTitle';
+		$q->select[] = '"SiteTree"."Title" AS "PageTitle"';
 	
-		$q->leftJoin('WorkflowRequest', 'WorkflowRequest.PageID = SiteTree.ID');
-		$q->select[] = "WorkflowRequest.LastEdited as Published";
-		$q->where[] = "WorkflowRequest.ClassName = 'WorkflowPublicationRequest'";
-		$q->where[] = "WorkflowRequest.Status = 'Completed'";
+		$q->leftJoin('WorkflowRequest', '"WorkflowRequest"."PageID" = "SiteTree"."ID"');
+		$q->select[] = "\"WorkflowRequest\".\"LastEdited\" AS \"Published\"";
+		$q->where[] = "\"WorkflowRequest\".\"ClassName\" = 'WorkflowPublicationRequest'";
+		$q->where[] = "\"WorkflowRequest\".\"Status\" = 'Completed'";
 		
 		
-		$q->leftJoin('Member', 'WorkflowRequest.PublisherID = Member.ID');
-		$q->select[] = Member::get_title_sql().' as PublisherTitle';
+		$q->leftJoin('Member', '"WorkflowRequest"."PublisherID" = "Member"."ID"');
+		$q->select[] = Member::get_title_sql().' AS "PublisherTitle"';
 		
 		// restrict to member id
 		if (!empty($params['memberId']) && DataObject::get_by_id('Member', $params['memberId'])) {
-			$q->where[] = "Member.ID = ".Convert::raw2sql($params['memberId']);
+			$q->where[] = "\"Member\".\"ID\" = ".Convert::raw2sql($params['memberId']);
 		}
 		
 		$startDate = isset($params['StartDate']) ? $params['StartDate'] : null;
@@ -77,13 +77,13 @@ class RecentlyPublishedPagesReport extends SS_Report {
 		}
 		
 		if ($startDate && $endDate) {
-			$q->where[] = "WorkflowRequest.LastEdited >= '".Convert::raw2sql($startDate)."' AND WorkflowRequest.LastEdited <= '".Convert::raw2sql($endDate)."'";
+			$q->where[] = "\"WorkflowRequest\".\"LastEdited\" >= '".Convert::raw2sql($startDate)."' AND \"WorkflowRequest\".\"LastEdited\" <= '".Convert::raw2sql($endDate)."'";
 		} else if ($startDate && !$endDate) {
-			$q->where[] = "WorkflowRequest.LastEdited >= '".Convert::raw2sql($startDate)."'";
+			$q->where[] = "\"WorkflowRequest\".\"LastEdited\" >= '".Convert::raw2sql($startDate)."'";
 		} else if (!$startDate && $endDate) {
-			$q->where[] = "WorkflowRequest.LastEdited <= '".Convert::raw2sql($endDate)."'";
+			$q->where[] = "\"WorkflowRequest\".\"LastEdited\" <= '".Convert::raw2sql($endDate)."'";
 		} else {
-			$q->where[] = "WorkflowRequest.LastEdited >= '".SS_Datetime::now()->URLDate()."'";
+			$q->where[] = "\"WorkflowRequest\".\"LastEdited\" >= '".SS_Datetime::now()->URLDate()."'";
 		}
 		
 		
@@ -94,8 +94,8 @@ class RecentlyPublishedPagesReport extends SS_Report {
 			$direction = $parts[1];
 			
 			if($field == 'AbsoluteLink') {
-				$sort = 'URLSegment ' . $direction;
-			} elseif($field == 'Subsite.Title') {
+				$sort = '"URLSegment" ' . $direction;
+			} elseif($field == '"Subsite"."Title"') {
 				$q->from[] = 'LEFT JOIN "Subsite" ON "Subsite"."ID" = "SiteTree"."SubsiteID"';
 			}
 		
