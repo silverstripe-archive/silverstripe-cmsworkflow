@@ -1,8 +1,10 @@
 # CMS Workflow Module
 
 ## Maintainer Contact
-* Tom Rix (Nickname: trix)
-  <tom (at) silverstripe (dot) com>
+ * Mark Stephens
+   <mark (at) silverstripe (dot) com>
+ * Luke Hudson
+   <luke (at) silverstripe (dot) com>
  * Sam Minnee (Nickname: sminnee)
    <sam (at) silverstripe (dot) com>
  * Ingo Schommer (Nickname: chillu)
