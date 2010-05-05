@@ -5,10 +5,6 @@
    <mark (at) silverstripe (dot) com>
  * Luke Hudson
    <luke (at) silverstripe (dot) com>
- * Sam Minnee (Nickname: sminnee)
-   <sam (at) silverstripe (dot) com>
- * Ingo Schommer (Nickname: chillu)
-   <ingo (at) silverstripe (dot) com>
 
 ## Requirements
  * SilverStripe 2.4 or newer
