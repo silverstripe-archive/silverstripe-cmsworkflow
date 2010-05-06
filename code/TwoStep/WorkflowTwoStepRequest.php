@@ -13,7 +13,7 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		'WorkflowPublicationRequest' => array(
 			'request' => array(
 				'author' => false,
-				'publisher' => false
+				'publisher' => true
 			),
 			'approve' => array(
 				'author' => true,
@@ -40,7 +40,7 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		'WorkflowDeletionRequest' => array(
 			'request' => array(
 				'author' => false,
-				'publisher' => false
+				'publisher' => true
 			),
 			'approve' => array(
 				'author' => true,
