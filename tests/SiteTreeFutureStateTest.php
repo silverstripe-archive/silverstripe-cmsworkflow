@@ -195,7 +195,7 @@ class SiteTreeFutureStateTest extends SapphireTest {
 		$this->assertTrue(in_array($this->idFromFixture('Page', 'product5'), $pages));
 		$this->assertTrue(in_array($this->idFromFixture('VirtualPage', 'vproduct5'), $pages));
 		
-		SiteTreeFutureState::set_future_datetime('2020-01-01 9:00:00');
+		SiteTreeFutureState::set_future_datetime('2020-01-01 09:00:00');
 
 		$pages = DataObject::get("SiteTree")->column("ID");
 		$this->assertTrue(in_array($this->idFromFixture('Page', 'product5'), $pages));
@@ -237,7 +237,7 @@ class SiteTreeFutureStateTest extends SapphireTest {
 		$this->assertEquals('Product 1', $vp1->Title);
 
 		// Verify the the change isn't reflected in future state prior to the embargo date
-		SiteTreeFutureState::set_future_datetime('2019-01-01 9:30:00');
+		SiteTreeFutureState::set_future_datetime('2019-01-01 09:30:00');
 		singleton('Page')->flushCache();
 
 		$p1 = $this->objFromFixture('Page', 'product1');
