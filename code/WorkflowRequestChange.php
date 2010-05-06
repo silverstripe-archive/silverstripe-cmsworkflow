@@ -35,6 +35,8 @@ class WorkflowRequestChange extends DataObject {
 		'DiffLinkToLastPublished' => 'Varchar'
 	);
 	
+	public static $default_sort = "\"ID\" ASC";
+	
 	/**
 	 * @return WorkflowRequestChange
 	 */
