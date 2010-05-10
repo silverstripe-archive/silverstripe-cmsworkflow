@@ -171,6 +171,7 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 		
 		// test "publish" action for publisher
 		$this->session()->inst_set('loggedInAs', $custompublisher->ID);
+		WorkflowRequest::set_force_publishers_to_use_workflow(false);
 		$this->assertContains(
 			'action_publish',
 			$unpublishedRecord->getCMSActions()->column('Name'),
@@ -185,6 +186,20 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 			'action_publish',
 			$changedOnStageRecord->getCMSActions()->column('Name'),
 			'Publisher cant trigger publish button'
+		);
+
+		WorkflowRequest::set_force_publishers_to_use_workflow(true);
+		$this->assertFalse(
+				in_array('action_publish', $unpublishedRecord->getCMSActions()->column('Name')),
+				'Publisher can trigger publish button even when forced to use workflow'
+		);
+		$this->assertFalse(
+				in_array('action_publish', $publishedRecord->getCMSActions()->column('Name')),
+				'Publisher can trigger publish button even when forced to use workflow'
+		);
+		$this->assertFalse(
+				in_array('action_publish', $changedOnStageRecord->getCMSActions()->column('Name')),
+				'Publisher can trigger publish button even when forced to use workflow'
 		);
 		
 		// test "request publication" action for author
