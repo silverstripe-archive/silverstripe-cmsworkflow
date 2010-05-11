@@ -68,8 +68,8 @@ CLASS is one of either WorkflowPublicationRequest or WorkflowDeletionRequest
 EVENT is one of
 
  * request
- * publish
- * approve (3 step only)
+ * publish (3 step only)
+ * approve 
  * deny
  * cancel
  * comment
