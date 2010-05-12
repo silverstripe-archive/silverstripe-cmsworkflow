@@ -162,9 +162,16 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 */
 	public function comment($comment, $member = null, $notify = true) {
 		if(!$member) $member = Member::currentUser();
-		if(!$this->Page()->canEdit($member) && !$this->Page()->canPublish($member)) {
-			return false;
+		
+		// Switch to handle both 2 step & 3 step
+		$page = $this->Page();
+		$isWorkflowParticipant = $page->canEdit($member) || $page->canPublish($member);
+		if($page->hasMethod('canApprove')) {
+			$isWorkflowParticipant = $isWorkflowParticipant || $page->canApprove($member);
 		}
+		// Don't let people who aren't workflow participants comment
+		if(!$isWorkflowParticipant) return false;
+
 		$this->addNewChange($comment, null, $member);
 		if($notify) $this->notifyComment($comment);
 
