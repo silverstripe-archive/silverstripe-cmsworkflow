@@ -17,7 +17,7 @@ class WorkflowReportsTest extends FunctionalTest {
 	);
 
 	protected $illegalExtensions = array(
-		'SiteTree' => array('SiteTreeCMSThreeStepWorkflow'),
+		'SiteTree' => array('SiteTreeCMSThreeStepWorkflow', 'SiteTreeSubsites'),
 		'WorkflowRequest' => array('WorkflowThreeStepRequest'),
 		'LeftAndMain' => array('LeftAndMainCMSThreeStepWorkflow'),
 		'SiteConfig' => array('SiteConfigThreeStepWorkflow'),
