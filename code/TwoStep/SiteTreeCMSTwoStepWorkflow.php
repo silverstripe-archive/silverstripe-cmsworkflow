@@ -20,7 +20,9 @@ class SiteTreeCMSTwoStepWorkflow extends SiteTreeCMSWFDecorator {
 	}
 	
 	public function getOpenRequest($workflowClass) {
-		$wf = DataObject::get_one($workflowClass, "\"PageID\" = " . (int)$this->owner->ID . " AND \"Status\" NOT IN ('Completed', 'Denied', 'Cancelled')");
+		$bt = defined('DB::USE_ANSI_SQL') ? "\"" : "`";
+
+		$wf = DataObject::get_one($workflowClass, "{$bt}PageID{$bt} = " . (int)$this->owner->ID . " AND {$bt}Status{$bt} NOT IN ('Completed', 'Denied', 'Cancelled')");
 		if($wf) return $wf;
 		
 		return null;
@@ -136,26 +138,27 @@ class SiteTreeCMSTwoStepWorkflow extends SiteTreeCMSWFDecorator {
 	 * are deselected from a record - is this desired behaviour?
 	 */
 	function onAfterWrite() {
+		$bt = defined('DB::USE_ANSI_SQL') ? "\"" : "`";
+
 		if(!$this->owner->EditorGroups()->Count()) {
 			$SQL_group = Convert::raw2sql('site-content-authors');
-			$groupCheckObj = DataObject::get_one('Group', "\"Group\".\"Code\" = '{$SQL_group}'");
+			$groupCheckObj = DataObject::get_one('Group', "{$bt}Group{$bt}.{$bt}Code{$bt} = '{$SQL_group}'");
 			if($groupCheckObj) $this->owner->EditorGroups()->add($groupCheckObj);
 			
 			$SQL_group = Convert::raw2sql('site-content-publishers');
-			$groupCheckObj = DataObject::get_one('Group', "\"Group\".\"Code\" = '{$SQL_group}'");
+			$groupCheckObj = DataObject::get_one('Group', "{$bt}Group{$bt}.{$bt}Code{$bt} = '{$SQL_group}'");
 			if($groupCheckObj) $this->owner->EditorGroups()->add($groupCheckObj);
 		}
 		
 		if(!$this->owner->PublisherGroups()->Count()) {
 			$SQL_group = Convert::raw2sql('site-content-publishers');
-			$groupCheckObj = DataObject::get_one('Group', "\"Group\".\"Code\" = '{$SQL_group}'");
+			$groupCheckObj = DataObject::get_one('Group', "{$bt}Group{$bt}.{$bt}Code{$bt} = '{$SQL_group}'");
 			if($groupCheckObj) $this->owner->PublisherGroups()->add($groupCheckObj);
 		}
 
 	}
 
 	function augmentDefaultRecords() {
-		// For 2.3 and 2.4 compatibility
 		$bt = defined('DB::USE_ANSI_SQL') ? "\"" : "`";
 		
 		$query = "SELECT \"ID\" FROM {$bt}Group{$bt} WHERE {$bt}Group{$bt}.{$bt}Code{$bt} = 'site-content-authors'";

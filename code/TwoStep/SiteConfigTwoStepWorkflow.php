@@ -108,8 +108,10 @@ class SiteConfigTwoStepWorkflow extends DataObjectDecorator {
 	 */
 	function onAfterWrite() {
 		if(!$this->owner->PublisherGroups()->Count() && $this->owner->CanPublishType == 'OnlyTheseUsers') {
+			$bt = defined('DB::USE_ANSI_SQL') ? "\"" : "`";
+
 			$SQL_group = Convert::raw2sql('site-content-publishers');
-			$groupCheckObj = DataObject::get_one('Group', "\"Code\" = '{$SQL_group}'");
+			$groupCheckObj = DataObject::get_one('Group', "{$bt}Code{$bt} = '{$SQL_group}'");
 			if($groupCheckObj) $this->owner->PublisherGroups()->add($groupCheckObj);
 		}
 	}

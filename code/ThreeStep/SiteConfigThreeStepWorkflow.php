@@ -185,15 +185,17 @@ class SiteConfigThreeStepWorkflow extends DataObjectDecorator {
 	 * @return void
 	 */
 	function onAfterWrite() {
+		$bt = defined('DB::USE_ANSI_SQL') ? "\"" : "`";
+
 		if(!$this->owner->ApproverGroups()->Count() && $this->owner->CanApproveType == 'OnlyTheseUsers') {
 			$SQL_group = Convert::raw2sql('site-content-approvers');
-			$groupCheckObj = DataObject::get_one('Group', "\"Code\" = '{$SQL_group}'");
+			$groupCheckObj = DataObject::get_one('Group', "{$bt}Code{$bt} = '{$SQL_group}'");
 			if($groupCheckObj) $this->owner->ApproverGroups()->add($groupCheckObj);
 		}
 		
 		if(!$this->owner->PublisherGroups()->Count() && $this->owner->CanPublishType == 'OnlyTheseUsers') {
 			$SQL_group = Convert::raw2sql('site-content-publishers');
-			$groupCheckObj = DataObject::get_one('Group', "\"Code\" = '{$SQL_group}'");
+			$groupCheckObj = DataObject::get_one('Group', "{$bt}Code{$bt} = '{$SQL_group}'");
 			if($groupCheckObj) $this->owner->PublisherGroups()->add($groupCheckObj);
 		}
 	}

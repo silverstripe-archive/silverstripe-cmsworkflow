@@ -27,7 +27,8 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 	}
 	
 	function getOpenRequest($workflowClass) {
-		$wf = DataObject::get_one($workflowClass, "\"PageID\" = " . (int)$this->owner->ID . " AND \"Status\" NOT IN ('Completed', 'Denied', 'Cancelled')");
+		$bt = defined('DB::USE_ANSI_SQL') ? "\"" : "`";
+		$wf = DataObject::get_one($workflowClass, "{$bt}PageID{$bt} = " . (int)$this->owner->ID . " AND {$bt}Status{$bt} NOT IN ('Completed', 'Denied', 'Cancelled')");
 		if($wf) return $wf;
 		
 		return null;
@@ -268,25 +269,27 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 	 * @return void
 	 */
 	function onAfterWrite() {
+		$bt = defined('DB::USE_ANSI_SQL') ? "\"" : "`";
+
 		if(!$this->owner->EditorGroups()->Count()) {
 			$SQL_group = Convert::raw2sql('site-content-authors');
-			$groupCheckObj = DataObject::get_one('Group', "\"Code\" = '{$SQL_group}'");
+			$groupCheckObj = DataObject::get_one('Group', "{$bt}Code{$bt} = '{$SQL_group}'");
 			if($groupCheckObj) $this->owner->EditorGroups()->add($groupCheckObj);
 			
 			$SQL_group = Convert::raw2sql('site-content-publishers');
-			$groupCheckObj = DataObject::get_one('Group', "\"Code\" = '{$SQL_group}'");
+			$groupCheckObj = DataObject::get_one('Group', "{$bt}Code{$bt} = '{$SQL_group}'");
 			if($groupCheckObj) $this->owner->EditorGroups()->add($groupCheckObj);
 		}
 		
 		if($this->owner->CanApproveType == 'OnlyTheseUsers' && !$this->owner->ApproverGroups()->Count()) {
 			$SQL_group = Convert::raw2sql('site-content-approvers');
-			$groupCheckObj = DataObject::get_one('Group', "\"Code\" = '{$SQL_group}'");
+			$groupCheckObj = DataObject::get_one('Group', "{$bt}Code{$bt} = '{$SQL_group}'");
 			if($groupCheckObj) $this->owner->ApproverGroups()->add($groupCheckObj);
 		}
 		
 		if($this->owner->CanPublishType == 'OnlyTheseUsers' && !$this->owner->PublisherGroups()->Count()) {
 			$SQL_group = Convert::raw2sql('site-content-publishers');
-			$groupCheckObj = DataObject::get_one('Group', "\"Code\" = '{$SQL_group}'");
+			$groupCheckObj = DataObject::get_one('Group', "{$bt}Code{$bt} = '{$SQL_group}'");
 			if($groupCheckObj) $this->owner->PublisherGroups()->add($groupCheckObj);
 		}
 	}

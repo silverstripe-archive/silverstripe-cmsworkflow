@@ -324,7 +324,9 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	}
 	
 	function ApprovalDate() {
-		$change = DataObject::get_one('WorkflowRequestChange', "WorkflowRequestID = $this->ID AND Status = 'Approved'", "ID DESC");
+		$bt = defined('DB::USE_ANSI_SQL') ? "\"" : "`";
+
+		$change = DataObject::get_one('WorkflowRequestChange', "{$bt}WorkflowRequestID{$bt} = {$this->ID} AND {$bt}Status{$bt} = 'Approved'", "{$bt}ID{$bt} DESC");
 		return $change ? $change->Created : null;
 	}
 	
@@ -607,9 +609,11 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * 
 	 * @return string URL
 	 */
-	protected function getDiffLinkToLastPublished() {		
+	protected function getDiffLinkToLastPublished() {
+		$bt = defined('DB::USE_ANSI_SQL') ? "\"" : "`";
+
 		// Get the completed request change and ask it
-		$completedChange = DataObject::get_one('WorkflowRequestChange', "\"WorkflowRequestID\" = {$this->ID} AND \"Status\" = 'Completed'");
+		$completedChange = DataObject::get_one('WorkflowRequestChange', "{$bt}WorkflowRequestID{$bt} = {$this->ID} AND [$bt}Status{$bt} = 'Completed'");
 		if (!$completedChange) return false;
 		return $completedChange->getDiffLinkToLastPublished();
 	}
@@ -637,7 +641,6 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * @return DataObjectSet
 	 */
 	public static function get_by_author($class, $author, $status = null) {
-		// To ensure 2.3 and 2.4 compatibility
 		$bt = defined('DB::USE_ANSI_SQL') ? "\"" : "`";
 		
 		if($status) $statusStr = "'".implode("','", $status)."'";
@@ -670,7 +673,6 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * @return DataObjectSet
 	 */
 	public static function get($class, $status = null) {
-		// To ensure 2.3 and 2.4 compatibility
 		$bt = defined('DB::USE_ANSI_SQL') ? "\"" : "`";
 
 		if($status) $statusStr = implode(',', $status);
