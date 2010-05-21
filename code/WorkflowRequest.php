@@ -613,7 +613,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$bt = defined('DB::USE_ANSI_SQL') ? "\"" : "`";
 
 		// Get the completed request change and ask it
-		$completedChange = DataObject::get_one('WorkflowRequestChange', "{$bt}WorkflowRequestID{$bt} = {$this->ID} AND [$bt}Status{$bt} = 'Completed'");
+		$completedChange = DataObject::get_one('WorkflowRequestChange', "{$bt}WorkflowRequestID{$bt} = {$this->ID} AND {$bt}Status{$bt} = 'Completed'");
 		if (!$completedChange) return false;
 		return $completedChange->getDiffLinkToLastPublished();
 	}
