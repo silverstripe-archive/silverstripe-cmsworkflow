@@ -201,14 +201,19 @@ class SiteTreeFutureState_SilverStripeNavigatorItem extends SilverStripeNavigato
 	
 	function getHTML($page) {
 		Requirements::css('cmsworkflow/css/FutureStateNavigatorItem.css');
-		Requirements::javascript('jsparty/jquery/jquery.js');
-		Requirements::javascript('jsparty/jquery/plugins/livequery/jquery.livequery.js');
+		Requirements::javascript(THIRDPARTY_DIR .'/jquery/jquery.js');
+		Requirements::javascript(THIRDPARTY_DIR .'/jquery-livequery/jquery.livequery.js');
+		
 		Requirements::javascript('cmsworkflow/javascript/futurestate.js');
 		
 		// $datetimeField = new DatetimeField('FutureStateDate', 'Date');
 		// $datetimeField->getDateField()->setConfig('showcalendar', true);
 		// $datetimeField->getTimeField()->setConfig('showdropdown', true);
 		$datetimeField = new DatetimeField('FutureStateDate', 'Date');
+		
+		$datetimeField->getDateField()->setConfig('showcalendar', true);
+		$datetimeField->getTimeField()->setConfig('showdropdown', true);
+		
 		$datetime = SiteTreeFutureState::get_future_datetime();
 		if($datetime) {
 			$datetimeField->setValue($datetime);
@@ -236,6 +241,5 @@ class SiteTreeFutureState_SilverStripeNavigatorItem extends SilverStripeNavigato
 		if($date = SiteTreeFutureState::get_future_datetime()) {
 			return $page->AbsoluteLink() . '?futureDate=' . $date;
 		}
-	}
-	
+	}	
 }
