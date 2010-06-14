@@ -69,6 +69,10 @@ class WorkflowPublicationRequest extends WorkflowRequest {
 		if(self::$force_publishers_to_use_workflow && !Permission::checkMember(Member::currentUser(), 'IS_WORKFLOW_ADMIN')) {
 			$actions->removeByName('action_publish');
 		}
+		// Remove the save & publish button if you don't have edit rights
+		if(!$page->canEdit()) {
+			$actions->removeByName('action_publish');
+		}
 		
 		$liveVersion = Versioned::get_one_by_stage('SiteTree', 'Live', "\"SiteTree_Live\".\"ID\" = {$page->ID}");
 		if ($liveVersion && $liveVersion->ExpiryDate != null && $liveVersion->ExpiryDate != '0000-00-00 00:00:00') {
