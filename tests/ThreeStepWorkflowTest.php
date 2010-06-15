@@ -24,6 +24,18 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 	static $extensionsToReapply = array();
 	static $extensionsToRemoveAfter = array();
 	
+	function setUp() {
+		// Static publishing will just confuse things
+		StaticPublisher::$disable_realtime = true;
+		parent::setUp();
+	}
+	
+	function tearDown() {
+		parent::tearDown();
+		// Static publishing will just confuse things
+		StaticPublisher::$disable_realtime = false;
+	}
+	
 	function testWorkflowActions() {
 		$custompublisher = $this->objFromFixture('Member', 'custompublisher');
 		$customapprover = $this->objFromFixture('Member', 'customapprover');
@@ -56,10 +68,14 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 			$actions = array_flip($request->WorkflowActions());
 			$this->assertContains('cms_cancel', $actions);
 			$this->assertContains('cms_comment', $actions);
-			$this->assertContains('cms_requestedit', $actions);
-			$this->assertContains('cms_approve', $actions);
-			$this->assertContains('cms_deny', $actions);
+			$this->assertNotContains('cms_requestedit', $actions);
+			$this->assertNotContains('cms_approve', $actions);
+			$this->assertNotContains('cms_deny', $actions);
+
+			// next status
+			$this->logInAs($customapprover);
 			$request->approve("app");
+
 		// approved
 			// author
 			$this->logInAs($customauthor);
@@ -71,6 +87,7 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 			$this->assertNotContains('cms_deny', $actions);
 			// approver
 			$this->logInAs($customapprover);
+			
 			$actions = array_flip($request->WorkflowActions());
 			$this->assertContains('cms_cancel', $actions);
 			$this->assertContains('cms_comment', $actions);
@@ -144,6 +161,7 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
 	
 		$custompublisher = $this->objFromFixture('Member', 'custompublisher');
+		$customapprover = $this->objFromFixture('Member', 'customapprover');
 		$customauthor = $this->objFromFixture('Member', 'customauthor');
 		$customauthorgroup = $this->objFromFixture('Group', 'customauthorsgroup');
 	
@@ -154,7 +172,8 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		// Asset publisher can approve but author cannot
 		SiteTree::reset();
 		$this->assertFalse($page->canApprove($customauthor));
-		$this->assertTrue($page->canApprove($custompublisher));
+		$this->assertFalse($page->canApprove($custompublisher));
+		$this->assertTrue($page->canApprove($customapprover));
 		
 		// Add the author group, assert they can now approve
 		$page->CanApproveType = 'OnlyTheseUsers';
@@ -169,6 +188,7 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		// Get fixtures
 		$page = $this->objFromFixture('SiteTree', 'embargoexpirypage');
 		$custompublisher = $this->objFromFixture('Member', 'custompublisher');
+		$customapprover = $this->objFromFixture('Member', 'customapprover');
 		$customauthor = $this->objFromFixture('Member', 'customauthor');
 	
 		$this->session()->inst_set('loggedInAs', $customauthor->ID);
@@ -193,9 +213,9 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		
 		$request = $page->openWorkflowRequest('WorkflowPublicationRequest');
 		
-		// Login as publisher and approve page
-		$custompublisher->logIn();
-		$this->session()->inst_set('loggedInAs', $custompublisher->ID);
+		// Login as approve and approve page
+		$customapprover->logIn();
+		$this->session()->inst_set('loggedInAs', $customapprover->ID);
 		$this->assertEquals(true, $request->approve('Looks good. Will go out a bit later'),
 			'Publisher ('.Member::currentUser()->Email.') can approve page');
 	
@@ -291,6 +311,7 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		$page5 = $this->objFromFixture('SiteTree', 'batchTest5');
 		$custompublisher = $this->objFromFixture('Member', 'custompublisher');
 		$customauthor = $this->objFromFixture('Member', 'customauthor');
+		$customapprover = $this->objFromFixture('Member', 'customapprover');
 	
 		// Modify content
 		$page1->Title = rand();$page1->write();
@@ -334,8 +355,8 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		}
 		
 		// Batch approve
-		$custompublisher->logIn();
-		$this->session()->inst_set('loggedInAs', $custompublisher->ID);
+		$customapprover->logIn();
+		$this->session()->inst_set('loggedInAs', $customapprover->ID);
 		
 		$_REQUEST['ajax'] = 1;
 		
@@ -387,6 +408,8 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		}
 		
 		// Batch publish
+		$custompublisher->logIn();
+
 		$action = new BatchPublishPages();
 		$this->assertTrue(is_string($action->getActionTitle()));
 		$this->assertTrue(is_string($action->getDoingText()));

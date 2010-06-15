@@ -23,7 +23,20 @@ class WorkflowRequestTest extends FunctionalTest {
 	protected $requireDefaultRecordsFrom = array(
 		'WorkflowSystemMember'
 	);
+
 	
+	function setUp() {
+		// Static publishing will just confuse things
+		StaticPublisher::$disable_realtime = true;
+		parent::setUp();
+	}
+	
+	function tearDown() {
+		parent::tearDown();
+		// Static publishing will just confuse things
+		StaticPublisher::$disable_realtime = false;
+	}
+		
 	function testEachPageCanHaveOnlyOpenOpenRequest() {
 		$page = $this->objFromFixture('SiteTree', 'custompublisherpage');
 		

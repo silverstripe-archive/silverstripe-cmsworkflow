@@ -24,6 +24,18 @@ class WorkflowReportsTest extends FunctionalTest {
 		'SiteConfig' => array('SiteConfigThreeStepWorkflow'),
 	);
 	
+	function setUp() {
+		// Static publishing will just confuse things
+		StaticPublisher::$disable_realtime = true;
+		parent::setUp();
+	}
+	
+	function tearDown() {
+		parent::tearDown();
+		// Static publishing will just confuse things
+		StaticPublisher::$disable_realtime = false;
+	}
+	
 	function testPagesScheduledForPublishingReport() {
 		$report = new PagesScheduledForPublishingReport();
 		$this->assertTrue(is_string($report->title()));

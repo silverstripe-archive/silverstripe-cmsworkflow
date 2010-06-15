@@ -189,9 +189,6 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 
 		// check for (workflow)admin permission
 		if(Permission::checkMember($member, array('ADMIN', 'IS_WORKFLOW_ADMIN'))) return true;
-		
-		if ($this->canPublish($member)) return true;
-		
 		$results = self::can_approve_multiple(array($this->owner->ID), $memberID);
 		return isset($results[$this->owner->ID]) ? $results[$this->owner->ID] : false;
 	}
