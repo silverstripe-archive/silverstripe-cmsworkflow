@@ -16,6 +16,10 @@ class BatchPublishPages extends CMSBatchAction {
 		$count = array();
 		$count['PUBLISH_SUCCESS'] = $count['DELETE_SUCCESS'] = 0;
 		$count['PUBLISH_FAILURE'] = $count['DELETE_FAILURE'] = 0;
+		
+		$arbitraryPage = $pages->First();
+		$arbitraryPage->invokeWithExtensions('onBeforeBatchPublish', $pages);
+		
 		foreach($pages as $page) {
 			$type = ($page->openWorkflowRequest() instanceof WorkflowDeletionRequest)
 				? 'DELETE' : 'PUBLISH';
@@ -38,6 +42,8 @@ class BatchPublishPages extends CMSBatchAction {
 			$page->destroy();
 			unset($page);
 		}
+
+		$arbitraryPage->invokeWithExtensions('onAfterBatchPublish', $pages);
 		
 		$messages = array(
 			'PUBLISH_SUCCESS' => _t('BatchPublishPages.PUBLISH_SUCCESS', 'Published %d pages.'),
