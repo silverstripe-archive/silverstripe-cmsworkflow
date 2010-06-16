@@ -90,7 +90,7 @@ class WorkflowPublicationRequest extends WorkflowRequest {
 			&& $page->stagesDiffer('Stage', 'Live')
 			&& $page->Version > 1 // page has been saved at least once
 			&& !$page->IsDeletedFromStage
-			&& !$page->canPublish() // if they can publish, they don't need to request it.
+			&& (!$page->canPublish() || self::$publisher_can_create_wf_requests)
 		) {
 			$actions->push(
 				$requestPublicationAction = new FormAction(

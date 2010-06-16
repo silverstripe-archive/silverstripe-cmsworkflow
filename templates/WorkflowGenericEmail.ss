@@ -67,7 +67,7 @@
 							<li><a href="$LiveSiteLink"><% _t('WorkflowRequest.VIEWPUBLISHEDLINK','View this page on the website') %></a></li>
 						</ul>
 						<br />
-						<% sprintf(_t('WorkflowRequest.EMAILTHANKS','Thanks, the %s web team'), $SiteConfig.Title) %>
+						<% sprintf(_t('WorkflowRequest.EMAILTHANKS','Thanks, the %s web team'),$SiteConfig.Title) %>
 					</td>
 				</tr>
 			</tbody>

@@ -122,7 +122,18 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 			}
 		}
 	}
-	
+
+	/**
+	 * Set this to true if publishers and admins can request new workflows.
+	 * This can be useful, for example for a publisher to modify
+	 * embargo and expiry in a workflow, they need to edit this in the workflow.
+	 * Or if they want to create a workflow for a change so it is tracked.
+	 */
+	protected static $publisher_can_create_wf_requests = true;
+	public function set_publisher_can_create_wf_requests($val) {
+		self::$publisher_can_create_wf_requests = $val;
+	}
+
 	/**
 	 * @ignore
 	 */
