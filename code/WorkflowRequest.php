@@ -492,7 +492,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 					$email[0], // sender
 					$email[1], // recipient
 					$comment,
-					'cancelled changes'
+					'requested edit'
 				);
 			}
 		}
