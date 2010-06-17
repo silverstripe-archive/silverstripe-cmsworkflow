@@ -43,7 +43,7 @@
 					<td scope="row" colspan="2" class="typography">
 						<% sprintf(_t('WorkflowRequest.EMAILGREETING','Hi %s'),$Recipient.Title) %>,<br />
 						
-						<p>$Sender.Title has made changes to $Page.Title and has $RequestedAction.</p>
+						<p>$Sender.Title has $ActionOnPage $Page.Title and has $RequestedAction.</p>
 						
 						<% if Comment %>
 						<h2><% _t('WorkflowRequest.COMMENT_HEADING','Comment') %></h2>
