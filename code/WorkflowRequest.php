@@ -648,13 +648,16 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	/**
 	 * Get all publication requests by a specific author
 	 * 
-	 * @param Member $author
+	 * @param String $class		The base class of the requests to fetch
+	 * @param Member $author	The author who created the request
 	 * @return DataObjectSet
 	 */
 	public static function get_by_author($class, $author, $status = null) {
 		$bt = defined('DB::USE_ANSI_SQL') ? "\"" : "`";
 		
-		if($status) $statusStr = "'".implode("','", $status)."'";
+		if($status) {
+			$statusStr = "'" . (is_array($status) ? implode("','", $status) : $status ) . "'";
+		}
 
 		$classes = (array)ClassInfo::subclassesFor($class);
 		$classes[] = $class;
@@ -667,7 +670,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		if($status) {
 			$filter .= "AND {$bt}WorkflowRequest{$bt}.{$bt}Status{$bt} IN (" . $statusStr . ")";
 		}
-		
+
 		return DataObject::get(
 			"SiteTree", 
 			$filter, 
