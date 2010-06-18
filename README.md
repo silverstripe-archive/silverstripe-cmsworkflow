@@ -34,7 +34,7 @@ Attach the following decorators in your `mysite/_config.php`:
 	Object::remove_extension('WorkflowRequest', 'WorkflowTwoStepRequest');
 	Object::remove_extension('SiteTree', 'SiteTreeCMSTwoStepWorkflow');
 	Object::remove_extension('SiteConfig', 'SiteConfigTwoStepWorkflow');
-	i// add three-step decorators
+	// add three-step decorators
 	Object::add_extension('WorkflowRequest', 'WorkflowThreeStepRequest');
 	Object::add_extension('SiteTree', 'SiteTreeCMSThreeStepWorkflow');
 	Object::add_extension('LeftAndMain', 'LeftAndMainCMSThreeStepWorkflow');
@@ -77,5 +77,19 @@ EVENT is one of
 GROUP is either author or publisher or approver
 
 NOTIFY is either true or false
+
+## Customising strings via translation
+
+The cmsworkflow uses the translation facilities of SilverStripe extensively.
+This allows us to support the module in different languages, with many
+languages available out of the box.
+
+If you want to customise these strings further, there is another module
+called customtranslation that allows you to override the strings provided
+in the lang files, without changing the lang files. The module can override
+strings across the whole site, not just cmsworkflow. customtranslation will
+be supported for SilverStripe 2.4.1 and up.
+
+See [customtranslation on silverstripe.org](http://silverstripe.org/custom-translations-module/)
 
 
