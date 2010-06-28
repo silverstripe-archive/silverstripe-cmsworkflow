@@ -98,12 +98,12 @@ class WorkflowRequestChangeTest extends FunctionalTest {
 		$this->assertTrue($secondChange->PreviousChange()->ID == $firstChange->ID);
 		
 		$this->assertEquals($firstChange->getStatusDescription(), 'Awaiting Approval');
-		$this->assertEquals($firstChange->getDiffLinkToLastPublished(), 'admin/compareversions/2/?From=2&To=3');
-		$this->assertEquals($secondChange->getDiffLinkToLastPublished(), 'admin/compareversions/2/?From=3&To=3');
-		$this->assertEquals($secondChange->getDiffLinkToOriginalRequest(), 'admin/compareversions/2/?From=2&To=3');
-		$this->assertEquals($secondChange->getDiffLinkOriginalToLastPublished(), 'admin/compareversions/2/?From=3&To=3');
-		$this->assertEquals($secondChange->getDiffLinkToPrevious(), 'admin/compareversions/2/?From=2&To=3');
-		$this->assertEquals($secondChange->getDiffLinkContentToPrevious(), '<a href="admin/compareversions/2/?From=2&To=3" target="_blank" class="externallink">Show</a>');
+		$this->assertEquals($firstChange->getDiffLinkToLastPublished(), "admin/compareversions/{$page->ID}/?From=2&To=3");
+		$this->assertEquals($secondChange->getDiffLinkToLastPublished(), "admin/compareversions/{$page->ID}/?From=3&To=3");
+		$this->assertEquals($secondChange->getDiffLinkToOriginalRequest(), "admin/compareversions/{$page->ID}/?From=2&To=3");
+		$this->assertEquals($secondChange->getDiffLinkOriginalToLastPublished(), "admin/compareversions/{$page->ID}/?From=3&To=3");
+		$this->assertEquals($secondChange->getDiffLinkToPrevious(), "admin/compareversions/{$page->ID}/?From=2&To=3");
+		$this->assertEquals($secondChange->getDiffLinkContentToPrevious(), "<a href=\"admin/compareversions/{$page->ID}/?From=2&To=3\" target=\"_blank\" class=\"externallink\">Show</a>");
 		
 		
 		
