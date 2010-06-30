@@ -130,9 +130,9 @@ class WorkflowPublicationRequest extends WorkflowRequest {
 		
 		// Only publish the page if it hasn't already been published elsewhere.  This occurs when
 		// SiteTree::doPublish() 'auto-closes' an open workflow
-		if($page->getIsModifiedOnStage()) {
+		//if($page->getIsModifiedOnStage()) {
 			$page->doPublish();
-		}
+		//}
 		if($notify) $this->notifyPublished($comment);
 		
 		$this->addNewChange($comment, $this->Status, DataObject::get_by_id('Member', $this->PublisherID));
