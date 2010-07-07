@@ -69,7 +69,7 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 	 */
 	function canBatchApprove($member = null) {
 		$request = $this->owner->openWorkflowRequest();
-		return $request && $request->Status == 'AwaitingApproval' && $this->owner->canPublish($member);
+		return $request && $request->Status == 'AwaitingApproval' && $this->owner->canApprove($member);
 	}
 	
 	function canDenyRequests() {
