@@ -92,7 +92,7 @@ class WorkflowPublicationRequest extends WorkflowRequest {
 			&& $page->canEdit() 
 			&& $isPublishable
 			&& $page->stagesDiffer('Stage', 'Live')
-			&& $page->Version > 1 // page has been saved at least once
+			&& ($page->Version > 1 || $page->Title != "New Page") // page has been saved at least once
 			&& !$page->IsDeletedFromStage
 			&& (!$page->canPublish() || self::$publisher_can_create_wf_requests)
 		) {
