@@ -50,17 +50,6 @@
 						<p>$Comment</p>
 						<% end_if %>
 						
-						<% control Workflow %>
-						<% if Diff.ChangedFields %>
-						<dl id="CMSWorkflowDiff">
-						<% control Diff.ChangedFields %>
-							<dt>$Title</dt>
-							<dd>$Diff</dd>
-						<% end_control %>
-						</dl>
-						<% end_if %>
-						<% end_control %>
-						
 						<h2>Actions</h2>
 						<ul>
 							<li><a href="$PageCMSLink"><% _t('WorkflowRequest.VIEWCMSLINK','View this page in the CMS to action the request') %></a></li>
