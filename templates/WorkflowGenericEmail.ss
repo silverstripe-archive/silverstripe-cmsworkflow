@@ -53,7 +53,7 @@
 						<h2>Actions</h2>
 						<ul>
 							<li><a href="$PageCMSLink"><% _t('WorkflowRequest.VIEWCMSLINK','View this page in the CMS to action the request') %></a></li>
-							<li><a href="$LiveSiteLink"><% _t('WorkflowRequest.VIEWPUBLISHEDLINK','View this page on the website') %></a></li>
+							<li><a href="$StageSiteLink"><% _t('WorkflowRequest.VIEWPUBLISHEDLINK','View this page on the website') %></a></li>
 						</ul>
 						<br />
 						<% sprintf(_t('WorkflowRequest.EMAILTHANKS','Thanks, the %s web team'),$SiteConfig.Title) %>
