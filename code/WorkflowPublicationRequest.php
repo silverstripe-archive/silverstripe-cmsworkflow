@@ -122,18 +122,26 @@ class WorkflowPublicationRequest extends WorkflowRequest {
 		
 		// We have to mark as completed now, or we'll get
 		// recursion from SiteTreeCMSWorkflow::onAfterPublish.
-		$this->Status = 'Completed';
-		$this->PublisherID = $member->ID;
-		$this->write();
-		
 		$page = $this->Page();
+
+		// Embargo means we go Approved -> Scheduled
+		if($this->EmbargoDate) {
+			$this->setSchedule();
+
+		// Otherwise we go Approved -> Published
+		} else {
+			$this->Status = 'Completed';
+			$this->PublisherID = $member->ID;
+			$this->write();
 		
-		// Only publish the page if it hasn't already been published elsewhere.  This occurs when
-		// SiteTree::doPublish() 'auto-closes' an open workflow
-		//if($page->getIsModifiedOnStage()) {
-			$page->doPublish();
-		//}
-		if($notify) $this->notifyPublished($comment);
+			// Only publish the page if it hasn't already been published elsewhere.  This occurs when
+			// SiteTree::doPublish() 'auto-closes' an open workflow
+			//if($page->getIsModifiedOnStage()) {
+				$page->doPublish();
+			//}
+
+			if($notify) $this->notifyPublished($comment);
+		}
 		
 		$this->addNewChange($comment, $this->Status, DataObject::get_by_id('Member', $this->PublisherID));
 
