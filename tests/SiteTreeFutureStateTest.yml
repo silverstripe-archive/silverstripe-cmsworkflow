@@ -38,8 +38,8 @@ Page:
     products:
         Title: Products
     embargotest:
-        Title: Product 6
-        URLSegment: product-6
+        Title: Product on embargo
+        URLSegment: product-embargo
         Sort: 5
     product1:
         Title: Product 1
@@ -60,6 +60,7 @@ Page:
         Sort: 4
     product5:
         Title: Product 5
+        URLSegment: product-5
         Parent: =>Page.products
         Sort: 5
     contact:

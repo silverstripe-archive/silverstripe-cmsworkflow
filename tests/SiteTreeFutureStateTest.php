@@ -38,24 +38,24 @@ class SiteTreeFutureStateTest extends SapphireTest {
 
 		$request->approve('Looks good.');
 		
-		$prodDraft = DataObject::get_one('SiteTree', "{$bt}URLSegment{$bt} = 'product-6'");
+		$prodDraft = DataObject::get_one('SiteTree', "{$bt}URLSegment{$bt} = 'product-embargo'");
 		$this->assertEquals('New Title', $prodDraft->Title, 'Correct page on draft site.');
 		
-		$prodLiveNow = Versioned::get_one_by_stage('SiteTree', 'Live', "{$bt}URLSegment{$bt} = 'product-6'");
-		$this->assertEquals('Product 6', $prodLiveNow->Title, 'Correct page on live site.');
+		$prodLiveNow = Versioned::get_one_by_stage('SiteTree', 'Live', "{$bt}URLSegment{$bt} = 'product-embargo'");
+		$this->assertEquals('Product on embargo', $prodLiveNow->Title, 'Correct page on live site.');
 		
 		SiteTreeFutureState::set_future_datetime('2020-06-01 14:00:00');
-		$prodBeforeEmbargo = DataObject::get_one('SiteTree', "{$bt}URLSegment{$bt} = 'product-6'");
-		$this->assertEquals('Product 6', $prodBeforeEmbargo->Title, 'Correct page before embargo.');
+		$prodBeforeEmbargo = DataObject::get_one('SiteTree', "{$bt}URLSegment{$bt} = 'product-embargo'");
+		$this->assertEquals('Product on embargo', $prodBeforeEmbargo->Title, 'Correct page before embargo.');
 
 		SiteTreeFutureState::set_future_datetime('2020-06-02 16:00:00');
-		$prodAfterEmbargo = DataObject::get_one('SiteTree', "{$bt}URLSegment{$bt} = 'product-6'");
+		$prodAfterEmbargo = DataObject::get_one('SiteTree', "{$bt}URLSegment{$bt} = 'product-embargo'");
 
 		$this->assertEquals('New Title', $prodAfterEmbargo->Title, 'Correct page after embargo.');
 		
 
 		SiteTreeFutureState::set_future_datetime('2020-06-07 16:00:00');
-		$prodAfterExpiry = DataObject::get_one('SiteTree', "{$bt}URLSegment{$bt} = 'product-6'");
+		$prodAfterExpiry = DataObject::get_one('SiteTree', "{$bt}URLSegment{$bt} = 'product-embargo'");
 		$this->assertFalse($prodAfterExpiry, 'No page after expiry.');
 		
 		
