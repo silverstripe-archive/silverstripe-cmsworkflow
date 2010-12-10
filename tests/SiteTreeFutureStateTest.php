@@ -8,6 +8,7 @@ class SiteTreeFutureStateTest extends SapphireTest {
 
 	protected $illegalExtensions = array(
 		'SiteTree' => array('SiteTreeCMSTwoStepWorkflow'),
+		'SiteConfig' => array('SiteConfigTwoStepWorkflow'),
 		'WorkflowRequest' => array('WorkflowTwoStepRequest'),
 	);
 

@@ -10,6 +10,7 @@ class TwoStepWorkflowReportsTest extends FunctionalTest {
 	protected $requiredExtensions = array(
 		'SiteTree' => array('SiteTreeCMSTwoStepWorkflow'),
 		'WorkflowRequest' => array('WorkflowTwoStepRequest'),
+		'SiteConfig' => array('SiteConfigTwoStepWorkflow'),
 	);
 
 	protected $illegalExtensions = array(
