@@ -8,6 +8,12 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 		'cms_denypublication',
 		'cms_denydeletion',
 		'cms_setembargoexpiry',
+		'cms_comment',
+		'cms_approve',
+		'cms_cancelexpiry',
+		'cms_requestedit',
+		'cms_deny',
+		'cms_cancel',
 	);
 
 	public static function set_prompt_admin_for_comments($enable) {

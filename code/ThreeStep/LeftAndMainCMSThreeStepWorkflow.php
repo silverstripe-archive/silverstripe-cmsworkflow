@@ -7,6 +7,11 @@
  * @subpackage ThreeStep
  */
 class LeftAndMainCMSThreeStepWorkflow extends LeftAndMainDecorator {
+	
+	public static $allowed_actions = array(
+		'cms_publish',
+	);
+	
 	// action
 	public function init() {
 		parent::init();
