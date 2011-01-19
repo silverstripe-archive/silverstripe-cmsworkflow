@@ -317,17 +317,21 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		// Test awaiting approval filters
 		$filter = new CMSWorkflowThreeStepFilters_PagesAwaitingApproval();
 		$this->assertTrue(is_string(CMSWorkflowThreeStepFilters_PagesAwaitingApproval::title()));
-		$filter->getTree();
-		$this->assertTrue($filter->includeInTree($page1));
-		$this->assertTrue($filter->includeInTree($page2));
-		$this->assertTrue($filter->includeInTree($page3));
-		$this->assertTrue($filter->includeInTree($page4));
+		$this->assertTrue($filter->isPageIncluded($page1));
+		$this->assertTrue($filter->isPageIncluded($page2));
+		$this->assertTrue($filter->isPageIncluded($page3));
+		$this->assertTrue($filter->isPageIncluded($page4));
 		
 		// Batch approve
 		$custompublisher->logIn();
 		$this->session()->inst_set('loggedInAs', $custompublisher->ID);
 		
 		$_REQUEST['ajax'] = 1;
+		
+		// Simulate response and request for batch action
+		$controller = Controller::curr(); 
+		$req = new NullHTTPRequest();
+		$controller->handleRequest(new SS_HTTPRequest('GET', 'admin')); 
 		
 		$pageIds = $doSet->column('ID');
 		
@@ -356,11 +360,10 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		// Test awaiting publication filters
 		$filter = new CMSWorkflowThreeStepFilters_PagesAwaitingPublishing();
 		$this->assertTrue(is_string(CMSWorkflowThreeStepFilters_PagesAwaitingPublishing::title()));
-		$filter->getTree();
-		$this->assertTrue($filter->includeInTree($page1));
-		$this->assertTrue($filter->includeInTree($page2));
-		$this->assertTrue($filter->includeInTree($page3));
-		$this->assertTrue($filter->includeInTree($page4));
+		$this->assertTrue($filter->isPageIncluded($page1));
+		$this->assertTrue($filter->isPageIncluded($page2));
+		$this->assertTrue($filter->isPageIncluded($page3));
+		$this->assertTrue($filter->isPageIncluded($page4));
 		
 		// Batch publish
 		$action = new BatchPublishPages();
