@@ -371,6 +371,7 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		$filter = new CMSWorkflowThreeStepFilters_PagesAwaitingPublishing();
 		$this->assertTrue(is_string(CMSWorkflowThreeStepFilters_PagesAwaitingPublishing::title()));
 		
+		// If it is ss2.4
 		if($filter->hasMethod('includeInTree')) {
 			$filter->getTree();
 			$this->assertTrue($filter->includeInTree($page1));
