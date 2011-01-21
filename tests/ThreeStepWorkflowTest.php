@@ -317,10 +317,21 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		// Test awaiting approval filters
 		$filter = new CMSWorkflowThreeStepFilters_PagesAwaitingApproval();
 		$this->assertTrue(is_string(CMSWorkflowThreeStepFilters_PagesAwaitingApproval::title()));
-		$this->assertTrue($filter->isPageIncluded($page1));
-		$this->assertTrue($filter->isPageIncluded($page2));
-		$this->assertTrue($filter->isPageIncluded($page3));
-		$this->assertTrue($filter->isPageIncluded($page4));
+		
+		// If it is ss2.4
+		if($filter->hasMethod('includeInTree')) {
+			$filter->getTree();
+			$this->assertTrue($filter->includeInTree($page1));
+			$this->assertTrue($filter->includeInTree($page2));
+			$this->assertTrue($filter->includeInTree($page3));
+			$this->assertTrue($filter->includeInTree($page4));
+		}
+		else {
+			$this->assertTrue($filter->isPageIncluded($page1));
+			$this->assertTrue($filter->isPageIncluded($page2));
+			$this->assertTrue($filter->isPageIncluded($page3));
+			$this->assertTrue($filter->isPageIncluded($page4));
+		}
 		
 		// Batch approve
 		$custompublisher->logIn();
@@ -330,7 +341,6 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		
 		// Simulate response and request for batch action
 		$controller = Controller::curr(); 
-		$req = new NullHTTPRequest();
 		$controller->handleRequest(new SS_HTTPRequest('GET', 'admin')); 
 		
 		$pageIds = $doSet->column('ID');
@@ -360,10 +370,20 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		// Test awaiting publication filters
 		$filter = new CMSWorkflowThreeStepFilters_PagesAwaitingPublishing();
 		$this->assertTrue(is_string(CMSWorkflowThreeStepFilters_PagesAwaitingPublishing::title()));
-		$this->assertTrue($filter->isPageIncluded($page1));
-		$this->assertTrue($filter->isPageIncluded($page2));
-		$this->assertTrue($filter->isPageIncluded($page3));
-		$this->assertTrue($filter->isPageIncluded($page4));
+		
+		if($filter->hasMethod('includeInTree')) {
+			$filter->getTree();
+			$this->assertTrue($filter->includeInTree($page1));
+			$this->assertTrue($filter->includeInTree($page2));
+			$this->assertTrue($filter->includeInTree($page3));
+			$this->assertTrue($filter->includeInTree($page4));
+		}
+		else {
+			$this->assertTrue($filter->isPageIncluded($page1));
+			$this->assertTrue($filter->isPageIncluded($page2));
+			$this->assertTrue($filter->isPageIncluded($page3));
+			$this->assertTrue($filter->isPageIncluded($page4));
+		}
 		
 		// Batch publish
 		$action = new BatchPublishPages();
