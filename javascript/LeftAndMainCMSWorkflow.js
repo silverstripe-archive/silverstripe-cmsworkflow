@@ -134,12 +134,15 @@ var EmbargoExpiry = {
 	expiryUnsaved: false,
 	init: function() {
 		EmbargoExpiry.fieldCheck();
-		
-		$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Date]'] = true;
-		$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[Time]'] = true;
+
+		var ids = EmbargoExpiry.ids('embaro');
+		if($(ids.dateField)) $('Form_EditForm').changeDetection_fieldsToIgnore[$(ids.dateField).name] = true;
+		if($(ids.timeField)) $('Form_EditForm').changeDetection_fieldsToIgnore[$(ids.timeField).name] = true;
+		ids = EmbargoExpiry.ids('expiry');
+		if($(ids.dateField)) $('Form_EditForm').changeDetection_fieldsToIgnore[$(ids.dateField).name] = true;
+		if($(ids.timeField)) $('Form_EditForm').changeDetection_fieldsToIgnore[$(ids.timeField).name] = true;
+
 		$('Form_EditForm').changeDetection_fieldsToIgnore['ExpiryDate[TimeZone]'] = true;
-		$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[Date]'] = true;
-		$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[Time]'] = true;
 		$('Form_EditForm').changeDetection_fieldsToIgnore['EmbargoDate[TimeZone]'] = true;
 		
 		EmbargoExpiry.embargoUnsaved = false;
@@ -151,17 +154,16 @@ var EmbargoExpiry = {
 		var url = 'admin/cms_setembargoexpiry?wfRequest='+$('WorkflowRequest_ID').value;
 		var ids = EmbargoExpiry.ids(what);
 
+		url += '&' + escape($(ids.dateField).name)+'='+escape($(ids.dateField).value)+'&' + escape($(ids.timeField).name) + '='+escape($(ids.timeField).value);
 		if (what == 'embargo') {
-			url += '&EmbargoDate[Date]='+escape($(ids.dateField).value)+'&EmbargoDate[Time]='+escape($(ids.timeField).value);
 			EmbargoExpiry.embargoUnsaved = false;
 		} else if (what == 'expiry') {
-			url += '&ExpiryDate[Date]='+escape($(ids.dateField).value)+'&ExpiryDate[Time]='+escape($(ids.timeField).value);
 			EmbargoExpiry.expiryUnsaved = false;
 		}
 		
 		if ($(ids.timezoneField)) {
 			var timezone = $(ids.timezoneField).options[$(ids.timezoneField).selectedIndex].value;
-			url += '&EmbargoDate[TimeZone]='+escape(timezone);
+			url += '&' + escape($(ids.timezoneField).name) + '='+escape(timezone);
 		}
 
 		if ($(ids.dateField).value == '' || $(ids.timeField).value == '') {
@@ -219,13 +221,24 @@ var EmbargoExpiry = {
 		alert("There was an error processing that request:\n\n"+data.message);
 	},
 	ids: function(forWhat) {
+		var dateSuffix, timeSuffix;
+		if(document.getElementById('ExpiryDate_Date') || document.getElementById('EmbargoDate_Date')) {
+			// PopupDateTimeField
+			dateSuffix = '_Date';
+			timeSuffix = '_Time';
+		} else {
+			// DateTimeField
+			dateSuffix = '-date';
+			timeSuffix = '-time';
+		}
+		
 		switch(forWhat) {
 			case 'expiry':
 				return {
 					resetButton: 'resetExpiryButton',
 					saveButton: 'saveExpiryButton',
-					dateField: 'ExpiryDate_Date',
-					timeField: 'ExpiryDate_Time',
+					dateField: 'ExpiryDate' + dateSuffix,
+					timeField: 'ExpiryDate' + timeSuffix,
 					timezoneField: 'ExpiryDate_TimeZone',
 					wholeMessage: 'embargoExpiry-expiryStatus',
 					dateTime: 'expiryDate',
@@ -235,8 +248,8 @@ var EmbargoExpiry = {
 				return {
 					resetButton: 'resetEmbargoButton',
 					saveButton: 'saveEmbargoButton',
-					dateField: 'EmbargoDate_Date',
-					timeField: 'EmbargoDate_Time',
+					dateField: 'EmbargoDate' + dateSuffix,
+					timeField: 'EmbargoDate' + timeSuffix,
 					timezoneField: 'EmbargoDate_TimeZone',
 					wholeMessage: 'embargoExpiry-embargoStatus',
 					dateTime: 'embargoDate',

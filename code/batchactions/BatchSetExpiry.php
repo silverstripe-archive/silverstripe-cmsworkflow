@@ -10,7 +10,9 @@ class BatchSetExpiry extends CMSBatchAction {
 
 	function run(DataObjectSet $pages) {
 		if(class_exists('TZDateTimeField')) $datefield = new TZDateTimeField('TZConvert', $_REQUEST['ExpiryDate_Batch'], SiteConfig::current_site_config()->Timezone);
-		else $datefield = new PopupDateTimeField('ExpiryDate_Batch');
+		else if(class_exists('PopupDateTimeField')) $datefield = new PopupDateTimeField('ExpiryDate_Batch');
+		else $datefield = new DateTimeField('EmbargoDate_Batch');
+
 		$datefield->setValue($_REQUEST['ExpiryDate_Batch']);
 		
 		$date = date('d/m/Y', strtotime($datefield->Value()));
