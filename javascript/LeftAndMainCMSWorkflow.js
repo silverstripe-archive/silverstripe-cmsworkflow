@@ -135,7 +135,7 @@ var EmbargoExpiry = {
 	init: function() {
 		EmbargoExpiry.fieldCheck();
 
-		var ids = EmbargoExpiry.ids('embaro');
+		var ids = EmbargoExpiry.ids('embargo');
 		if($(ids.dateField)) $('Form_EditForm').changeDetection_fieldsToIgnore[$(ids.dateField).name] = true;
 		if($(ids.timeField)) $('Form_EditForm').changeDetection_fieldsToIgnore[$(ids.timeField).name] = true;
 		ids = EmbargoExpiry.ids('expiry');
