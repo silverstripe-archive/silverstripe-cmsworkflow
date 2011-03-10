@@ -14,8 +14,8 @@ class BatchSetEmbargo extends CMSBatchAction {
 		else $datefield = new DateTimeField('EmbargoDate_Batch');
 
 		$datefield->setValue($_REQUEST['EmbargoDate_Batch']);
-		$date = date('d/m/Y', strtotime($datefield->Value()));
-		$time = date('h:i a', strtotime($datefield->Value()));
+		$date = date('d/m/Y', strtotime($datefield->dataValue()));
+		$time = date('h:i a', strtotime($datefield->dataValue()));
 		return $this->batchaction($pages, 'setEmbargo',
 			_t('BatchSetEmbargo.ACTIONED_PAGES', 'Set embargo date on %d pages, %d failures'),
 		array($date, $time));

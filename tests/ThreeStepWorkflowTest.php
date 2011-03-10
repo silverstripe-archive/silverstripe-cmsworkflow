@@ -223,30 +223,35 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 	
 		$this->assertEquals(
 			$request->Status,
-			'Scheduled',
-			"Request is set to Scheduled after approving a request with embargo and/or expriy dates set"
+			'Approved',
+			"Request changes status to approved"
 		);
 		
 		$sp = new ScheduledPublishing();
 		$sp->suppressOutput();
 		$sp->run(new SS_HTTPRequest('GET', '/'));
 		
+		$request = $page->openWorkflowRequest('WorkflowPublicationRequest');
 		$this->assertEquals(
 			$request->Status,
-			'Scheduled',
-			"Request is still set to Scheduled after approving a request with embargo and/or expriy dates set, and running the publisher cron"
+			'Approved',
+			"Request is still set to Approved after running the publisher cron"
 		);
 		
-		SS_Datetime::set_mock_now('2009-06-03 15:00:00');
-		
+		$request->publish('Set the timers in motion.', $custompublisher, false);
+		$this->assertEquals($request->Status, 'Scheduled', "The request becomes Scheduled after publishing");
+
 		$sp->run(new SS_HTTPRequest('GET', '/'));
-		
+		$request = $page->openWorkflowRequest('WorkflowPublicationRequest');
+		$this->assertEquals($request->Status, 'Scheduled', "The request is still Scheduled as we are before Embargo");
+
+		SS_Datetime::set_mock_now('2009-06-03 15:00:00');
+		$sp->run(new SS_HTTPRequest('GET', '/'));
 		$request = DataObject::get_by_id('WorkflowPublicationRequest', $request->ID);
-		
 		$this->assertEquals(
 			$request->Status,
 			'Completed',
-			"Request is Completed after embargo date set"
+			"Request is Completed after embargo date has elapsed"
 		);
 		
 		SS_Datetime::set_mock_now('2009-06-15 15:00:00');

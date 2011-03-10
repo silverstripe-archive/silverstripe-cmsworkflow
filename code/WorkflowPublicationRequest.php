@@ -127,6 +127,8 @@ class WorkflowPublicationRequest extends WorkflowRequest {
 		// Embargo means we go Approved -> Scheduled
 		if($this->EmbargoDate) {
 			$this->setSchedule();
+			$this->PublisherID = $member->ID;
+			$this->write();
 
 		// Otherwise we go Approved -> Published
 		} else {
