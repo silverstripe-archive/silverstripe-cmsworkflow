@@ -15,8 +15,8 @@ class BatchSetExpiry extends CMSBatchAction {
 
 		$datefield->setValue($_REQUEST['ExpiryDate_Batch']);
 		
-		$date = date('d/m/Y', strtotime($datefield->Value()));
-		$time = date('h:i a', strtotime($datefield->Value()));
+		$date = date('d/m/Y', strtotime($datefield->dataValue()));
+		$time = date('h:i a', strtotime($datefield->dataValue()));
 		return $this->batchaction($pages, 'setExpiry',
 			_t('BatchSetExpiry.ACTIONED_PAGES', 'Set expiry date on %d pages, %d failures'),
 		array($date, $time));

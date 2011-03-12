@@ -206,10 +206,10 @@ class SiteTreeCMSWorkflowTest extends FunctionalTest {
 		
 		// test "request publication" action for author
 		$this->session()->inst_set('loggedInAs', $customauthor->ID);
-		$this->assertNotContains(
+		$this->assertContains(
 			'action_cms_requestpublication',
 			$unpublishedRecord->getCMSActions()->column('Name'),
-			'Author cant trigger request publication button if page hasnt been altered'
+			'Author can trigger request publication button if page is not published'
 		);
 		$this->assertNotContains(
 			'action_cms_requestpublication',

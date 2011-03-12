@@ -86,7 +86,7 @@ class WorkflowTwoStepRequest extends WorkflowRequestDecorator {
 		
 		// Embargo means we go Approved -> Scheduled
 		if($this->owner->EmbargoDate) {
-			$this->setSchedule();
+			$this->owner->setSchedule();
 			$this->owner->addNewChange($comment, $this->owner->Status, $member);
 
 		// Otherwise we go Approved -> Published

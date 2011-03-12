@@ -97,7 +97,7 @@
 
 				<% if EmbargoField || ExpiryField %>
 					<% if Status = AwaitingApproval %>
-						<p id="startTimers">You need to click 'Approve' to start these timers in motion.</p>
+						<p id="startTimers">The timers will only be started in motion after the page is published.</p>
 					<% end_if %>
 					<% if Status = Approved %>
 						<p id="startTimers">You need to click 'Publish changes' to start this timer in motion.</p>
