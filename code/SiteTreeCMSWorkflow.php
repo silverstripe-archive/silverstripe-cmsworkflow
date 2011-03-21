@@ -182,7 +182,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			if (class_exists('TZDateTimeField')) {
 				$tzConverter = new TZDateTimeField('ExpiryDate', 'Expiry Date', $liveVersion->ExpiryDate, SiteConfig::current_site_config()->Timezone);
 				$fields->addFieldsToTab('Root.Expiry', array(
-							new LiteralField('ExpiryWarning', "<p>This page is scheduled to expire at ".$tzConverter->SS_Datetime()->Full().', '.$tzConverter->DefaultTimezoneName().' time. <a href="' . $this->ViewExpiredLink() . '" target="_blank">View site on date</a></p>')
+							new LiteralField('ExpiryWarning', "<p>This page is scheduled to expire at ".$tzConverter->SS_Datetime()->Nice24().', '.$tzConverter->DefaultTimezoneName().' time. <a href="' . $this->ViewExpiredLink() . '" target="_blank">View site on date</a></p>')
 							));
 			} else {
 				$tzfield = new DateTimeField('ExpiryDate', 'Expiry Date', $liveVersion->ExpiryDate);

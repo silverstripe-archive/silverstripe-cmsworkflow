@@ -85,8 +85,8 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 						$result = array(
 							'status' => 'success',
 							'message' => array(
-								'embargo' => date('j M Y', strtotime($embargoField->dataValue())),
-								'expiry' => date('j M Y', strtotime($expiryField->dataValue()))
+								'embargo' => date('j M Y H:i', strtotime($embargoField->dataValue())),
+								'expiry' => date('j M Y H:i', strtotime($expiryField->dataValue()))
 							)
 						);
 					}
