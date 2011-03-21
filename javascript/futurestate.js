@@ -15,20 +15,11 @@
 	
 	$('#FutureStateGoLink').live('click',
 		function() {
-			var date = $('#FutureStateDate_Date').val();
-			// Javascript is silly, so we need to convert to US date format first
-			if(date) {
-				var dateParts = date.split('/');
-				date = dateParts[1] + '/' + dateParts[0] + '/' + dateParts[2];
-			} else {
-				date = new Date();
-				date = date.toDateString();
-			}
-			var time = $('#FutureStateDate_Time').val();
+			var date = $('#FutureStateDate-date').val();
+			var time = $('#FutureStateDate-time').val();
 			var dateObj = new Date(date + ' ' + time);
-			
-			var urlDate = dateObj.getFullYear() + '-' + (dateObj.getMonth() + 1) + '-' + dateObj.getDate();
-			urlDate += '+' + dateObj.getHours() + ':' + dateObj.getMinutes() + ':00';
+			var urlDate = dateObj.getFullYear() + '-' + pad(dateObj.getMonth()+1) + '-' + pad(dateObj.getDate());
+			urlDate += ' ' + pad(dateObj.getHours()) + ':' + pad(dateObj.getMinutes()) + ':00';
 			
 			var w = window.open(this.href + '?futureDate=' + urlDate, windowName(this.target));
 			w.focus();
@@ -36,5 +27,6 @@
 			return false;
 		}
 	);
+	function pad(n){return n<10 ? '0'+n : n;}
 
 })(jQuery);
