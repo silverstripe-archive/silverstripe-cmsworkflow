@@ -382,12 +382,26 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	function EmbargoField() {
 		if (class_exists('TZDateTimeField')) return new TZDateTimeField('EmbargoDate', 'Embargo Date', $this->EmbargoDate, SiteConfig::current_site_config()->Timezone);
 		else if(class_exists('PopupDateTimeField')) return new PopupDatetimeField('EmbargoDate', 'Embargo Date', $this->EmbargoDate);
-		else return new DatetimeField('EmbargoDate', 'Embargo Date', $this->EmbargoDate);
+		else {
+			$datetimeField = new DatetimeField('EmbargoDate', 'Embargo Date', $this->EmbargoDate);
+			$datetimeField->getDateField()->setConfig('showcalendar', true);
+			$datetimeField->getTimeField()->setConfig('showdropdown', true);
+			$datetimeField->getDateField()->setConfig('dateformat', 'dd/MM/YYYY');
+			$datetimeField->getTimeField()->setConfig('timeformat', 'HH');
+			return $datetimeField;
+		}
 	}
 	function ExpiryField() {
 		if (class_exists('TZDateTimeField')) return new TZDateTimeField('ExpiryDate', 'Expiry Date', $this->ExpiryDate, SiteConfig::current_site_config()->Timezone);
 		else if(class_exists('PopupDateTimeField')) return new PopupDateTimeField('ExpiryDate', 'Expiry Date', $this->ExpiryDate);
-		else return new DateTimeField('ExpiryDate', 'Expiry Date', $this->ExpiryDate);
+		else {
+			$datetimeField = new DatetimeField('ExpiryDate', 'Expiry Date', $this->ExpiryDate);
+			$datetimeField->getDateField()->setConfig('showcalendar', true);
+			$datetimeField->getTimeField()->setConfig('showdropdown', true);
+			$datetimeField->getDateField()->setConfig('dateformat', 'dd/MM/YYYY');
+			$datetimeField->getTimeField()->setConfig('timeformat', 'h:m a');
+			return $datetimeField;
+		}
 	}
 	
 	function getEmbargoDate() {

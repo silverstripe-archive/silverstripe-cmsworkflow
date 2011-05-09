@@ -25,6 +25,7 @@
 	background:#E9E9E9;
 	border: 1px #CCC solid;
 	padding: 3px;
+	overflow: auto;
 }
 
 #CMSWorkflowTab h2 {
