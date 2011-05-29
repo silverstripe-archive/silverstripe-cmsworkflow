@@ -176,7 +176,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		
 		// Switch to handle both 2 step & 3 step
 		$page = $this->Page();
-		$isWorkflowParticipant = $page->canEdit($member) || $page->canPublish($member);
+		$isWorkflowParticipant = $page->canEdit($member) || $page->canPublish($member) || $page->canView($member);
 		if($page->hasMethod('canApprove')) {
 			$isWorkflowParticipant = $isWorkflowParticipant || $page->canApprove($member);
 		}

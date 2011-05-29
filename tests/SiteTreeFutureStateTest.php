@@ -267,6 +267,9 @@ class SiteTreeFutureStateTest extends SapphireTest {
 	}	
 	
 	function setUp() {
+		// Static publishing will just confuse things
+		StaticPublisher::$disable_realtime = true;
+	
 		parent::setUp();
 		
 		// Publish all but the embargoed content and switch view to Live
@@ -282,6 +285,8 @@ class SiteTreeFutureStateTest extends SapphireTest {
 		$this->objFromFixture('VirtualPage', 'vproduct5')->doPublish();
 		
 		Versioned::reading_stage('Live');
+
+
 	}
 
 	function tearDown() {
@@ -289,5 +294,8 @@ class SiteTreeFutureStateTest extends SapphireTest {
 		Versioned::reading_stage('Stage');
 		
 		parent::tearDown();
+
+		// Static publishing will just confuse things
+		StaticPublisher::$disable_realtime = false;
 	}
 }

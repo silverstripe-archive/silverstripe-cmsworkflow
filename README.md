@@ -3,8 +3,8 @@
 ## Maintainer Contact
  * Mark Stephens
    <mark (at) silverstripe (dot) com>
- * Luke Hudson
-   <luke (at) silverstripe (dot) com>
+ * Rainer Spittel
+   <rainer (at) silverstripe (dot) com>
 
 ## Requirements
  * SilverStripe 2.4 or newer
