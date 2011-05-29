@@ -25,13 +25,36 @@
 	background:#E9E9E9;
 	border: 1px #CCC solid;
 	padding: 3px;
+	overflow: auto;
 }
 
 #CMSWorkflowTab h2 {
 	margin-bottom: -10px;
 }
 
+/* PopupDateTimeField styles */
 #embargoExpiry .popupdatetime , #embargoExpiry .popupdatetime ul {
 	float: left;
 	margin-right:3px;
+}
+/* DateTimeField styles */
+/*#embargoExpiry input {
+	width: auto;
+}*/
+ #embargoExpiry .field.date, #embargoExpiry .field.time {
+	float: left;
+	margin-top: -4px;
+}
+#embargoExpiry .field.time {
+	clear: none;
+}
+	 #embargoExpiry .field.date input, #embargoExpiry .field.time input {
+		width: auto;
+	}
+	 #embargoExpiry .field.date .middleColumn, #embargoExpiry .field.time .middleColumn {
+		width: auto;
+	}
+
+#CMSWorkflowTab{
+	padding-bottom: 16px;
 }

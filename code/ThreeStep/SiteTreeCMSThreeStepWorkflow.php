@@ -120,7 +120,7 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 			$actionerGroupsField = new TreeMultiselectField("PublisherGroups", $this->owner->fieldLabel('PublisherGroups'))
 		));
 		
-		if(!$this->owner->canPublish() || !Permission::check('SITETREE_GRANT_ACCESS')) {
+		if(!$this->owner->canPublish() && !Permission::check('SITETREE_GRANT_ACCESS')) {
 			$fields->replaceField('CanApproveType', $approveTypeField->performReadonlyTransformation());
 			if($this->owner->CanApproveType == 'OnlyTheseUsers') {
 				$fields->replaceField('ApproverGroups', $approverGroupsField->performReadonlyTransformation());

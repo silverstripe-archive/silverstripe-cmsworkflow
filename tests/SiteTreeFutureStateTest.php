@@ -20,6 +20,8 @@ class SiteTreeFutureStateTest extends SapphireTest {
 	);
 
 	function testPagesWithBothEmbargoAndExpiryAreDisplayedCorrectlyInFutureState() {
+		$admin = $this->objFromFixture('Member', 'admin');
+		
 		$bt = defined('DB::USE_ANSI_SQL') ? "\"" : "`";
 
 		Versioned::reading_stage('Stage');
@@ -38,6 +40,7 @@ class SiteTreeFutureStateTest extends SapphireTest {
 		$request = $product6->openWorkflowRequest('WorkflowPublicationRequest');
 
 		$request->approve('Looks good.');
+		$request->publish('Set the timers in motion.', $admin, false);
 		
 		$prodDraft = DataObject::get_one('SiteTree', "{$bt}URLSegment{$bt} = 'product-embargo'");
 		$this->assertEquals('New Title', $prodDraft->Title, 'Correct page on draft site.');
@@ -222,6 +225,8 @@ class SiteTreeFutureStateTest extends SapphireTest {
 	 * Test embargo edits for both regular and virtual pages.
 	 */
 	function testEmbargoedEdit() {
+		$admin = $this->objFromFixture('Member', 'admin');
+
 		// Make an edit
 		Versioned::reading_stage('Stage');
 		
@@ -233,6 +238,7 @@ class SiteTreeFutureStateTest extends SapphireTest {
 		$wf = $product1->openOrNewWorkflowRequest('WorkflowPublicationRequest');
 		$wf->EmbargoDate = '2019-01-01 10:00:00';
 		$wf->approve("Approved");
+		$wf->publish("Set the timers in motion.", $admin, false);
 
 		// Verify that the change isn't currently on the live site (just in case a bug meant that
 		// the change was insta-published

@@ -51,11 +51,19 @@ class WorkflowBatchActionTest extends FunctionalTest {
 			'applicableIds only returns pages with open requests');
 		
 		SS_Datetime::set_mock_now('2009-06-15 15:00:00');
-			
-		$_REQUEST['EmbargoDate_Batch'] = array(
-			'Date' => '01/01/2010',
-			'Time' => '3:00 pm'
-		);
+
+		if(class_exists('PopupDateTimeField')) {
+			$_REQUEST['EmbargoDate_Batch'] = array(
+				'Date' => '01/01/2010',
+				'Time' => '3:00 pm'
+			);
+		}	else {
+			$_REQUEST['EmbargoDate_Batch'] = array(
+				'date' => '01/01/2010',
+				'time' => '3:00 pm'
+			);
+		}
+		
 		$_REQUEST['ajax'] = 1;
 		$action->run($pages);
 		
@@ -118,10 +126,17 @@ class WorkflowBatchActionTest extends FunctionalTest {
 		
 		SS_Datetime::set_mock_now('2009-06-15 15:00:00');
 			
-		$_REQUEST['ExpiryDate_Batch'] = array(
-			'Date' => '01/01/2010',
-			'Time' => '3:00 pm'
-		);
+		if(class_exists('PopupDateTimeField')) {
+			$_REQUEST['ExpiryDate_Batch'] = array(
+				'Date' => '01/01/2010',
+				'Time' => '3:00 pm'
+			);
+		}	else {
+			$_REQUEST['ExpiryDate_Batch'] = array(
+				'date' => '01/01/2010',
+				'time' => '3:00 pm'
+			);
+		}
 		$_REQUEST['ajax'] = 1;
 		
 		// Test confirmation dialog

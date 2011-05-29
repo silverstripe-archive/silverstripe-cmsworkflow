@@ -45,7 +45,9 @@ class ScheduledPublishing extends BuildTask {
 				// taking down the whole queue
 				try {
 					if (!$this->suppressOutput) echo "\n<br />Attempting to publish ".$request->Page()->Title.": ";
-					$request->publish('Page was embargoed. Automatically published.', WorkflowSystemMember::get(), false);
+					// We remove the embargo date and republish to trigger this.
+					$request->EmbargoDate = null;
+					$result = $request->publish('Page was embargoed. Automatically published.', WorkflowSystemMember::get(), false);
 					if (!$this->suppressOutput) echo "ok.";
 				} catch (Exception $e) {
 					// Log it?

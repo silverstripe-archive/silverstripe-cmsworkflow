@@ -83,27 +83,24 @@
 							
 				<% if EmbargoField %>
 					<p id="embargoExpiry-embargoStatus" style="display:<% if EmbargoDate %>block<% else %>none<% end_if %>">
-						This page is currently scheduled to be published at <span id="embargoDate">$EmbargoField.SSDatetime.Full</span><% if ExpiryField.DefaultTimezoneName %>, $ExpiryField.DefaultTimezoneName time<% end_if %>.
-						<% if Status = Scheduled %><a href="$ViewEmbargoedLink" target="_blank">View on date</a><% end_if %>
+						This page is currently scheduled to be published at <span id="embargoDate">$EmbargoDate.Nice</span><% if ExpiryField.DefaultTimezoneName %>, $ExpiryField.DefaultTimezoneName time<% end_if %>.
+						<% if Status = Scheduled %><a href="$ViewEmbargoedLink" target="_blank">View site on date</a><% end_if %>
 					</p>
 				<% end_if %>
 				
 				<% if ExpiryField %>
 					<p id="embargoExpiry-expiryStatus" style="display:<% if ExpiryDate %>block<% else %>none<% end_if %>">
-							This page is currently scheduled to be unpublished at <span id="expiryDate">$ExpiryField.SSDatetime.Full</span><% if ExpiryField.DefaultTimezoneName %>, $ExpiryField.DefaultTimezoneName time<% end_if %>.
+							This page is currently scheduled to be unpublished at <span id="expiryDate">$Page.ExpiryDate.Nice</span><% if ExpiryField.DefaultTimezoneName %>, $ExpiryField.DefaultTimezoneName time<% end_if %>.
 						<% if Status = Scheduled %><a href="$ViewExpiredLink" target="_blank">View site on date</a><% end_if %>
 					</p>
 				<% end_if %>
 
 				<% if EmbargoField || ExpiryField %>
 					<% if Status = AwaitingApproval %>
-						<p id="startTimers">You need to click 'Approve' to start these timers in motion.</p>
+						<p id="startTimers">The timers will only be started in motion after the page is published.</p>
 					<% end_if %>
 					<% if Status = Approved %>
-						<% if EmbargoDate %>
-						<% else_if ExpiryDate %>
-							<p id="startTimers">You need to click 'Publish changes' to start this timer in motion.</p>
-						<% end_if %>
+						<p id="startTimers">You need to click 'Publish changes' to start this timer in motion.</p>
 					<% end_if %>
 				<% end_if %>
 

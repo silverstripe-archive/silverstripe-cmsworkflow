@@ -49,29 +49,15 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 					$expiryField = $wfRequest->ExpiryField();
 					
 					if (isset($data['EmbargoDate'])) {
-						// Only doing parsing here to make sure we are not rolling over
-						// in to another day.
-						list($day, $month, $year) = explode('/', $data['EmbargoDate']['Date']);
-						$embargoTimestamp = strtotime("$year-$month-$day {$data['EmbargoDate']['Time']}");
-						if ((int)$day != (int)date('d', $embargoTimestamp)) $embargoTimestamp = false;
-						else {
-							$embargoField->setValue($data['EmbargoDate']);
-							$embargoDate = $embargoField->Value();
-							$embargoTimestamp = strtotime($embargoField->Value());
-						}
+						$embargoField->setValue($data['EmbargoDate']);
+						$embargoDate = $embargoField->Value();
+						$embargoTimestamp = strtotime($embargoField->Value());
 					}
 					
 					if (isset($data['ExpiryDate'])) {
-						// Only doing parsing here to make sure we are not rolling over
-						// in to another day.
-						list($day, $month, $year) = explode('/', $data['ExpiryDate']['Date']);
-						$expiryTimestamp = strtotime("$year-$month-$day {$data['ExpiryDate']['Time']}");
-						if ((int)$day != (int)date('d', $expiryTimestamp)) $expiryTimestamp = false;
-						else {
-							$expiryField->setValue($data['ExpiryDate']);
-							$expiryDate = $expiryField->Value();
-							$expiryTimestamp = strtotime($expiryField->Value());
-						}
+						$expiryField->setValue($data['ExpiryDate']);
+						$expiryDate = $expiryField->Value();
+						$expiryTimestamp = strtotime($expiryField->Value());
 					}
 					
 					$embargoField->saveInto($wfRequest);
@@ -99,8 +85,8 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 						$result = array(
 							'status' => 'success',
 							'message' => array(
-								'embargo' => $embargoField->SSDatetime()->Full(),
-								'expiry' => $expiryField->SSDatetime()->Full()
+								'embargo' => date('j M Y H:i', strtotime($embargoField->dataValue())),
+								'expiry' => date('j M Y H:i', strtotime($expiryField->dataValue()))
 							)
 						);
 					}

@@ -125,7 +125,6 @@ class WorkflowThreeStepRequest extends WorkflowRequestDecorator {
 		$this->owner->write();
 
 		$this->owner->addNewChange($comment, 'Approved', $member);
-		$this->owner->setSchedule();
 
 		if($notify) $this->notifyApproved($comment);
 		
