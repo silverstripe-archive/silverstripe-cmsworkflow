@@ -58,3 +58,9 @@
 #CMSWorkflowTab{
 	padding-bottom: 16px;
 }
+
+/* Necessary if the fields are overloaded by the timezoneawareness module */
+#batchactions_options #EmbargoDate_Batch_Date,
+#batchactions_options #ExpiryDate_Batch_Date {
+	padding: 0;
+}
