@@ -347,8 +347,10 @@ function action_publish_right(e) {
 		messageEl = CMSWorkflow.createPromptElement('WorkflowComment', 'Please comment on this publication, if applicable.');
 	}
 	$('Form_EditForm').appendChild(messageEl);
-	$('Form_EditForm_action_publish').value = ss.i18n._t('CMSMAIN.PUBLISHING');
-	$('Form_EditForm_action_publish').className = 'action loading';
+	
+	// Don't need to restore the button state after ajax success because the form is replaced completely
+	var btn = jQuery('#Form_EditForm_action_publish');
+	btn.val(ss.i18n._t('CMSMAIN.PUBLISHING')).addClass('loading').attr('disabled', 'disabled');
 	$('Form_EditForm').save(false, null, 'cms_publishwithcomment', true);
 	$('Form_EditForm').removeChild(messageEl);
 }
