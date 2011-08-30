@@ -36,10 +36,10 @@ class SiteTreeFutureState extends DataObjectDecorator {
 		if($date) {
 			Session::set('readingMode', 'FutureState.' . $date);
 			self::set_future_datetime($date);
-			Cookie::set('bypassStaticCache', '1', 0);
+			if(!Director::is_cli()) Cookie::set('bypassStaticCache', '1', 0);
 		} else {
 			if(Versioned::current_stage() == 'Live') {
-				Cookie::set('bypassStaticCache', null, 0);
+				if(!Director::is_cli()) Cookie::set('bypassStaticCache', null, 0);
 			}
 		}
 	}
