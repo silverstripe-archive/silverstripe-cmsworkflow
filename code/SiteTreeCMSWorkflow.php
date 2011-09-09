@@ -403,6 +403,11 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			$wf->deny(_t('SiteTreeCMSWorkflow.AUTO_DENIED', "(automatically denied)"));
 		}
 	}
+	
+	function onBeforeDuplicate() {
+		// Explicitly set expiry to null, it shouldn't persist in copies
+		$this->owner->ExpiryDate = null;
+	}
 
 	function providePermissions() {
 		return array(
