@@ -101,6 +101,34 @@ class WorkflowReportsTest extends FunctionalTest {
 		SS_Datetime::clear_mock_now();
 	}
 	
+	function testPagesScheduledForPublishingReportIncludesVirtualPages() {
+		$report = new PagesScheduledForPublishingReport();
+		$this->logInAs($this->objFromFixture('Member', 'admin'));
+		
+		$page2 = $this->objFromFixture('SiteTree', 'pagepub2');
+		$page3 = $this->objFromFixture('SiteTree', 'pagepub3');
+		$virtualPage = new VirtualPage();
+		$virtualPage->URLSegment = 'virtual';
+		$virtualPage->CopyContentFromID = $page3->ID;
+		$virtualPage->write();
+		
+		SS_Datetime::set_mock_now('2010-02-14 00:00:00');
+		$results = $report->sourceRecords(array(), '"ID" DESC', false);
+		// Can't test with titles as they'll be the same for virtual pages
+		$this->assertEquals($results->column('ID'), array(
+			$page3->ID,
+			$virtualPage->ID,
+			$page2->ID
+		));
+		$this->assertEquals($results->column('EmbargoDate'), array(
+			$page3->openWorkflowRequest()->EmbargoDate,
+			$page3->openWorkflowRequest()->EmbargoDate,
+			$page2->openWorkflowRequest()->EmbargoDate
+		));
+		
+		SS_Datetime::clear_mock_now();
+	}
+	
 	function testPagesScheduledForDeletionReport() {
 		$report = new PagesScheduledForDeletionReport();
 		$this->assertTrue(is_string($report->title()));
@@ -166,6 +194,39 @@ class WorkflowReportsTest extends FunctionalTest {
 		$this->assertEquals($report->sourceRecords(array(), '', false)->Count(), 3);
 		$this->logInAs($this->objFromFixture('Member', 'publisher'));
 		$this->assertEquals($report->sourceRecords(array(), '"Title" DESC', false)->Count(), 2);
+		
+		SS_Datetime::clear_mock_now();
+	}
+	
+	function testPagesScheduledForDeletionReportIncludesVirtualPages() {
+		$report = new PagesScheduledForDeletionReport();
+		$this->logInAs($this->objFromFixture('Member', 'admin'));
+		
+		$page1 = $this->objFromFixture('SiteTree', 'pagedel1');
+		$page1->doPublish();
+		$page2 = $this->objFromFixture('SiteTree', 'pagedel2');
+		$page2->doPublish();
+		$page3 = $this->objFromFixture('SiteTree', 'pagedel3');
+		$page3->doPublish();
+
+		$virtualPage = new VirtualPage();
+		$virtualPage->URLSegment = 'virtual';
+		$virtualPage->CopyContentFromID = $page3->ID;
+		$virtualPage->write();
+		
+		SS_Datetime::set_mock_now('2010-02-14 00:00:00');
+		$results = $report->sourceRecords(array(), '"ID" DESC', false);
+		// Can't test with titles as they'll be the same for virtual pages
+		$this->assertEquals($results->column('ID'), array(
+			$page3->ID,
+			$virtualPage->ID,
+			$page2->ID
+		));
+		$this->assertEquals($results->column('ExpiryDate'), array(
+			$page3->ExpiryDate,
+			$page3->ExpiryDate,
+			$page2->ExpiryDate
+		));
 		
 		SS_Datetime::clear_mock_now();
 	}

@@ -137,7 +137,19 @@ class PagesScheduledForDeletionReport extends SS_Report {
 		$filteredRecords = new DataObjectSet();
 		if($records) foreach($records as $record) {
 			$record->BacklinkCount = $record->BackLinkTracking()->Count();
-			if($record->canEdit()) $filteredRecords->push($record);
+			if($record->canEdit()) {
+				$filteredRecords->push($record);
+				// Add any related pages to the list as well to ensure authors
+				// can review what they're actually scheduling
+				$virtualPages = $record->VirtualPages();
+				if($virtualPages) foreach($virtualPages as $virtualPage) {
+					// Simulate custom SQL fields from WorkflowRequest join
+					$virtualPage->ExpiryDate = $record->ExpiryDate;
+					$virtualPage->ApproverName = $record->ApproverName;
+					$filteredRecords->push($virtualPage);
+				}
+			}
+			
 		}
 		
 		// Apply limit after that filtering.

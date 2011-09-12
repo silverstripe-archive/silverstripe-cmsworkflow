@@ -87,7 +87,18 @@ class PagesScheduledForPublishingReport extends SS_Report {
 		// Filter to only those with canEdit permission
 		$filteredRecords = new DataObjectSet();
 		if($records) foreach($records as $record) {
-			if($record->canEdit()) $filteredRecords->push($record);
+			if($record->canEdit()) {
+				$filteredRecords->push($record);
+				// Add any related pages to the list as well to ensure authors
+				// can review what they're actually scheduling
+				$virtualPages = $record->VirtualPages();
+				if($virtualPages) foreach($virtualPages as $virtualPage) {
+					// Simulate custom SQL fields from WorkflowRequest join
+					$virtualPage->EmbargoDate = $record->EmbargoDate;
+					$virtualPage->ApproverName = $record->ApproverName;
+					$filteredRecords->push($virtualPage);
+				}
+			}
 		}
 		
 		// Apply limit after that filtering.
