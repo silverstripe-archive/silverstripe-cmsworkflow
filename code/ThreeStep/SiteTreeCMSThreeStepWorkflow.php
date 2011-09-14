@@ -175,6 +175,8 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 	 */
 	public function canApprove($member = null) {
 		if(!$member) $member = Member::currentUser();
+		if(!$member) return false;
+		
 		$memberID = $member->ID;
 		
 		if(isset(SiteTree::$cache_permissions['CanApproveType'][$this->owner->ID])) {
