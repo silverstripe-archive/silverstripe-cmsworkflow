@@ -31,6 +31,12 @@ class ScheduledPublishing extends BuildTask {
 		require_once 'Zend/Log/Writer/Stream.php';
 		SS_Log::add_writer(new Zend_Log_Writer_Stream('php://output'), SS_Log::NOTICE);
 		
+		$db = DB::getConn();
+		if(method_exists($db, 'supportsLocks') && $db->supportsLocks() && !$db->getLock('ScheduledPublishing')) {
+			$this->log('Publication has already been triggered by a different process');
+			return;
+		}
+		
 		Cookie::$report_errors = false;
 		if (class_exists('Subsite')) Subsite::$disable_subsite_filter = true;
 
@@ -93,6 +99,10 @@ class ScheduledPublishing extends BuildTask {
 				}
 			}
 		}
+		
+		// We don't need to clear the lock on every potential exception,
+		// as the closing of the DB connection will do that for us.
+		if(method_exists($db, 'supportsLocks') && $db->supportsLocks()) $db->releaseLock('ScheduledPublishing');
 	}
 	
 	/**
