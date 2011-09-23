@@ -22,6 +22,8 @@ class MyTwoStepWorkflowRequests extends SS_Report {
 	 * any more), and merges the result sets together.
 	 */
 	function sourceRecords($params) {
+		increase_time_limit_to(120);
+		
 		$currentStage = Versioned::current_stage();
 
 		$changes = WorkflowTwoStepRequest::get_by_author(

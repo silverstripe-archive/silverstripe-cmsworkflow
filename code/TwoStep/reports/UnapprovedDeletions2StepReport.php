@@ -10,6 +10,8 @@ class UnapprovedDeletions2StepReport extends SS_Report {
 		return _t('UnapprovedDeletions2StepReport.TITLE',"Deletion requests I need to approve");
 	}
 	function sourceRecords($params, $sort, $limit) {
+		increase_time_limit_to(120);
+		
 		$res = WorkflowTwoStepRequest::get_by_publisher(
 			'WorkflowDeletionRequest',
 			Member::currentUser(),

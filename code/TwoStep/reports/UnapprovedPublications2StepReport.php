@@ -11,6 +11,8 @@ class UnapprovedPublications2StepReport extends SS_Report {
 	}
 	
 	function sourceRecords($params, $sort, $limit) {
+		increase_time_limit_to(120);
+		
 		$res = WorkflowTwoStepRequest::get_by_publisher(
 			'WorkflowPublicationRequest',
 			Member::currentUser(),

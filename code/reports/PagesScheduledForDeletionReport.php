@@ -55,6 +55,8 @@ class PagesScheduledForDeletionReport extends SS_Report {
 	}
 	
 	function sourceRecords($params, $sort, $limit) {
+		increase_time_limit_to(120);
+		
 		$wheres = array();
 		
 		$startDate = !empty($params['StartDate']) ? $params['StartDate'] : null;

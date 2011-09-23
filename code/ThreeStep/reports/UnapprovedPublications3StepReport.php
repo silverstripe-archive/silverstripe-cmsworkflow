@@ -11,6 +11,8 @@ class UnapprovedPublications3StepReport extends SS_Report {
 	}
 	
 	function sourceRecords($params, $sort, $limit) {
+		increase_time_limit_to(120);
+		
 		$res = WorkflowThreeStepRequest::get_by_approver(
 			'WorkflowPublicationRequest',
 			Member::currentUser(),

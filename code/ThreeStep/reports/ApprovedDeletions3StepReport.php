@@ -10,6 +10,8 @@ class ApprovedDeletions3StepReport extends SS_Report {
 		return _t('ApprovedDeletions3StepReport.TITLE',"Approved deletions I need to publish");
 	}
 	function sourceRecords($params, $sort, $limit) {
+		increase_time_limit_to(120);
+		
 		$res = WorkflowThreeStepRequest::get_by_publisher(
 			'WorkflowDeletionRequest',
 			Member::currentUser(),

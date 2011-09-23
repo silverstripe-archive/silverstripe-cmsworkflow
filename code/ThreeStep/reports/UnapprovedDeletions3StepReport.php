@@ -10,6 +10,8 @@ class UnapprovedDeletions3StepReport extends SS_Report {
 		return _t('UnapprovedDeletions3StepReport.TITLE',"Deletion requests I need to approve");
 	}
 	function sourceRecords($params, $sort, $limit) {
+		increase_time_limit_to(120);
+		
 		$res = WorkflowThreeStepRequest::get_by_approver(
 			'WorkflowDeletionRequest',
 			Member::currentUser(),

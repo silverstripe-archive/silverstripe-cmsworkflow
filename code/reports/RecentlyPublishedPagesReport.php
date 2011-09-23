@@ -36,6 +36,8 @@ class RecentlyPublishedPagesReport extends SS_Report {
 	}
 	
 	function sourceRecords($params, $sort, $limit) {
+		increase_time_limit_to(120);
+		
 		$q = singleton('SiteTree')->extendedSQL();
 		$q->select[] = '"SiteTree"."Title" AS "PageTitle"';
 	
