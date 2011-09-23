@@ -6,37 +6,36 @@
  * @subpackage ThreeStep
  */
 class UnapprovedPublications3StepReport extends SS_Report {
+
 	function title() {
 		return _t('UnapprovedPublications3StepReport.TITLE',"Publication requests I need to approve");
 	}
 	
 	function sourceRecords($params, $sort, $limit) {
-		increase_time_limit_to(120);
+		$cachekey = md5(serialize($params));
+		if(!isset($this->_cache_sourceRecords[$cachekey])) {
+			$res = WorkflowThreeStepRequest::get_by_approver(
+				'WorkflowPublicationRequest',
+				Member::currentUser(),
+				array('AwaitingApproval')
+			);
 		
-		$res = WorkflowThreeStepRequest::get_by_approver(
-			'WorkflowPublicationRequest',
-			Member::currentUser(),
-			array('AwaitingApproval')
-		);
-		
-		SiteTree::prepopuplate_permission_cache('CanApproveType', $res->column('ID'), 
-			"SiteTreeCMSThreeStepWorkflow::can_approve_multiple");
-		SiteTree::prepopuplate_permission_cache('CanEditType', $res->column('ID'),
-			"SiteTree::can_edit_multiple");
-
-		$doSet = new DataObjectSet();
-		if ($res) {
-			foreach ($res as $result) {
-				if (!$result->canApprove()) continue;
-				if ($wf = $result->openWorkflowRequest()) {
-					if(ClassInfo::exists('Subsite')) $result->SubsiteTitle = $result->Subsite()->Title;
-					$result->RequestedAt = $wf->Created;
-					$result->WFAuthorTitle = $wf->Author()->Title;
-					$result->HasEmbargo = $wf->getEmbargoDate() ? date('j M Y g:ia', strtotime($wf->getEmbargoDate())) : 'no';
-					$doSet->push($result);
+			$doSet = new DataObjectSet();
+			if ($res) {
+				foreach ($res as $result) {
+					if ($wf = $result->openWorkflowRequest()) {
+						if(ClassInfo::exists('Subsite')) $result->SubsiteTitle = $result->Subsite()->Title;
+						$result->RequestedAt = $wf->Created;
+						$result->WFAuthorTitle = $wf->Author()->Title;
+						$result->HasEmbargo = $wf->getEmbargoDate();
+						$doSet->push($result);
+					}
 				}
 			}
+			$this->_cache_sourceRecords[$cachekey] = $doSet;
 		}
+		
+		$doSet = $this->_cache_sourceRecords[$cachekey];
 		
 		if($sort) {
 			$parts = explode(' ', $sort);
