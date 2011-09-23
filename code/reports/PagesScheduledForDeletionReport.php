@@ -42,7 +42,7 @@ class PagesScheduledForDeletionReport extends SS_Report {
 			'ApproverName' => 'Approved by',
 			'AbsoluteLink' => array(
 				'title' => 'URL',
-				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a target=\"_blank\" href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a target=\"_blank\" href=\"$value?stage=Stage\">(draft)</a> <a target=\"_blank\" href=\"home?futureDate=$ExpiryDate\">(view site on expiry date)</a>'
+				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a target=\"_blank\" href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a target=\"_blank\" href=\"$value?stage=Stage\">(draft)</a> <a target=\"_blank\" href=\"$PageDomain/home?futureDate=$ExpiryDate\">(view site on expiry date)</a>'
 			),
 			"BacklinkCount" => array(
 				"title" => "Incoming links",
@@ -137,6 +137,8 @@ class PagesScheduledForDeletionReport extends SS_Report {
 		$filteredRecords = new DataObjectSet();
 		if($records) foreach($records as $record) {
 			$record->BacklinkCount = $record->BackLinkTracking()->Count();
+			if (class_exists('Subsite')) $record->PageDomain = $record->Subsite()->absoluteBaseURL();
+			else $record->PageDomain = Director::absoluteBaseURL();
 			if($record->canEdit()) {
 				$filteredRecords->push($record);
 				// Add any related pages to the list as well to ensure authors
