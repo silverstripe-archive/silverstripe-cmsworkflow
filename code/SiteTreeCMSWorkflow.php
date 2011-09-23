@@ -387,7 +387,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		
 		if($this->owner->ReviewPeriodDays) {
 			$this->owner->NextReviewDate = date('Y-m-d', strtotime('+' . $this->owner->ReviewPeriodDays . ' days'));
-			$this->owner->write();
+			$this->owner->writeWithoutVersion();
 		}
 	}
 	
