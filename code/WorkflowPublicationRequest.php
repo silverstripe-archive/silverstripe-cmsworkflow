@@ -123,6 +123,8 @@ class WorkflowPublicationRequest extends WorkflowRequest {
 		// We have to mark as completed now, or we'll get
 		// recursion from SiteTreeCMSWorkflow::onAfterPublish.
 		$page = $this->Page();
+		$page->LatestCompletedWorkflowRequestID = $this->ID; 
+		$page->writeWithoutVersion();
 
 		// Embargo means we go Approved -> Scheduled
 		if($this->EmbargoDate) {

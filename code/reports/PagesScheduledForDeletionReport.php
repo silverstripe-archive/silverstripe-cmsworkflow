@@ -94,7 +94,7 @@ class PagesScheduledForDeletionReport extends SS_Report {
 		Versioned::reading_stage('Live');
 		
 		$query = singleton("SiteTree")->extendedSQL(join(' AND ', $wheres), null, null, 
-			"LEFT JOIN \"WorkflowRequest\" on \"WorkflowRequest\".\"PageID\" = \"SiteTree_Live\".\"ID\""
+			'LEFT JOIN "WorkflowRequest" on "WorkflowRequest"."ID" = "SiteTree_Live"."LatestCompletedWorkflowRequestID"'
 		);
 
 		

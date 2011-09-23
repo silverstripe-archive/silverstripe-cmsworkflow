@@ -50,6 +50,9 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			'db' => array(
 				"ExpiryDate" => "SS_Datetime",
 			),
+			'has_one' => array(
+				'LatestCompletedWorkflowRequest' => 'WorkflowRequest'
+			),
 			'has_many' => array(
 				// has_one OpenWorkflowRequest is implemented as custom getter
 				'WorkflowRequests' => 'WorkflowRequest'
