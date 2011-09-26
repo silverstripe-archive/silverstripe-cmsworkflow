@@ -132,16 +132,16 @@ class PagesScheduledForPublishingReport extends SS_Report {
 		$params = new FieldSet();
 		
 		if(class_exists('PopupDateTimeField')) {
-    		$params->push($startDate = new PopupDateTimeField('StartDate', 'Start date'));
-    		$params->push($endDate = new PopupDateTimeField('EndDate', 'End date'));
-            $endDate->defaultToEndOfDay();
-    		$startDate->allowOnlyTime(false);
-    		$endDate->allowOnlyTime(false);
-    		$endDate->mustBeAfter($startDate->Name());
-    		$startDate->mustBeBefore($endDate->Name());
+			$params->push($startDate = new PopupDateTimeField('StartDate', 'Start date'));
+			$params->push($endDate = new PopupDateTimeField('EndDate', 'End date'));
+			$endDate->defaultToEndOfDay();
+			$startDate->allowOnlyTime(false);
+			$endDate->allowOnlyTime(false);
+			$endDate->mustBeAfter($startDate->Name());
+			$startDate->mustBeBefore($endDate->Name());
 		} else {
-    		$params->push($startDate = new DateTimeField('StartDate', 'Start date'));
-    		$params->push($endDate = new DateTimeField('EndDate', 'End date'));
+			$params->push($startDate = new DateTimeField('StartDate', 'Start date'));
+			$params->push($endDate = new DateTimeField('EndDate', 'End date'));
 		}
 
 		return $params;
