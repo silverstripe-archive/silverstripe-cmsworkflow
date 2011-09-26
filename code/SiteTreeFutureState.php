@@ -206,11 +206,7 @@ class SiteTreeFutureState_SilverStripeNavigatorItem extends SilverStripeNavigato
 		
 		Requirements::javascript('cmsworkflow/javascript/futurestate.js');
 		
-		// $datetimeField = new DatetimeField('FutureStateDate', 'Date');
-		// $datetimeField->getDateField()->setConfig('showcalendar', true);
-		// $datetimeField->getTimeField()->setConfig('showdropdown', true);
-		$datetimeField = new DatetimeField('FutureStateDate', 'Date');
-		
+		$datetimeField = Object::create('DatetimeField', 'FutureStateDate', 'Date');
 		$datetimeField->getDateField()->setConfig('showcalendar', true);
 		$datetimeField->getTimeField()->setConfig('showdropdown', true);
 		

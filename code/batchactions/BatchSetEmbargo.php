@@ -9,9 +9,7 @@ class BatchSetEmbargo extends CMSBatchAction {
 	}
 
 	function run(DataObjectSet $pages) {
-		if(class_exists('TZDateTimeField')) $datefield = new TZDateTimeField('TZConvert', $_REQUEST['EmbargoDate_Batch'], SiteConfig::current_site_config()->Timezone);
-		else $datefield = new DatetimeField('EmbargoDate_Batch');
-
+		$datefield = Object::create('DatetimeField', 'EmbargoDate_Batch');
 		$datefield->setValue($_REQUEST['EmbargoDate_Batch']);
 		$date = date('d/m/Y', strtotime($datefield->dataValue()));
 		$time = date('h:i a', strtotime($datefield->dataValue()));
@@ -21,10 +19,7 @@ class BatchSetEmbargo extends CMSBatchAction {
 	}
 	
 	function getParameterFields() {
-		if(class_exists('TZDateTimeField')) $dateField = new TZDateTimeField('EmbargoDate_Batch');
-		else $dateField = new DatetimeField('EmbargoDate_Batch');
-		
-		return new FieldSet($dateField);
+		return new FieldSet(Object::create('DatetimeField', 'EmbargoDate_Batch'));
 	}
 
 	function applicablePages($ids) {

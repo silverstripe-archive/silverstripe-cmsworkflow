@@ -118,8 +118,8 @@ class RecentlyPublishedPagesReport extends SS_Report {
 			$options
 		));
 		
-		$params->push($startDate = new DateTimeField('StartDate', 'Start date'));
-		$params->push($endDate = new DateTimeField('EndDate', 'End date'));
+		$params->push($startDate = Object::create('DatetimeField', 'StartDate', 'Start date'));
+		$params->push($endDate = Object::create('DatetimeField', 'EndDate', 'End date'));
 		$startDate->getTimeField()->setValue('23:59:59');
 		$endDate->getTimeField()->setValue('23:59:59');
 		

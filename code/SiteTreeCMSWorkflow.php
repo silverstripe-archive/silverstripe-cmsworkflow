@@ -182,23 +182,35 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		// Check if there is an expiry date...
 		$liveVersion = Versioned::get_one_by_stage('SiteTree', 'Live', "\"SiteTree_Live\".\"ID\" = {$this->owner->ID}");
 		if ($liveVersion && $liveVersion->ExpiryDate != null && $liveVersion->ExpiryDate != '0000-00-00 00:00:00') {
+			// TODO Remove TZDateTimeField dependency
 			if (class_exists('TZDateTimeField')) {
-				$tzConverter = new TZDateTimeField('ExpiryDate', 'Expiry Date', $liveVersion->ExpiryDate, SiteConfig::current_site_config()->Timezone);
+				$tzField = new TZDateTimeField('ExpiryDate', 'Expiry Date', $liveVersion->ExpiryDate);
+				$zones = $tzField->getTimezones();
 				$fields->addFieldsToTab('Root.Expiry', array(
-							new LiteralField('ExpiryWarning', "<p>This page is scheduled to expire at ".$tzConverter->SSDatetime()->Nice24().', '.$tzConverter->DefaultTimezoneName().' time. <a href="' . $this->ViewExpiredLink() . '" target="_blank">View site on date</a></p>')
-							));
+					new LiteralField(
+						'ExpiryWarning', 
+						sprintf(
+							'<p>This page is scheduled to expire at %s, %s time. <a href="%s" target="_blank">View site on date</a></p>',
+							DBField::create('SS_Datetime', $tzField->dataValue())->Nice24(),
+							@$zones[$tzField->getConfig('usertimezone')],
+							$this->ViewExpiredLink()
+						)
+					)
+				));
 			} else {
-				$tzfield = new DateTimeField('ExpiryDate', 'Expiry Date', $liveVersion->ExpiryDate);
+				$tzfield = Object::create('DateTimeField', 'ExpiryDate', 'Expiry Date', $liveVersion->ExpiryDate);
 				$datetime = $liveVersion->dbObject('ExpiryDate');
 				$fields->addFieldsToTab('Root.Expiry', array(
-							new LiteralField('ExpiryWarning', "<p>This page is scheduled to expire at "
-								. $datetime->Time()
-								. ', on '
-								. $datetime->Long()
-								. '. <a href="' 
-								. $this->ViewExpiredLink() 
-								. '" target="_blank">View site on date</a></p>')
-							));
+					new LiteralField(
+						'ExpiryWarning', 
+						sprintf(
+							'<p>This page is scheduled to expire at %s, on %s <a href="%s" target="_blank">View site on date</a></p>',
+							$datetime->Time(),
+							$datetime->Long(),
+							$this->ViewExpiredLink()
+						)
+					)
+				));
 			}
 			if ($this->owner->BackLinkTracking() && $this->owner->BackLinkTracking()->Count() > 0) {
 				$fields->addFieldsToTab('Root.Expiry', array(
