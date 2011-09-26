@@ -28,16 +28,6 @@
 			<% end_control %>
 		</ul>
 
-		<style type="text/css">
-			div#futurePublishing div.popupdatetime {
-				display:inline;
-			}
-			div#futurePublishing div.popupdatetime ul {
-				float:left;
-				margin-right:10px;
-			}
-		</style>
-
 		<div id="embargoExpiry">
 			<% if ClassName == WorkflowDeletionRequest %>
 				<% if Page.canApprove %>

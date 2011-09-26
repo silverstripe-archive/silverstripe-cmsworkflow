@@ -15,28 +15,20 @@ class PagesScheduledForPublishingReport extends SS_Report {
 		
 		$wheres = array();
 		
+		// Emulate Form->loadDataFrom()
+		$fields = $this->parameterFields();
+		foreach($fields as $field) {
+			if(isset($params[$field->Name()])) {
+				$val = $params[$field->Name()];
+				if($val) $field->setValue($val);
+			}
+		}
+		
 		$startDate = !empty($params['StartDate']) ? $params['StartDate'] : null;
 		$endDate = !empty($params['EndDate']) ? $params['EndDate'] : null;
 		
-		if($startDate) {
-			if(count(explode('/', $startDate['Date'])) == 3) {
-				list($d, $m, $y) = explode('/', $startDate['Date']);
-				$startDate['Time'] = $startDate['Time'] ? $startDate['Time'] : '00:00:00';
-				$startDate = @date('Y-m-d H:i:s', strtotime("$y-$m-$d {$startDate['Time']}"));
-			} else {
-				$startDate = null;
-			}
-		}
-		
-		if($endDate) {
-			if(count(explode('/', $endDate['Date'])) == 3) {
-				list($d,$m,$y) = explode('/', $endDate['Date']);
-				$endDate['Time'] = $endDate['Time'] ? $endDate['Time'] : '23:59:59';
-				$endDate = @date('Y-m-d H:i:s', strtotime("$y-$m-$d {$endDate['Time']}"));
-			} else {
-				$endDate = null;
-			}
-		}
+		if($startDate) $startDate = $fields->dataFieldByName('StartDate')->dataValue();
+		if($endDate) $endDate = $fields->dataFieldByName('EndDate')->dataValue();
 		
 		if ($startDate && $endDate) {
 			$wheres[] = "\"EmbargoDate\" >= '".Convert::raw2sql($startDate)."' AND \"EmbargoDate\" <= '".Convert::raw2sql($endDate)."'";
@@ -131,18 +123,10 @@ class PagesScheduledForPublishingReport extends SS_Report {
 	function parameterFields() {
 		$params = new FieldSet();
 		
-		if(class_exists('PopupDateTimeField')) {
-			$params->push($startDate = new PopupDateTimeField('StartDate', 'Start date'));
-			$params->push($endDate = new PopupDateTimeField('EndDate', 'End date'));
-			$endDate->defaultToEndOfDay();
-			$startDate->allowOnlyTime(false);
-			$endDate->allowOnlyTime(false);
-			$endDate->mustBeAfter($startDate->Name());
-			$startDate->mustBeBefore($endDate->Name());
-		} else {
-			$params->push($startDate = new DateTimeField('StartDate', 'Start date'));
-			$params->push($endDate = new DateTimeField('EndDate', 'End date'));
-		}
+		$params->push($startDate = new DateTimeField('StartDate', 'Start date'));
+		$params->push($endDate = new DateTimeField('EndDate', 'End date'));
+		$startDate->getTimeField()->setValue('23:59:59');
+		$endDate->getTimeField()->setValue('23:59:59');
 
 		return $params;
 	}

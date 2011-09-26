@@ -380,9 +380,9 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 	 * returns false if the field cant be used in this context
 	 */
 	function EmbargoField() {
-		if (class_exists('TZDateTimeField')) return new TZDateTimeField('EmbargoDate', 'Embargo Date', $this->EmbargoDate, SiteConfig::current_site_config()->Timezone);
-		else if(class_exists('PopupDateTimeField')) return new PopupDatetimeField('EmbargoDate', 'Embargo Date', $this->EmbargoDate);
-		else {
+		if (class_exists('TZDateTimeField')) {
+			return new TZDateTimeField('EmbargoDate', 'Embargo Date', $this->EmbargoDate, SiteConfig::current_site_config()->Timezone);
+		} else {
 			$datetimeField = new DatetimeField('EmbargoDate', 'Embargo Date', $this->EmbargoDate);
 			$datetimeField->getDateField()->setConfig('showcalendar', true);
 			$datetimeField->getTimeField()->setConfig('showdropdown', true);
@@ -392,9 +392,9 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		}
 	}
 	function ExpiryField() {
-		if (class_exists('TZDateTimeField')) return new TZDateTimeField('ExpiryDate', 'Expiry Date', $this->ExpiryDate, SiteConfig::current_site_config()->Timezone);
-		else if(class_exists('PopupDateTimeField')) return new PopupDateTimeField('ExpiryDate', 'Expiry Date', $this->ExpiryDate);
-		else {
+		if (class_exists('TZDateTimeField')) {
+			return new TZDateTimeField('ExpiryDate', 'Expiry Date', $this->ExpiryDate, SiteConfig::current_site_config()->Timezone);
+		} else {
 			$datetimeField = new DatetimeField('ExpiryDate', 'Expiry Date', $this->ExpiryDate);
 			$datetimeField->getDateField()->setConfig('showcalendar', true);
 			$datetimeField->getTimeField()->setConfig('showdropdown', true);

@@ -32,16 +32,7 @@
 	margin-bottom: -10px;
 }
 
-/* PopupDateTimeField styles */
-#embargoExpiry .popupdatetime , #embargoExpiry .popupdatetime ul {
-	float: left;
-	margin-right:3px;
-}
-/* DateTimeField styles */
-/*#embargoExpiry input {
-	width: auto;
-}*/
- #embargoExpiry .field.date, #embargoExpiry .field.time {
+#embargoExpiry .field.date, #embargoExpiry .field.time {
 	float: left;
 	margin-top: -4px;
 }

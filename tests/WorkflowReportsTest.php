@@ -27,13 +27,19 @@ class WorkflowReportsTest extends FunctionalTest {
 	function setUp() {
 		// Static publishing will just confuse things
 		StaticPublisher::$disable_realtime = true;
+		
 		parent::setUp();
+		
+		$this->origLocale = i18n::get_locale();
+		i18n::set_locale('en_NZ');
 	}
 	
 	function tearDown() {
 		parent::tearDown();
+		
 		// Static publishing will just confuse things
 		StaticPublisher::$disable_realtime = false;
+		i18n::set_locale($this->origLocale);
 	}
 	
 	function testPagesScheduledForPublishingReport() {
@@ -56,8 +62,8 @@ class WorkflowReportsTest extends FunctionalTest {
 		// Test with start date only
 		$results = $report->sourceRecords(array(
 			'StartDate' => array(
-				'Date' => '14/02/2010',
-				'Time' => '12:00 am'
+				'date' => '14/02/2010',
+				'time' => '12:00 am'
 			)
 		), 'Title DESC', false);
 		$this->assertEquals($results->column('Title'), array(
@@ -68,8 +74,8 @@ class WorkflowReportsTest extends FunctionalTest {
 		// Test with end date only
 		$results = $report->sourceRecords(array(
 			'EndDate' => array(
-				'Date' => '14/02/2010',
-				'Time' => '12:00 am'
+				'date' => '14/02/2010',
+				'time' => '12:00 am'
 			)
 		), 'Title ASC', false);
 		$this->assertEquals($results->column('Title'), array(
@@ -79,12 +85,12 @@ class WorkflowReportsTest extends FunctionalTest {
 		// Test with start and end dates
 		$results = $report->sourceRecords(array(
 			'StartDate' => array(
-				'Date' => '04/02/2010',
-				'Time' => '12:00 am'
+				'date' => '04/02/2010',
+				'time' => '12:00 am'
 			),
 			'EndDate' => array(
-				'Date' => '12/02/2010',
-				'Time' => '12:00 am'
+				'date' => '12/02/2010',
+				'time' => '12:00 am'
 			)
 		), 'AbsoluteLink DESC', false);
 		$this->assertEquals($results->column('Title'), array(
@@ -153,8 +159,8 @@ class WorkflowReportsTest extends FunctionalTest {
 		// Test with start date only
 		$results = $report->sourceRecords(array(
 			'StartDate' => array(
-				'Date' => '14/02/2010',
-				'Time' => '12:00 am'
+				'date' => '14/02/2010',
+				'time' => '12:00 am'
 			)
 		), 'Title DESC', false);
 		$this->assertEquals($results->column('Title'), array(
@@ -165,8 +171,8 @@ class WorkflowReportsTest extends FunctionalTest {
 		// Test with end date only
 		$results = $report->sourceRecords(array(
 			'EndDate' => array(
-				'Date' => '14/02/2010',
-				'Time' => '12:00 am'
+				'date' => '14/02/2010',
+				'time' => '12:00 am'
 			)
 		), 'Title ASC', false);
 		$this->assertEquals($results->column('Title'), array(
@@ -176,12 +182,12 @@ class WorkflowReportsTest extends FunctionalTest {
 		// Test with start and end dates
 		$results = $report->sourceRecords(array(
 			'StartDate' => array(
-				'Date' => '04/02/2010',
-				'Time' => '12:00 am'
+				'date' => '04/02/2010',
+				'time' => '12:00 am'
 			),
 			'EndDate' => array(
-				'Date' => '12/02/2010',
-				'Time' => '12:00 am'
+				'date' => '12/02/2010',
+				'time' => '12:00 am'
 			)
 		), 'Title DESC', false);
 		$this->assertEquals($results->column('Title'), array(
@@ -273,8 +279,8 @@ class WorkflowReportsTest extends FunctionalTest {
 		// Test with start date only
 		$results = $report->sourceRecords(array(
 			'StartDate' => array(
-				'Date' => '14/02/2010',
-				'Time' => '12:00 am'
+				'date' => '14/02/2010',
+				'time' => '12:00 am'
 			)
 		), '"Title" DESC', false);
 		$this->assertEquals($results->column('Title'), array(
@@ -285,8 +291,8 @@ class WorkflowReportsTest extends FunctionalTest {
 		// Test with end date only
 		$results = $report->sourceRecords(array(
 			'EndDate' => array(
-				'Date' => '14/02/2010',
-				'Time' => '12:00 am'
+				'date' => '14/02/2010',
+				'time' => '12:00 am'
 			)
 		), '"Title" ASC', false);
 		$this->assertEquals($results->column('Title'), array(
@@ -296,12 +302,12 @@ class WorkflowReportsTest extends FunctionalTest {
 		// Test with start and end dates
 		$results = $report->sourceRecords(array(
 			'StartDate' => array(
-				'Date' => '04/02/2010',
-				'Time' => '12:00 am'
+				'date' => '04/02/2010',
+				'time' => '12:00 am'
 			),
 			'EndDate' => array(
-				'Date' => '12/02/2010',
-				'Time' => '12:00 am'
+				'date' => '12/02/2010',
+				'time' => '12:00 am'
 			)
 		), '"Title" DESC', false);
 		$this->assertEquals($results->column('Title'), array(

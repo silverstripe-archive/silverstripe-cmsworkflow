@@ -226,24 +226,13 @@ var EmbargoExpiry = {
 		alert("There was an error processing that request:\n\n"+data.message);
 	},
 	ids: function(forWhat) {
-		var dateSuffix, timeSuffix;
-		if(document.getElementById('ExpiryDate_Date') || document.getElementById('EmbargoDate_Date')) {
-			// PopupDateTimeField
-			dateSuffix = '_Date';
-			timeSuffix = '_Time';
-		} else {
-			// DateTimeField
-			dateSuffix = '-date';
-			timeSuffix = '-time';
-		}
-		
 		switch(forWhat) {
 			case 'expiry':
 				return {
 					resetButton: 'resetExpiryButton',
 					saveButton: 'saveExpiryButton',
-					dateField: 'ExpiryDate' + dateSuffix,
-					timeField: 'ExpiryDate' + timeSuffix,
+					dateField: 'ExpiryDate-date',
+					timeField: 'ExpiryDate-time',
 					timezoneField: 'ExpiryDate_TimeZone',
 					wholeMessage: 'embargoExpiry-expiryStatus',
 					dateTime: 'expiryDate',
@@ -253,8 +242,8 @@ var EmbargoExpiry = {
 				return {
 					resetButton: 'resetEmbargoButton',
 					saveButton: 'saveEmbargoButton',
-					dateField: 'EmbargoDate' + dateSuffix,
-					timeField: 'EmbargoDate' + timeSuffix,
+					dateField: 'EmbargoDate-date',
+					timeField: 'EmbargoDate-time',
 					timezoneField: 'EmbargoDate_TimeZone',
 					wholeMessage: 'embargoExpiry-embargoStatus',
 					dateTime: 'embargoDate',
