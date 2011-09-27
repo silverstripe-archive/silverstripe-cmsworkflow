@@ -306,7 +306,7 @@ var EmbargoExpiry = {
 
 Behaviour.register({
 	'#EmbargoDate_Time' : {
-		initialize: EmbargoExpiry.init,
+		initialize: EmbargoExpiry.init
 	}
 });
 
@@ -318,7 +318,7 @@ autoSave = function(confirmation, callAfter) {
 		}
 	}
 	return autoSave_original(confirmation, callAfter);
-}
+};
 
 var save_original = CMSForm.prototype.save;
 CMSForm.prototype.save = function(ifChanged, callAfter, action, publish) {
@@ -331,7 +331,7 @@ CMSForm.prototype.save = function(ifChanged, callAfter, action, publish) {
 		}
 	}
 	return save_original.call(this, ifChanged, callAfter, action, publish);
-}
+};
 
 function action_publish_right(e) {
 	var messageEl = null;
@@ -368,7 +368,7 @@ Behaviour.register({
 			if(this.checked) this.click();
 		},
 		onclick: function() {
-			$('PublisherGroups').style.display = (this.value == 'OnlyTheseUsers') ? 'block' : 'none'
+			$('PublisherGroups').style.display = (this.value == 'OnlyTheseUsers') ? 'block' : 'none';
 		}
 	}
 });
