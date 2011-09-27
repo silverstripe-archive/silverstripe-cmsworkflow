@@ -372,3 +372,25 @@ Behaviour.register({
 		}
 	}
 });
+
+(function($) {
+	// Limit date range for start/end date on reports
+	$('.ReportAdmin input[name="StartDate\[date\]"], .ReportAdmin .field.datetime input[name="EndDate\[date\]"]').live('change', function(e) {
+		// Don't apply if ssDatepicker plugin isn't present (e.g. in SilverStripe 2.4),
+		// or if no datepicker has been applied to the field (configurable via the "showcalendar" option in DateField.php)
+		if(!$.fn.ssDatepicker || !$(this).data('datepicker')) return;
+		
+		var $thisField = $(this), isStart = $thisField.is('[name="StartDate\[date\]"]'), isEnd = !isStart;
+			
+		var holder = $thisField.parents('form'), 
+			otherFieldName = isStart ? 'EndDate\[date\]' : 'StartDate\[date\]',
+			$otherField = holder.find('input[name="' + otherFieldName + '"]');
+			
+		$otherField.ssDatepicker();
+		$otherField.datepicker(
+			'option', 
+			isStart ? 'minDate' : 'maxDate', 
+			$.datepicker.parseDate($otherField.datepicker('option', 'dateFormat'), $thisField.val())
+		);
+	});
+}(jQuery));
