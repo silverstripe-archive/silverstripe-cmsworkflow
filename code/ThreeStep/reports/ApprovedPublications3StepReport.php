@@ -6,6 +6,11 @@
  * @subpackage ThreeStep
  */
 class ApprovedPublications3StepReport extends SS_Report {
+	
+	/**
+	 * @var Array
+	 */
+	protected $_cache_sourceRecords = array();
 
 	function title() {
 		return _t('ApprovedPublications3StepReport.TITLE',"Approved pages I need to publish");

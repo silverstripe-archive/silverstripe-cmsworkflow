@@ -7,6 +7,11 @@
  */
 class UnapprovedPublications3StepReport extends SS_Report {
 
+	/**
+	 * @var Array
+	 */
+	protected $_cache_sourceRecords = array();
+	
 	function title() {
 		return _t('UnapprovedPublications3StepReport.TITLE',"Publication requests I need to approve");
 	}
