@@ -1,56 +1,49 @@
 #FutureStateDatePopup {	
 	display: none;
 	position: absolute;
-	top: -60px;
-	height: 60px;
-	width: 280px;
+	bottom: 25px;
 	left: 200px;
+	padding: 5px;
 	background-color: white;
 	border: 1px solid black;
 	z-index: 100;
 }
-#FutureStateDatePopup a.close {
-	display:block;
-	width:95%;
-	text-align:right;
-	color: blue;
-	cursor: pointer;
-	height:12px;
-	display:block;
-	clear:both;
+#FutureStateDatePopup > * {
+	display: inline-block;
+	vertical-align: middle;
+}
+#FutureStateDatePopup #FutureStateDate {
+	float: left;
+	margin-top: 0;
+}
+#FutureStateDatePopup label {
+	display: none;
+}
+#FutureStateDatePopup .middleColumn {
+	width: auto;
+	margin: 0;
+	background: none;
+}
+#FutureStateDatePopup input,
+#FutureStateDatePopup select {
+	width: 8em;
 }
 #FutureStateDatePopup .date, 
 #FutureStateDatePopup .time {
-	width:49%;
 	float: left;
+	margin-right: 5px;
 }
-#FutureStateDatePopup .date {
-	margin-left: 5px;
-}
-#FutureStateDatePopup > div {
-	margin-top:8px;
-}
-#FutureStateDate-time {
-	float:left;
-}
-#FutureStateDate-time-icon {
-	display: block;
-	float: left;
-	height: 16px;
-	margin-left: 3px;
-	width: 16px;
-	top:0px;
-}
-#FutureStateDatePopup .dropdownpopup {
-	top:-26em;
-}
-#bottom #switchView a#FutureStateGoLink {
-	width: 25px; 
-	height: 16px; 
-	float: right; 
-	border: medium none; 
-	color: blue;
+#FutureStateDatePopup a:link,
+#FutureStateDatePopup a:hover,
+#FutureStateDatePopup a:visited {
+	color: black;
 }
 #bottom {
 	z-index:60;
+}
+div.time-picker {
+	width: 6em;
+	/* Unfortunately the time picker library doesn't reposition based on window constraints */
+	bottom: 50px !important;
+	top: auto !important;
 }
