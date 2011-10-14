@@ -8,13 +8,9 @@
 	border: 1px solid black;
 	z-index: 100;
 }
-#FutureStateDatePopup > * {
+#FutureStateDatePopup * {
 	display: inline-block;
 	vertical-align: middle;
-}
-#FutureStateDatePopup #FutureStateDate {
-	float: left;
-	margin-top: 0;
 }
 #FutureStateDatePopup label {
 	display: none;
@@ -32,6 +28,11 @@
 #FutureStateDatePopup .time {
 	float: left;
 	margin-right: 5px;
+}
+/* Some implementations have icons needing to be centered (not enabled by default) */
+#FutureStateDatePopup .date img,
+#FutureStateDatePopup .time img {
+	vertical-align: middle;
 }
 #FutureStateDatePopup a:link,
 #FutureStateDatePopup a:hover,
