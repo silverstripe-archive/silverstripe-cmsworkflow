@@ -133,10 +133,10 @@ var EmbargoExpiry = {
 	embargoUnsaved: false,
 	expiryUnsaved: false,
 	init: function() {
-		$('EmbargoDate_Date').addEventListener('change', EmbargoExpiry.embargoChange, false);
-		$('EmbargoDate_Time').addEventListener('change', EmbargoExpiry.embargoChange, false);
-		$('ExpiryDate_Date').addEventListener('change', EmbargoExpiry.expiryChange, false);
-		$('ExpiryDate_Time').addEventListener('change', EmbargoExpiry.expiryChange, false);
+		jQuery('#EmbargoDate-date').change(EmbargoExpiry.embargoChange);
+		jQuery('#EmbargoDate-time').change(EmbargoExpiry.embargoChange);
+		jQuery('#ExpiryDate-date').change(EmbargoExpiry.expiryChange);
+		jQuery('#ExpiryDate-time').change(EmbargoExpiry.expiryChange);
 
 		EmbargoExpiry.fieldCheck();
 
@@ -305,7 +305,7 @@ var EmbargoExpiry = {
 };
 
 Behaviour.register({
-	'#EmbargoDate_Time' : {
+	'#embargoExpiry' : {
 		initialize: EmbargoExpiry.init
 	}
 });

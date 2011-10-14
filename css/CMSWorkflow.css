@@ -1,3 +1,7 @@
+.clear {
+	clear: both;
+}
+
 #CMSWorkflowChanges li {
 	background:#E9E9E9;
 	border: 1px #CCC solid;
@@ -32,12 +36,12 @@
 	margin-bottom: -10px;
 }
 
-#embargoExpiry .field.date, #embargoExpiry .field.time {
+#embargoExpiry .field.date, 
+#embargoExpiry .field.time,
+#embargoExpiry .field.dropdown {
+	clear: none;
 	float: left;
 	margin-top: -4px;
-}
-#embargoExpiry .field.time {
-	clear: none;
 }
 	 #embargoExpiry .field.date input, #embargoExpiry .field.time input {
 		width: auto;
