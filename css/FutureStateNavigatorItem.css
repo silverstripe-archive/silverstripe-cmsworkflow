@@ -1,10 +1,56 @@
-#FutureStateDatePopup {	display: none;position: absolute;top: -60px;height: 60px;width: 280px;left: 200px;background-color: white;border: 1px solid black;z-index: 100;}
-#FutureStateDatePopup a.close {display:block;width:95%;text-align:right;color: blue;cursor: pointer;height:12px;display:block;clear:both;}
-#FutureStateDatePopup .date, #FutureStateDatePopup .time{width:49%;float: left;}
-#FutureStateDatePopup .date {margin-left: 5px;}
-#FutureStateDatePopup > div{margin-top:8px;}
-#FutureStateDate-time{float:left;}
-#FutureStateDate-time-icon{display: block;float: left;height: 16px;margin-left: 3px;width: 16px;top:0px;}
-#FutureStateDatePopup .dropdownpopup{top:-26em;}
-#bottom #switchView a#FutureStateGoLink {width: 25px; height: 16px; float: right; border: medium none; color: blue;}
-#bottom{z-index:60;}
+#FutureStateDatePopup {	
+	display: none;
+	position: absolute;
+	top: -60px;
+	height: 60px;
+	width: 280px;
+	left: 200px;
+	background-color: white;
+	border: 1px solid black;
+	z-index: 100;
+}
+#FutureStateDatePopup a.close {
+	display:block;
+	width:95%;
+	text-align:right;
+	color: blue;
+	cursor: pointer;
+	height:12px;
+	display:block;
+	clear:both;
+}
+#FutureStateDatePopup .date, 
+#FutureStateDatePopup .time {
+	width:49%;
+	float: left;
+}
+#FutureStateDatePopup .date {
+	margin-left: 5px;
+}
+#FutureStateDatePopup > div {
+	margin-top:8px;
+}
+#FutureStateDate-time {
+	float:left;
+}
+#FutureStateDate-time-icon {
+	display: block;
+	float: left;
+	height: 16px;
+	margin-left: 3px;
+	width: 16px;
+	top:0px;
+}
+#FutureStateDatePopup .dropdownpopup {
+	top:-26em;
+}
+#bottom #switchView a#FutureStateGoLink {
+	width: 25px; 
+	height: 16px; 
+	float: right; 
+	border: medium none; 
+	color: blue;
+}
+#bottom {
+	z-index:60;
+}
