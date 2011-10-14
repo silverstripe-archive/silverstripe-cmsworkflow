@@ -21,7 +21,7 @@
 			var urlDate = dateObj.getFullYear() + '-' + pad(dateObj.getMonth()+1) + '-' + pad(dateObj.getDate());
 			urlDate += ' ' + pad(dateObj.getHours()) + ':' + pad(dateObj.getMinutes()) + ':00';
 			
-			var w = window.open(this.href + '?futureDate=' + urlDate, windowName(this.target));
+			var w = window.open(this.href + '?futureDate=' + urlDate);
 			w.focus();
 			
 			return false;
