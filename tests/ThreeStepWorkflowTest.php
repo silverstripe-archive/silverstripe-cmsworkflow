@@ -180,7 +180,7 @@ class ThreeStepWorkflowTest extends FunctionalTest {
 		$page->write();
 		$page->ApproverGroups()->add($customauthorgroup);
 		// Clear permission cache
-		SiteTree::on_db_reset();
+		SiteTreeFutureState::on_db_reset();
 		
 		$this->assertTrue($page->canApprove($customauthor));
 		
