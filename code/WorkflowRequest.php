@@ -384,7 +384,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$datetimeField->getDateField()->setConfig('showcalendar', true);
 		$datetimeField->getTimeField()->setConfig('showdropdown', true);
 		$datetimeField->getDateField()->setConfig('dateformat', 'dd/MM/YYYY');
-		$datetimeField->getTimeField()->setConfig('timeformat', 'HH');
+		$datetimeField->getTimeField()->setConfig('timeformat', 'HH:mm');
 		return $datetimeField;
 	}
 	
@@ -393,7 +393,7 @@ class WorkflowRequest extends DataObject implements i18nEntityProvider {
 		$datetimeField->getDateField()->setConfig('showcalendar', true);
 		$datetimeField->getTimeField()->setConfig('showdropdown', true);
 		$datetimeField->getDateField()->setConfig('dateformat', 'dd/MM/YYYY');
-		$datetimeField->getTimeField()->setConfig('timeformat', 'h:m a');
+		$datetimeField->getTimeField()->setConfig('timeformat', 'HH:mm');
 		return $datetimeField;
 	}
 	
