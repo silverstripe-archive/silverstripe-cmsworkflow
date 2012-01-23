@@ -76,7 +76,7 @@ class PagesScheduledForPublishingReport extends SS_Report {
 		// Turn a query into records
 		$records = singleton('SiteTree')->buildDataObjectSet($query->execute(), 'DataObjectSet', $query);
 		
-		if ($records) SiteTree::prepopuplate_permission_cache('edit', $records->column('ID'));
+		if ($records) SiteTree::prepopulate_permission_cache('edit', $records->column('ID'));
 
 		// Filter to only those with canEdit permission
 		$filteredRecords = new DataObjectSet();
