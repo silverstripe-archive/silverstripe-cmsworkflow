@@ -233,7 +233,7 @@ var EmbargoExpiry = {
 					saveButton: 'saveExpiryButton',
 					dateField: 'ExpiryDate-date',
 					timeField: 'ExpiryDate-time',
-					timezoneField: 'ExpiryDate_TimeZone',
+					timezoneField: 'ExpiryDate-timezone',
 					wholeMessage: 'embargoExpiry-expiryStatus',
 					dateTime: 'expiryDate',
 					what: 'expiry'
@@ -244,7 +244,7 @@ var EmbargoExpiry = {
 					saveButton: 'saveEmbargoButton',
 					dateField: 'EmbargoDate-date',
 					timeField: 'EmbargoDate-time',
-					timezoneField: 'EmbargoDate_TimeZone',
+					timezoneField: 'EmbargoDate-timezone',
 					wholeMessage: 'embargoExpiry-embargoStatus',
 					dateTime: 'embargoDate',
 					what: 'embargo'
