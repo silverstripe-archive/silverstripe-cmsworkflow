@@ -36,6 +36,11 @@
 	margin-bottom: -10px;
 }
 
+/* Overwrites weird global defaults in cms/css/typography.css which apply for <p>, but not for contained <span> */
+#embargoExpiry p * {
+	font-size: 12px;
+}
+
 #embargoExpiry .field.date, 
 #embargoExpiry .field.time,
 #embargoExpiry .field.dropdown {
