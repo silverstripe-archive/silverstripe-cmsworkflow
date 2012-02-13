@@ -201,7 +201,7 @@ class SiteTreeFutureState_SilverStripeNavigatorItem extends SilverStripeNavigato
 	
 	function getHTML($page) {
 		Requirements::css('cmsworkflow/css/FutureStateNavigatorItem.css');
-		Requirements::javascript(THIRDPARTY_DIR .'/jquery/jquery.js');
+		Requirements::javascript(THIRDPARTY_DIR .'/jquery/jquery-packed.js');
 		Requirements::javascript(THIRDPARTY_DIR .'/jquery-livequery/jquery.livequery.js');
 		
 		Requirements::javascript('cmsworkflow/javascript/futurestate.js');
