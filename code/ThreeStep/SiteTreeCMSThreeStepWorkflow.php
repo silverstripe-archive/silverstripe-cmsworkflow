@@ -175,11 +175,14 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 	 */
 	public function canApprove($member = null) {
 		if(!$member) $member = Member::currentUser();
+		if(!$member) return false;
+		
 		$memberID = $member->ID;
 		
-		if(isset(SiteTree::$cache_permissions['CanApproveType'][$this->owner->ID])) {
-			return SiteTree::$cache_permissions['CanApproveType'][$this->owner->ID];
-		}
+		// can_approve_multiple will check the cache so this isn't necessary
+		//if(isset(SiteTree::$cache_permissions['approve'][$this->owner->ID])) {
+		//	return SiteTree::$cache_permissions['approve'][$this->owner->ID];
+		//}
 		
 		// DANGER, WILL ROBINSON!
 		// we currently have not implemented extensions here. if you do
@@ -239,9 +242,10 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 		if ($member instanceof Member) $memberID = $member->ID;
 		else $memberID = $member;
 		
-		if(isset(SiteTree::$cache_permissions['CanPublishType'][$this->owner->ID])) {
-			return SiteTree::$cache_permissions['CanPublishType'][$this->owner->ID];
-		}
+		// can_publish_multiple will check the cache so this isn't necessary
+		//if(isset(SiteTree::$cache_permissions['publish'][$this->owner->ID])) {
+		//	return SiteTree::$cache_permissions['publish'][$this->owner->ID];
+		//}
 		
 		// DANGER, WILL ROBINSON!
 		// we currently have not implemented extensions here. if you do
@@ -257,7 +261,9 @@ class SiteTreeCMSThreeStepWorkflow extends SiteTreeCMSWFDecorator implements Per
 	}
 
 	static function can_publish_multiple($ids, $memberID, $useCached = true) {
-		return SiteTree::batch_permission_check($ids, $memberID, 'CanPublishType', 'SiteTree_PublisherGroups', 'canPublish', null, $useCached);
+		$checks = SiteTree::batch_permission_check($ids, $memberID, 'CanPublishType', 'SiteTree_PublisherGroups', 'canPublish', null, $useCached);
+
+		return $checks;
 	}
 	
 	/**

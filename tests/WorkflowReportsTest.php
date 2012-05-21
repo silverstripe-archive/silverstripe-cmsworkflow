@@ -27,13 +27,19 @@ class WorkflowReportsTest extends FunctionalTest {
 	function setUp() {
 		// Static publishing will just confuse things
 		StaticPublisher::$disable_realtime = true;
+		
 		parent::setUp();
+		
+		$this->origLocale = i18n::get_locale();
+		i18n::set_locale('en_NZ');
 	}
 	
 	function tearDown() {
 		parent::tearDown();
+		
 		// Static publishing will just confuse things
 		StaticPublisher::$disable_realtime = false;
+		i18n::set_locale($this->origLocale);
 	}
 	
 	function testPagesScheduledForPublishingReport() {
@@ -56,8 +62,8 @@ class WorkflowReportsTest extends FunctionalTest {
 		// Test with start date only
 		$results = $report->sourceRecords(array(
 			'StartDate' => array(
-				'Date' => '14/02/2010',
-				'Time' => '12:00 am'
+				'date' => '14/02/2010',
+				'time' => '12:00 am'
 			)
 		), 'Title DESC', false);
 		$this->assertEquals($results->column('Title'), array(
@@ -68,8 +74,8 @@ class WorkflowReportsTest extends FunctionalTest {
 		// Test with end date only
 		$results = $report->sourceRecords(array(
 			'EndDate' => array(
-				'Date' => '14/02/2010',
-				'Time' => '12:00 am'
+				'date' => '14/02/2010',
+				'time' => '12:00 am'
 			)
 		), 'Title ASC', false);
 		$this->assertEquals($results->column('Title'), array(
@@ -79,12 +85,12 @@ class WorkflowReportsTest extends FunctionalTest {
 		// Test with start and end dates
 		$results = $report->sourceRecords(array(
 			'StartDate' => array(
-				'Date' => '04/02/2010',
-				'Time' => '12:00 am'
+				'date' => '04/02/2010',
+				'time' => '12:00 am'
 			),
 			'EndDate' => array(
-				'Date' => '12/02/2010',
-				'Time' => '12:00 am'
+				'date' => '12/02/2010',
+				'time' => '12:00 am'
 			)
 		), 'AbsoluteLink DESC', false);
 		$this->assertEquals($results->column('Title'), array(
@@ -97,6 +103,34 @@ class WorkflowReportsTest extends FunctionalTest {
 		$this->assertEquals($report->sourceRecords(array(), '"Title" DESC', false)->Count(), 3);
 		$this->logInAs($this->objFromFixture('Member', 'publisher'));
 		$this->assertEquals($report->sourceRecords(array(), '"Title" DESC', false)->Count(), 2);
+		
+		SS_Datetime::clear_mock_now();
+	}
+	
+	function testPagesScheduledForPublishingReportIncludesVirtualPages() {
+		$report = new PagesScheduledForPublishingReport();
+		$this->logInAs($this->objFromFixture('Member', 'admin'));
+		
+		$page2 = $this->objFromFixture('SiteTree', 'pagepub2');
+		$page3 = $this->objFromFixture('SiteTree', 'pagepub3');
+		$virtualPage = new VirtualPage();
+		$virtualPage->URLSegment = 'virtual';
+		$virtualPage->CopyContentFromID = $page3->ID;
+		$virtualPage->write();
+		
+		SS_Datetime::set_mock_now('2010-02-14 00:00:00');
+		$results = $report->sourceRecords(array(), '"ID" DESC', false);
+		// Can't test with titles as they'll be the same for virtual pages
+		$this->assertEquals($results->column('ID'), array(
+			$page3->ID,
+			$virtualPage->ID,
+			$page2->ID
+		));
+		$this->assertEquals($results->column('EmbargoDate'), array(
+			$page3->openWorkflowRequest()->EmbargoDate,
+			$page3->openWorkflowRequest()->EmbargoDate,
+			$page2->openWorkflowRequest()->EmbargoDate
+		));
 		
 		SS_Datetime::clear_mock_now();
 	}
@@ -125,8 +159,8 @@ class WorkflowReportsTest extends FunctionalTest {
 		// Test with start date only
 		$results = $report->sourceRecords(array(
 			'StartDate' => array(
-				'Date' => '14/02/2010',
-				'Time' => '12:00 am'
+				'date' => '14/02/2010',
+				'time' => '12:00 am'
 			)
 		), 'Title DESC', false);
 		$this->assertEquals($results->column('Title'), array(
@@ -137,8 +171,8 @@ class WorkflowReportsTest extends FunctionalTest {
 		// Test with end date only
 		$results = $report->sourceRecords(array(
 			'EndDate' => array(
-				'Date' => '14/02/2010',
-				'Time' => '12:00 am'
+				'date' => '14/02/2010',
+				'time' => '12:00 am'
 			)
 		), 'Title ASC', false);
 		$this->assertEquals($results->column('Title'), array(
@@ -148,12 +182,12 @@ class WorkflowReportsTest extends FunctionalTest {
 		// Test with start and end dates
 		$results = $report->sourceRecords(array(
 			'StartDate' => array(
-				'Date' => '04/02/2010',
-				'Time' => '12:00 am'
+				'date' => '04/02/2010',
+				'time' => '12:00 am'
 			),
 			'EndDate' => array(
-				'Date' => '12/02/2010',
-				'Time' => '12:00 am'
+				'date' => '12/02/2010',
+				'time' => '12:00 am'
 			)
 		), 'Title DESC', false);
 		$this->assertEquals($results->column('Title'), array(
@@ -166,6 +200,39 @@ class WorkflowReportsTest extends FunctionalTest {
 		$this->assertEquals($report->sourceRecords(array(), '', false)->Count(), 3);
 		$this->logInAs($this->objFromFixture('Member', 'publisher'));
 		$this->assertEquals($report->sourceRecords(array(), '"Title" DESC', false)->Count(), 2);
+		
+		SS_Datetime::clear_mock_now();
+	}
+	
+	function testPagesScheduledForDeletionReportIncludesVirtualPages() {
+		$report = new PagesScheduledForDeletionReport();
+		$this->logInAs($this->objFromFixture('Member', 'admin'));
+		
+		$page1 = $this->objFromFixture('SiteTree', 'pagedel1');
+		$page1->doPublish();
+		$page2 = $this->objFromFixture('SiteTree', 'pagedel2');
+		$page2->doPublish();
+		$page3 = $this->objFromFixture('SiteTree', 'pagedel3');
+		$page3->doPublish();
+
+		$virtualPage = new VirtualPage();
+		$virtualPage->URLSegment = 'virtual';
+		$virtualPage->CopyContentFromID = $page3->ID;
+		$virtualPage->write();
+		
+		SS_Datetime::set_mock_now('2010-02-14 00:00:00');
+		$results = $report->sourceRecords(array(), '"ID" DESC', false);
+		// Can't test with titles as they'll be the same for virtual pages
+		$this->assertEquals($results->column('ID'), array(
+			$page3->ID,
+			$virtualPage->ID,
+			$page2->ID
+		));
+		$this->assertEquals($results->column('ExpiryDate'), array(
+			$page3->ExpiryDate,
+			$page3->ExpiryDate,
+			$page2->ExpiryDate
+		));
 		
 		SS_Datetime::clear_mock_now();
 	}
@@ -212,8 +279,8 @@ class WorkflowReportsTest extends FunctionalTest {
 		// Test with start date only
 		$results = $report->sourceRecords(array(
 			'StartDate' => array(
-				'Date' => '14/02/2010',
-				'Time' => '12:00 am'
+				'date' => '14/02/2010',
+				'time' => '12:00 am'
 			)
 		), '"Title" DESC', false);
 		$this->assertEquals($results->column('Title'), array(
@@ -224,8 +291,8 @@ class WorkflowReportsTest extends FunctionalTest {
 		// Test with end date only
 		$results = $report->sourceRecords(array(
 			'EndDate' => array(
-				'Date' => '14/02/2010',
-				'Time' => '12:00 am'
+				'date' => '14/02/2010',
+				'time' => '12:00 am'
 			)
 		), '"Title" ASC', false);
 		$this->assertEquals($results->column('Title'), array(
@@ -235,12 +302,12 @@ class WorkflowReportsTest extends FunctionalTest {
 		// Test with start and end dates
 		$results = $report->sourceRecords(array(
 			'StartDate' => array(
-				'Date' => '04/02/2010',
-				'Time' => '12:00 am'
+				'date' => '04/02/2010',
+				'time' => '12:00 am'
 			),
 			'EndDate' => array(
-				'Date' => '12/02/2010',
-				'Time' => '12:00 am'
+				'date' => '12/02/2010',
+				'time' => '12:00 am'
 			)
 		), '"Title" DESC', false);
 		$this->assertEquals($results->column('Title'), array(

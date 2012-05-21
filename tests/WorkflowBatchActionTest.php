@@ -24,6 +24,19 @@ class WorkflowBatchActionTest extends FunctionalTest {
 		'SiteConfig' => array('SiteConfigThreeStepWorkflow'),
 	);
 	
+	function setUp() {
+		parent::setUp();
+		
+		$this->origLocale = i18n::get_locale();
+		i18n::set_locale('en_NZ');
+	}
+	
+	function tearDown() {
+		parent::tearDown();
+		
+		i18n::set_locale($this->origLocale);
+	}
+	
 	function testBatchSetResetEmbargo() {
 		$oldRequest = $_REQUEST;
 		
@@ -52,17 +65,10 @@ class WorkflowBatchActionTest extends FunctionalTest {
 		
 		SS_Datetime::set_mock_now('2009-06-15 15:00:00');
 
-		if(class_exists('PopupDateTimeField')) {
-			$_REQUEST['EmbargoDate_Batch'] = array(
-				'Date' => '01/01/2010',
-				'Time' => '3:00 pm'
-			);
-		}	else {
-			$_REQUEST['EmbargoDate_Batch'] = array(
-				'date' => '01/01/2010',
-				'time' => '3:00 pm'
-			);
-		}
+		$_REQUEST['EmbargoDate_Batch'] = array(
+			'date' => '31/01/2010',
+			'time' => '3:00 pm'
+		);
 		
 		$_REQUEST['ajax'] = 1;
 		$action->run($pages);
@@ -70,7 +76,7 @@ class WorkflowBatchActionTest extends FunctionalTest {
 		$page1 = DataObject::get_by_id('Page', $page1ID);
 		$page2 = DataObject::get_by_id('Page', $page2ID);
 		
-		$this->assertEquals($page1->openWorkflowRequest()->EmbargoDate, '2010-01-01 15:00:00');
+		$this->assertEquals($page1->openWorkflowRequest()->EmbargoDate, '2010-01-31 15:00:00');
 		$this->assertNull($page2->openWorkflowRequest());
 		
 		// Now test resetting
@@ -126,17 +132,10 @@ class WorkflowBatchActionTest extends FunctionalTest {
 		
 		SS_Datetime::set_mock_now('2009-06-15 15:00:00');
 			
-		if(class_exists('PopupDateTimeField')) {
-			$_REQUEST['ExpiryDate_Batch'] = array(
-				'Date' => '01/01/2010',
-				'Time' => '3:00 pm'
-			);
-		}	else {
-			$_REQUEST['ExpiryDate_Batch'] = array(
-				'date' => '01/01/2010',
-				'time' => '3:00 pm'
-			);
-		}
+		$_REQUEST['ExpiryDate_Batch'] = array(
+			'date' => '31/01/2010',
+			'time' => '3:00 pm'
+		);
 		$_REQUEST['ajax'] = 1;
 		
 		// Test confirmation dialog
@@ -149,7 +148,7 @@ class WorkflowBatchActionTest extends FunctionalTest {
 		$page1 = DataObject::get_by_id('Page', $page1ID);
 		$page2 = DataObject::get_by_id('Page', $page2ID);
 		
-		$this->assertEquals($page1->ExpiryDate, '2010-01-01 15:00:00');
+		$this->assertEquals($page1->ExpiryDate, '2010-01-31 15:00:00');
 		$this->assertNull($page2->openWorkflowRequest());
 		$this->assertNull($page2->ExpiryDate);
 		

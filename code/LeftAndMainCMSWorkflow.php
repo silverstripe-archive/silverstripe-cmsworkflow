@@ -50,19 +50,22 @@ class LeftAndMainCMSWorkflow extends LeftAndMainDecorator {
 					
 					if (isset($data['EmbargoDate'])) {
 						$embargoField->setValue($data['EmbargoDate']);
+						$tz = @$data['EmbargoDate']['timezone'];
+						if($tz) $embargoField->setConfig('usertimezone', $tz);
 						$embargoDate = $embargoField->Value();
 						$embargoTimestamp = strtotime($embargoField->Value());
 					}
 					
 					if (isset($data['ExpiryDate'])) {
 						$expiryField->setValue($data['ExpiryDate']);
+						$tz = @$data['ExpiryDate']['timezone'];
+						if($tz) $expiryField->setConfig('usertimezone', $tz);
 						$expiryDate = $expiryField->Value();
 						$expiryTimestamp = strtotime($expiryField->Value());
 					}
 					
 					$embargoField->saveInto($wfRequest);
 					$expiryField->saveInto($wfRequest->Page());
-					
 					$embargoTimestamp = strtotime($embargoField->dataValue());
 					$expiryTimestamp = strtotime($expiryField->dataValue());
 		

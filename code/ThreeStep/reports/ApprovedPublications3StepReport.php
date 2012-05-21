@@ -6,40 +6,47 @@
  * @subpackage ThreeStep
  */
 class ApprovedPublications3StepReport extends SS_Report {
+	
+	/**
+	 * @var Array
+	 */
+	protected $_cache_sourceRecords = array();
+
 	function title() {
 		return _t('ApprovedPublications3StepReport.TITLE',"Approved pages I need to publish");
 	}
+	
 	function sourceRecords($params, $sort, $limit) {
 		increase_time_limit_to(120);
-
-		$res = WorkflowThreeStepRequest::get_by_publisher(
-			'WorkflowPublicationRequest',
-			Member::currentUser(),
-			array('Approved')
-		);
 		
-		SiteTree::prepopuplate_permission_cache('CanPublishType', $res->column('ID'), 
-			"SiteTreeCMSThreeStepWorkflow::can_publish_multiple");
-		SiteTree::prepopuplate_permission_cache('CanEditType', $res->column('ID'),
-			"SiteTree::can_edit_multiple");
+		$cachekey = md5(serialize($params));
+		if(!isset($this->_cache_sourceRecords[$cachekey])) {
+			$res = WorkflowThreeStepRequest::get_by_publisher(
+				'WorkflowPublicationRequest',
+				Member::currentUser(),
+				array('Approved')
+			);
 
-		$doSet = new DataObjectSet();
-		foreach ($res as $result) {
-			if (!$result->canPublish()) continue;
-			if ($wf = $result->openWorkflowRequest()) {
-				$result->WFAuthorID = $wf->AuthorID;
-				$result->WFApproverTitle = $wf->Approver()->Title;
-				$result->WFAuthorTitle = $wf->Author()->Title;
-				$result->WFApprovedWhen = $wf->ApprovalDate();
-				$result->WFRequestedWhen = $wf->Created;
-				$result->WFApproverID = $wf->ApproverID;
-				$result->WFPublisherID = $wf->PublisherID;
-				$result->HasEmbargoOrExpiry = $wf->getEmbargoDate() || $wf->ExpiryDate() ? date('j M Y g:ia', strtotime($wf->ExpiryDate())) : 'no';
-				if (isset($_REQUEST['OnlyMine']) && $result->WFApproverID != Member::currentUserID()) continue;
-				$doSet->push($result);
+			$doSet = new DataObjectSet();
+			foreach ($res as $result) {
+				if ($wf = $result->openWorkflowRequest()) {
+					$result->WFAuthorID = $wf->AuthorID;
+					$result->WFApproverTitle = $wf->Approver()->Title;
+					$result->WFAuthorTitle = $wf->Author()->Title;
+					$result->WFApprovedWhen = $wf->ApprovalDate();
+					$result->WFRequestedWhen = $wf->Created;
+					$result->WFApproverID = $wf->ApproverID;
+					$result->WFPublisherID = $wf->PublisherID;
+					$result->HasExpiry = $wf->ExpiryDate();
+					if (isset($_REQUEST['OnlyMine']) && $result->WFApproverID != Member::currentUserID()) continue;
+					$doSet->push($result);
+				}
 			}
+			
+			$this->_cache_sourceRecords[$cachekey] = $doSet;
 		}
 		
+		$doSet = $this->_cache_sourceRecords[$cachekey];
 		if($sort) {
 			$parts = explode(' ', $sort);
 			$field = $parts[0];
@@ -54,6 +61,7 @@ class ApprovedPublications3StepReport extends SS_Report {
 		if($limit && $limit['limit']) return $doSet->getRange($limit['start'], $limit['limit']);
 		else return $doSet;
 	}
+	
 	function columns() {
 		return array(
 			"Title" => array(
@@ -74,7 +82,10 @@ class ApprovedPublications3StepReport extends SS_Report {
 				"title" => "Requested",
 				'casting' => 'SS_Datetime->Full'
 			),
-			'HasEmbargoOrExpiry' => 'Embargo',
+			'HasExpiry' => array(
+				'title' => 'Expiry',
+				'formatting' => '" . ($value ? date("j M Y g:ia", strtotime($value)) : "no") . "'
+			),
 			'AbsoluteLink' => array(
 				'title' => 'URL',
 				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a target=\"_blank\" href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a target=\"_blank\" href=\"$value?stage=Stage\">(draft)</a>'

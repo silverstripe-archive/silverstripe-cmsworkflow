@@ -1,3 +1,7 @@
+.clear {
+	clear: both;
+}
+
 #CMSWorkflowChanges li {
 	background:#E9E9E9;
 	border: 1px #CCC solid;
@@ -32,21 +36,17 @@
 	margin-bottom: -10px;
 }
 
-/* PopupDateTimeField styles */
-#embargoExpiry .popupdatetime , #embargoExpiry .popupdatetime ul {
-	float: left;
-	margin-right:3px;
+/* Overwrites weird global defaults in cms/css/typography.css which apply for <p>, but not for contained <span> */
+#embargoExpiry p * {
+	font-size: 12px;
 }
-/* DateTimeField styles */
-/*#embargoExpiry input {
-	width: auto;
-}*/
- #embargoExpiry .field.date, #embargoExpiry .field.time {
+
+#embargoExpiry .field.date, 
+#embargoExpiry .field.time,
+#embargoExpiry .field.dropdown {
+	clear: none;
 	float: left;
 	margin-top: -4px;
-}
-#embargoExpiry .field.time {
-	clear: none;
 }
 	 #embargoExpiry .field.date input, #embargoExpiry .field.time input {
 		width: auto;
@@ -57,4 +57,14 @@
 
 #CMSWorkflowTab{
 	padding-bottom: 16px;
+}
+
+/* Necessary if the fields are overloaded by the timezoneawareness module */
+#batchactions_options #EmbargoDate_Batch_Date,
+#batchactions_options #ExpiryDate_Batch_Date {
+	padding: 0;
+}
+
+#ExpiryWorkflowWarning {
+	margin-top: 1em;
 }

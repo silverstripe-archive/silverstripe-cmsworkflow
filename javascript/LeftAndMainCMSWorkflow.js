@@ -133,6 +133,11 @@ var EmbargoExpiry = {
 	embargoUnsaved: false,
 	expiryUnsaved: false,
 	init: function() {
+		jQuery('#EmbargoDate-date').change(EmbargoExpiry.embargoChange);
+		jQuery('#EmbargoDate-time').change(EmbargoExpiry.embargoChange);
+		jQuery('#ExpiryDate-date').change(EmbargoExpiry.expiryChange);
+		jQuery('#ExpiryDate-time').change(EmbargoExpiry.expiryChange);
+
 		EmbargoExpiry.fieldCheck();
 
 		var ids = EmbargoExpiry.ids('embargo');
@@ -221,25 +226,14 @@ var EmbargoExpiry = {
 		alert("There was an error processing that request:\n\n"+data.message);
 	},
 	ids: function(forWhat) {
-		var dateSuffix, timeSuffix;
-		if(document.getElementById('ExpiryDate_Date') || document.getElementById('EmbargoDate_Date')) {
-			// PopupDateTimeField
-			dateSuffix = '_Date';
-			timeSuffix = '_Time';
-		} else {
-			// DateTimeField
-			dateSuffix = '-date';
-			timeSuffix = '-time';
-		}
-		
 		switch(forWhat) {
 			case 'expiry':
 				return {
 					resetButton: 'resetExpiryButton',
 					saveButton: 'saveExpiryButton',
-					dateField: 'ExpiryDate' + dateSuffix,
-					timeField: 'ExpiryDate' + timeSuffix,
-					timezoneField: 'ExpiryDate_TimeZone',
+					dateField: 'ExpiryDate-date',
+					timeField: 'ExpiryDate-time',
+					timezoneField: 'ExpiryDate-timezone',
 					wholeMessage: 'embargoExpiry-expiryStatus',
 					dateTime: 'expiryDate',
 					what: 'expiry'
@@ -248,9 +242,9 @@ var EmbargoExpiry = {
 				return {
 					resetButton: 'resetEmbargoButton',
 					saveButton: 'saveEmbargoButton',
-					dateField: 'EmbargoDate' + dateSuffix,
-					timeField: 'EmbargoDate' + timeSuffix,
-					timezoneField: 'EmbargoDate_TimeZone',
+					dateField: 'EmbargoDate-date',
+					timeField: 'EmbargoDate-time',
+					timezoneField: 'EmbargoDate-timezone',
 					wholeMessage: 'embargoExpiry-embargoStatus',
 					dateTime: 'embargoDate',
 					what: 'embargo'
@@ -296,22 +290,24 @@ var EmbargoExpiry = {
 			if ($(ids.dateField).value == '' || $(ids.timeField).value == '') {
 				EmbargoExpiry.dButton(ids.saveButton);
 				EmbargoExpiry.dButton(ids.resetButton);
+				EmbargoExpiry.setExpiryWarning(false);
 			} else {
 				EmbargoExpiry.eButton(ids.saveButton);
 				EmbargoExpiry.eButton(ids.resetButton);
+				EmbargoExpiry.setExpiryWarning(true);
 			}
 		}
+	},
+	setExpiryWarning: function(shouldDisplay) {
+		var el = $('ExpiryWorkflowWarning');
+		if(el) el.style.display = shouldDisplay ? '' : 'none';
 	}
 };
 
 Behaviour.register({
-	'#EmbargoDate_Time' : {
-		initialize: EmbargoExpiry.init,
-		onchange: EmbargoExpiry.embargoChange
-	},
-	'#EmbargoDate_Date' : { onchange: EmbargoExpiry.embargoChange },
-	'#ExpiryDate_Date' : { onchange: EmbargoExpiry.expiryChange },
-	'#ExpiryDate_Time' : { onchange: EmbargoExpiry.expiryChange }
+	'#embargoExpiry' : {
+		initialize: EmbargoExpiry.init
+	}
 });
 
 var autoSave_original = autoSave;
@@ -322,7 +318,7 @@ autoSave = function(confirmation, callAfter) {
 		}
 	}
 	return autoSave_original(confirmation, callAfter);
-}
+};
 
 var save_original = CMSForm.prototype.save;
 CMSForm.prototype.save = function(ifChanged, callAfter, action, publish) {
@@ -335,7 +331,7 @@ CMSForm.prototype.save = function(ifChanged, callAfter, action, publish) {
 		}
 	}
 	return save_original.call(this, ifChanged, callAfter, action, publish);
-}
+};
 
 function action_publish_right(e) {
 	var messageEl = null;
@@ -347,8 +343,10 @@ function action_publish_right(e) {
 		messageEl = CMSWorkflow.createPromptElement('WorkflowComment', 'Please comment on this publication, if applicable.');
 	}
 	$('Form_EditForm').appendChild(messageEl);
-	$('Form_EditForm_action_publish').value = ss.i18n._t('CMSMAIN.PUBLISHING');
-	$('Form_EditForm_action_publish').className = 'action loading';
+	
+	// Don't need to restore the button state after ajax success because the form is replaced completely
+	var btn = jQuery('#Form_EditForm_action_publish');
+	btn.val(ss.i18n._t('CMSMAIN.PUBLISHING')).addClass('loading').attr('disabled', 'disabled');
 	$('Form_EditForm').save(false, null, 'cms_publishwithcomment', true);
 	$('Form_EditForm').removeChild(messageEl);
 }
@@ -370,7 +368,29 @@ Behaviour.register({
 			if(this.checked) this.click();
 		},
 		onclick: function() {
-			$('PublisherGroups').style.display = (this.value == 'OnlyTheseUsers') ? 'block' : 'none'
+			$('PublisherGroups').style.display = (this.value == 'OnlyTheseUsers') ? 'block' : 'none';
 		}
 	}
 });
+
+(function($) {
+	// Limit date range for start/end date on reports
+	$('.ReportAdmin input[name="StartDate\[date\]"], .ReportAdmin .field.datetime input[name="EndDate\[date\]"]').live('change', function(e) {
+		// Don't apply if ssDatepicker plugin isn't present (e.g. in SilverStripe 2.4),
+		// or if no datepicker has been applied to the field (configurable via the "showcalendar" option in DateField.php)
+		if(!$.fn.ssDatepicker || !$(this).data('datepicker')) return;
+		
+		var $thisField = $(this), isStart = $thisField.is('[name="StartDate\[date\]"]'), isEnd = !isStart;
+			
+		var holder = $thisField.parents('form'), 
+			otherFieldName = isStart ? 'EndDate\[date\]' : 'StartDate\[date\]',
+			$otherField = holder.find('input[name="' + otherFieldName + '"]');
+			
+		$otherField.ssDatepicker();
+		$otherField.datepicker(
+			'option', 
+			isStart ? 'minDate' : 'maxDate', 
+			$.datepicker.parseDate($otherField.datepicker('option', 'dateFormat'), $thisField.val())
+		);
+	});
+}(jQuery));

@@ -233,6 +233,8 @@ class TwoStepWorkflowTest extends FunctionalTest {
 		$page->CanPublishType = 'OnlyTheseUsers';
 		$page->write();
 		$page->PublisherGroups()->add($customauthorgroup);
+		SiteTreeFutureState::on_db_reset();
+		
 		$this->assertTrue($page->canPublish($customauthor));
 		
 		$custompublisher->logIn();

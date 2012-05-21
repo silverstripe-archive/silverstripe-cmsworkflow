@@ -100,7 +100,7 @@ class WorkflowDeletionRequest extends WorkflowRequest implements i18nEntityProvi
 		$this->write();
 
 		$page = $this->Page();
-		$page->deleteFromStage('Live');
+		$page->doDeleteFromLive();
 
 		// @todo Coupling to UI :-(
 		FormResponse::add(LeftAndMain::deleteTreeNodeJS($page));

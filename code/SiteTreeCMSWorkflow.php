@@ -50,6 +50,9 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 			'db' => array(
 				"ExpiryDate" => "SS_Datetime",
 			),
+			'has_one' => array(
+				'LatestCompletedWorkflowRequest' => 'WorkflowRequest'
+			),
 			'has_many' => array(
 				// has_one OpenWorkflowRequest is implemented as custom getter
 				'WorkflowRequests' => 'WorkflowRequest'
@@ -179,28 +182,40 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		// Check if there is an expiry date...
 		$liveVersion = Versioned::get_one_by_stage('SiteTree', 'Live', "\"SiteTree_Live\".\"ID\" = {$this->owner->ID}");
 		if ($liveVersion && $liveVersion->ExpiryDate != null && $liveVersion->ExpiryDate != '0000-00-00 00:00:00') {
+			// TODO Remove TZDateTimeField dependency
 			if (class_exists('TZDateTimeField')) {
-				$tzConverter = new TZDateTimeField('ExpiryDate', 'Expiry Date', $liveVersion->ExpiryDate, SiteConfig::current_site_config()->Timezone);
+				$tzField = new TZDateTimeField('ExpiryDate', 'Expiry Date', $liveVersion->ExpiryDate);
+				$zones = $tzField->getTimezones();
 				$fields->addFieldsToTab('Root.Expiry', array(
-							new LiteralField('ExpiryWarning', "<p>This page is scheduled to expire at ".$tzConverter->SS_Datetime()->Nice24().', '.$tzConverter->DefaultTimezoneName().' time. <a href="' . $this->ViewExpiredLink() . '" target="_blank">View site on date</a></p>')
-							));
+					new LiteralField(
+						'ExpiryWarning', 
+						sprintf(
+							'<p>This page is scheduled to expire at %s, %s time. <a href="%s" target="_blank">View site on date</a></p>',
+							DBField::create('SS_Datetime', $tzField->dataValue())->Nice24(),
+							@$zones[$tzField->getConfig('usertimezone')],
+							$this->ViewExpiredLink()
+						)
+					)
+				));
 			} else {
-				$tzfield = new DateTimeField('ExpiryDate', 'Expiry Date', $liveVersion->ExpiryDate);
+				$tzfield = Object::create('DateTimeField', 'ExpiryDate', 'Expiry Date', $liveVersion->ExpiryDate);
 				$datetime = $liveVersion->dbObject('ExpiryDate');
 				$fields->addFieldsToTab('Root.Expiry', array(
-							new LiteralField('ExpiryWarning', "<p>This page is scheduled to expire at "
-								. $datetime->Time()
-								. ', on '
-								. $datetime->Long()
-								. '. <a href="' 
-								. $this->ViewExpiredLink() 
-								. '" target="_blank">View site on date</a></p>')
-							));
+					new LiteralField(
+						'ExpiryWarning', 
+						sprintf(
+							'<p>This page is scheduled to expire at %s, on %s <a href="%s" target="_blank">View site on date</a></p>',
+							$datetime->Time(),
+							$datetime->Long(),
+							$this->ViewExpiredLink()
+						)
+					)
+				));
 			}
 			if ($this->owner->BackLinkTracking() && $this->owner->BackLinkTracking()->Count() > 0) {
 				$fields->addFieldsToTab('Root.Expiry', array(
 					new HeaderField("Please check these pages", 2),
-					new LiteralField('ExpiryBacklinkWarning', "This page is scheduled to expire, but the following pages link to it"),
+					new LiteralField('ExpiryBacklinkWarning', "<p>This page is scheduled to expire, but the following pages link to it.</p>"),
 					$this->BacklinkTable()
 				));
 			}
@@ -210,38 +225,35 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	}
 	
 	public function ViewExpiredLink() {
-		$link = $this->owner->AbsoluteLink();
-		
-		if(class_exists('Subsite') && $this->owner->SubsiteID) {
-			$link = preg_replace('/\/\/[^\/]+\//', '//' .  $this->owner->Subsite()->domain() . '/', $link);
-		}
-		return $link . '?futureDate=' . $this->owner->dbObject('ExpiryDate')->URLDatetime();
+		return $this->owner->AbsoluteLink() . '?futureDate=' . $this->owner->dbObject('ExpiryDate')->URLDatetime();
 	}
 	
 	function BacklinkTable() {
-	 	$backLinksTable = new TableListField(
-			'BackLinkTrackingWorkflow',
-			'SiteTree',
-			array(
-				'Title' => 'Title',
-				'AbsoluteLink' => 'URL'
-			),
-			'"ChildID" = ' . $this->owner->ID,
-			'',
-			'LEFT JOIN "SiteTree_LinkTracking" ON "SiteTree"."ID" = "SiteTree_LinkTracking"."SiteTreeID"'
+		$dependentColumns = array(
+			'Title' => 'Title',
+			'Subsite.Title' => 'Subsite',
+			'AbsoluteLink' => 'URL',
+			'DependentLinkType' => 'Link type',
 		);
-
-		$backLinksTable->setFieldFormatting(array(
+		if(!class_exists('Subsite')) unset($dependentColumns['Subsite.Title']);
+		
+		$dependentNote = new LiteralField('DependentNote', '<p>' . _t('SiteTree.DEPENDENT_NOTE', 'The following pages depend on this page. This includes virtual pages, redirector pages, and pages with content links.') . '</p>');
+		$dependentTable = new TableListField(
+			'DependentPagesOnExpiry',
+			'SiteTree',
+			$dependentColumns
+		);
+		$dependentTable->setCustomSourceItems($this->owner->DependentPages(false));
+		$dependentTable->setFieldFormatting(array(
 			'Title' => '<a href=\"admin/show/$ID\">$Title</a>',
-			'AbsoluteLink' => '$value " . ($AbsoluteLiveLink ? "<a target=\"_blank\" href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a target=\"_blank\" href=\"$value?stage=Stage\">(draft)</a>'
+			'AbsoluteLink' => '<a href=\"$value\">$value</a>',
 		));
-
-		$backLinksTable->setPermissions(array(
+		$dependentTable->setPermissions(array(
 			'show',
 			'export'
 		));
 		
-		return $backLinksTable;
+		return $dependentTable;
 	}
 	
 	/**
@@ -384,7 +396,7 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		
 		if($this->owner->ReviewPeriodDays) {
 			$this->owner->NextReviewDate = date('Y-m-d', strtotime('+' . $this->owner->ReviewPeriodDays . ' days'));
-			$this->owner->write();
+			$this->owner->writeWithoutVersion();
 		}
 	}
 	
@@ -402,6 +414,11 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 		if($wf = $this->openWorkflowRequest()) {
 			$wf->deny(_t('SiteTreeCMSWorkflow.AUTO_DENIED', "(automatically denied)"));
 		}
+	}
+	
+	function onBeforeDuplicate() {
+		// Explicitly set expiry to null, it shouldn't persist in copies
+		$this->owner->ExpiryDate = null;
 	}
 
 	function providePermissions() {

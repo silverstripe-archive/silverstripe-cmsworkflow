@@ -48,7 +48,7 @@ SiteTree:
     pagedel3:
         Title: Page3
         ExpiryDate: 2010-02-16 15:00:00
-        
+
 SiteConfig:
     default:
         CanPublishType: OnlyTheseUsers
