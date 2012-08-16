@@ -27,7 +27,11 @@ class RecentlyPublishedPagesReport extends SS_Report {
 			'PublisherTitle' => 'Publisher',
 			'AbsoluteLink' => array(
 				'title' => 'URL',
-				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a target=\"_blank\" href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " " . (!$IsDeletedFromStage ? "<a target=\"_blank\" href=\"$AbsoluteLink\">(draft)</a>" : "") . "'
+				'formatting' => '$value <br />" . ($AbsoluteLiveLink ? "<a target=\"_blank\" href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " " . (!$IsDeletedFromStage ? "<a target=\"_blank\" href=\"$AbsoluteLink\">(draft)</a>" : "") . "'
+			),
+			'DiffLink' => array(
+				'title' => 'Changes',
+				'formatting' => '<a target=\"_blank\" href=\"$DiffLink\">' . _t('PublishedPages.ShowChanges', 'Show changes') . '</a>'
 			),
 			'ExpiryDate' => array(
 				'title' => 'Expiry',
@@ -49,33 +53,38 @@ class RecentlyPublishedPagesReport extends SS_Report {
 				if($val) $field->setValue($val);
 			}
 		}
-		
+
+		$summarize = (isset($params['SummarizeChanges']) && $params['SummarizeChanges']);
+
 		$origStage = Versioned::current_stage();
 		Versioned::reading_stage('Live');
-		$q = singleton('SiteTree')->extendedSQL();
+		$join = implode(' ', array(
+			'LEFT JOIN "WorkflowRequest" ON "WorkflowRequest"."PageID" = "SiteTree_Live"."ID"',
+			'LEFT JOIN "Member" ON "WorkflowRequest"."PublisherID" = "Member"."ID"'
+		));
+		$q = singleton('SiteTree')->extendedSQL(null, null, null, $join);
 		Versioned::reading_stage($origStage);
 		$q->select[] = '"SiteTree_Live"."Title" AS "PageTitle"';
-	
-		$q->leftJoin('WorkflowRequest', '"WorkflowRequest"."PageID" = "SiteTree_Live"."ID"');
 		$q->select[] = "\"WorkflowRequest\".\"LastEdited\" AS \"Published\"";
+		$q->groupby[] = "\"WorkflowRequest\".\"LastEdited\"";
 		$q->where[] = "\"WorkflowRequest\".\"ClassName\" = 'WorkflowPublicationRequest'";
 		$q->where[] = "\"WorkflowRequest\".\"Status\" = 'Completed'";
-		
-		
-		$q->leftJoin('Member', '"WorkflowRequest"."PublisherID" = "Member"."ID"');
+		$q->select[] = 'COUNT("WorkflowRequest"."Status") AS "WorkflowRequestCount"';
 		$q->select[] = Member::get_title_sql().' AS "PublisherTitle"';
+		$q->groupby[] = '"Member"."FirstName"';
+		$q->groupby[] = '"Member"."Surname"';
 		
 		// restrict to member id
 		if (!empty($params['memberId']) && DataObject::get_by_id('Member', $params['memberId'])) {
 			$q->where[] = "\"Member\".\"ID\" = ".Convert::raw2sql($params['memberId']);
+			$q->groupby[] = '"Member"."ID"';
 		}
 		
+		// Date calculations
 		$startDate = !empty($params['StartDate']) ? $params['StartDate'] : null;
 		$endDate = !empty($params['EndDate']) ? $params['EndDate'] : null;
-		
 		if($startDate) $startDate = $fields->dataFieldByName('StartDate')->dataValue();
 		if($endDate) $endDate = $fields->dataFieldByName('EndDate')->dataValue();
-		
 		if ($startDate && $endDate) {
 			$q->where[] = "\"WorkflowRequest\".\"LastEdited\" >= '".Convert::raw2sql($startDate)."' AND \"WorkflowRequest\".\"LastEdited\" <= '".Convert::raw2sql($endDate)."'";
 		} else if ($startDate && !$endDate) {
@@ -85,7 +94,6 @@ class RecentlyPublishedPagesReport extends SS_Report {
 		} else {
 			$q->where[] = "\"WorkflowRequest\".\"LastEdited\" >= '".SS_Datetime::now()->URLDate()."'";
 		}
-		
 		
 		// Turn a query into records
 		if($sort) {
@@ -101,11 +109,54 @@ class RecentlyPublishedPagesReport extends SS_Report {
 
 			$q->orderby = $sort;
 		}
+
+		// Avoid duplicating records (=change entries) if summarizing the changes
+		if($summarize) array_unshift($q->groupby, '"SiteTree"."ID"');
+
+		// Fetch all records (unlimited)
 		$records = singleton('SiteTree')->buildDataObjectSet($q->execute(), 'DataObjectSet', $q);
 
-		// Apply limit after that filtering.
-		if($limit && $records) return $records->getRange($limit['start'], $limit['limit']);
-		else return $records;
+		// Apply limit after that filtering
+		if($limit && $records) $records = $records->getRange($limit['start'], $limit['limit']);
+
+		if($records) foreach($records as $record) {
+			if($startDate) {
+				$fromVersionRecords = $record->allVersions(
+					sprintf('"SiteTree_versions"."LastEdited" < \'%s\'', Convert::raw2sql($startDate)),
+					'"SiteTree_versions"."Version" DESC',
+					1
+				);
+				$fromVersion = $fromVersionRecords->Count() ? $fromVersionRecords->First()->Version : 1;
+			} else if($summarize) {
+				$fromVersion = ($record->Version > 1) ? $record->Version - 1 : 1;
+			} else {
+				$fromVersion = 1;
+			} 
+
+			if($endDate && $summarize) {
+				$toVersionRecords = $record->allVersions(
+					sprintf('"SiteTree_versions"."LastEdited" < \'%s\'', Convert::raw2sql($endDate)),
+					'"SiteTree_versions"."Version" DESC',
+					1
+				);
+				$toVersion = $toVersionRecords->Count() ? $toVersionRecords->First()->Version : $record->Version;
+			} else if($summarize) {
+				$toVersion = $record->Version;
+			} else {
+				$toVersion = $record->Version;
+			} 
+			
+			$record->DiffLink = sprintf(
+				'%s/%d/?From=%d&To=%d',
+				singleton('CMSMain')->Link('compareversions'),
+				$record->ID,
+				// Note changed parameter order, naming doesn't match logic in core
+				$toVersion,
+				$fromVersion
+			);
+		}
+
+		return $records;
 	}
 	
 	function parameterFields() {
@@ -120,8 +171,14 @@ class RecentlyPublishedPagesReport extends SS_Report {
 		
 		$params->push($startDate = Object::create('DatetimeField', 'StartDate', 'Start date'));
 		$params->push($endDate = Object::create('DatetimeField', 'EndDate', 'End date'));
+		$startDate->getDateField()->setConfig('showcalendar', true);
 		$startDate->getTimeField()->setValue('23:59:59');
+		$endDate->getDateField()->setConfig('showcalendar', true);
 		$endDate->getTimeField()->setValue('23:59:59');
+
+		$params->push(new CheckboxField(
+			'SummarizeChanges', _t('RecentlyPublishedPagesReport.Summarize', 'Summarize changes?')
+		));
 		
 		return $params;
 	}
