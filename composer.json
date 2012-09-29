@@ -1,10 +1,6 @@
 {
 	"name": "silverstripe/cmsworkflow",
-	"description": "Adds a publishing workflow to the CMS, in which content authors
-		can request publication from a group of administrators. The permissions for
-		content ownership and publication are configurable on a page-by-page basis.
-		The module acts on top of the built-in staging/live workflow. It is modeled
-		closely to fit a document-based sequential publication context.",
+	"description": "Adds a publishing workflow to the CMS, in which content authors can request publication from a group of administrators.",
 	"type": "silverstripe-module",
 	"keywords": ["silverstripe", "cmsworkflow"],
 	"authors": [
@@ -20,7 +16,7 @@
 	"minimum-stability": "dev",
 	"require":
 	{
-		"silverstripe/framework": ">=2.4.*",
+		"silverstripe/framework": ">=2.4",
 		"silverstripe/legacydatetimefields": "dev-master"
 	}
 }
