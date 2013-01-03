@@ -1,0 +1,21 @@
+{
+  "name": "silverstripe/cmsworkflow",
+	"description": "Two- and three-step approval workflow for page content in SilverStripe CMS",
+	"type": "silverstripe-module",
+	"keywords": ["silverstripe", "workflow"],
+	"authors": [
+	{
+		"name": "Mark Stephens",
+		"email": "mark@silverstripe.com"
+	},
+  {
+  	"name": "Rainer Spittel",
+		"email": "rainer@silverstripe.com"
+	}
+	],
+	"require":
+	{
+		"silverstripe/framework": "~2.3",
+		"silverstripe/cms": "~2.3"
+	}
+}
