@@ -174,9 +174,19 @@ class SiteTreeCMSWorkflow extends DataObjectDecorator {
 	
 	public function updateCMSFields(&$fields) {
 		if($wf = $this->openWorkflowRequest()) {
-			$fields->fieldByName('Root')->insertBefore(new Tab("Workflow",
-				new LiteralField("WorkflowInfo", $this->owner->renderWith("SiteTreeCMSWorkflow_workflowtab"))
-			), "Content");
+			$workflowTab = $fields->fieldByName( 'Root' )->fieldByName( 'Workflow' );
+			$workflowField = new LiteralField( 'WorkflowInfo', $this->owner->renderWith( 'SiteTreeCMSWorkflow_workflowtab' ) );
+			if( $workflowTab ) {
+				if( $workflowTab->fieldByName( 'WorkflowInfo' ) ) {
+					$workflowTab->replaceField( 'WorkflowInfo', $workflowField );
+				} else {
+					$workflowTab->push( $workflowField );
+				}
+			} else {
+				$fields->fieldByName( 'Root' )->insertBefore( new Tab( 'Workflow',
+					$workflowField
+				), 'Content' );
+			}
 		}
 		
 		// Check if there is an expiry date...
